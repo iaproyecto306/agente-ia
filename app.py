@@ -1,63 +1,50 @@
 import streamlit as st
 from google import genai
 
-# --- 1. CONFIGURACIÓN DE IA ---
+# --- CONFIGURACIÓN DE IA ---
 API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 
-# Conexión estable v1
-client = genai.Client(api_key=API_KEY, http_options={'api_version': 'v1'})
+# Conexión sin forzar versión de API para que use la que mejor le funcione a tu clave
+client = genai.Client(api_key=API_KEY)
 
 def generar_texto(prompt, idioma):
-    # Lista corregida de nombres de modelos
-    modelos_a_probar = [
-        'gemini-1.5-flash',
-        'gemini-1.5-flash-002',
-        'gemini-1.5-pro'
-    ]
-    
-    ultimo_error = ""
-    
-    for nombre in modelos_a_probar:
-        try:
-            response = client.models.generate_content(
-                model=nombre,
-                contents=f"Actúa como experto inmobiliario. Escribe en {idioma}: {prompt}"
-            )
-            if response and response.text:
-                return response.text
-        except Exception as e:
-            ultimo_error = str(e)
-            continue
-            
-    # SI TODO FALLA: Esto nos dirá qué modelos tienes tú permitidos exactamente
     try:
-        modelos_reales = [m.name for m in client.models.list()]
-        return f"ERROR_SISTEMA: No se encontró el modelo. Modelos disponibles en tu cuenta: {modelos_reales}"
-    except:
-        return f"ERROR_SISTEMA: Error crítico. Detalle: {ultimo_error}"
+        # PASO 1: Listamos los modelos que Google te permite usar a TI
+        modelos_disponibles = [m.name for m in client.models.list() if 'generateContent' in m.supported_methods]
+        
+        if not modelos_disponibles:
+            return "ERROR_SISTEMA: Tu API Key no tiene modelos con permiso de generación habilitados."
 
-# --- 2. INTERFAZ ---
-st.set_page_config(page_title="IA Realty Pro", layout="centered")
+        # PASO 2: Intentamos generar con el primero de la lista (el más compatible)
+        # Normalmente el primero es gemini-1.5-flash
+        modelo_a_usar = modelos_disponibles[0]
+        
+        response = client.models.generate_content(
+            model=modelo_a_usar,
+            contents=f"Como experto inmobiliario, escribe en {idioma}: {prompt}"
+        )
+        
+        if response and response.text:
+            return response.text
+        return "ERROR_SISTEMA: El modelo respondió pero sin texto."
+
+    except Exception as e:
+        return f"ERROR_SISTEMA: {str(e)}"
+
+# --- INTERFAZ ---
 st.title("🏢 IA Realty Pro")
+user_input = st.text_area("Describe la propiedad:")
 
-if "idioma" not in st.session_state:
-    st.session_state.idioma = "Español"
-
-idioma = st.radio("Idioma:", ["Español", "English"], horizontal=True)
-st.session_state.idioma = idioma
-
-user_input = st.text_area("Describe la propiedad (ej: Apartamento moderno en el centro):")
-
-if st.button("✨ GENERAR ANUNCIO"):
+if st.button("GENERAR"):
     if user_input:
-        with st.spinner("Buscando el modelo correcto en tu cuenta..."):
-            resultado = generar_texto(user_input, st.session_state.idioma)
-            
+        with st.spinner("Buscando modelo compatible..."):
+            resultado = generar_texto(user_input, "Español")
             if "ERROR_SISTEMA" in resultado:
-                st.error("Error de configuración de Google")
-                st.info(resultado)
+                st.error(resultado)
+                # Mostramos un botón para depurar si falla
+                if st.button("Ver mis modelos permitidos"):
+                    modelos = [m.name for m in client.models.list()]
+                    st.write(modelos)
             else:
-                st.success("¡Anuncio generado!")
+                st.success("¡Éxito!")
                 st.write(resultado)
-    else:
-        st.warning("Por favor, ingresa una descripción.")
