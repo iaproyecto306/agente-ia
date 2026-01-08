@@ -12,27 +12,28 @@ except Exception as e:
 
 # CORRECCIÓN AQUÍ: Ahora acepta 'idioma' para evitar el TypeError
 def generar_texto(prompt, idioma):
-    try:
-        # Usamos el nombre técnico completo para evitar el error 404
-        # Esta ruta es compatible con todas las versiones de la API
-        model = genai.GenerativeModel('models/gemini-1.5-flash') 
-        
-        prompt_final = f"Actúa como experto inmobiliario. Escribe en {idioma}: {prompt}"
-        
-        response = model.generate_content(prompt_final)
-        
-        if response and response.text:
-            return response.text
-        else:
-            return "El modelo no devolvió texto. Prueba describiendo más la propiedad."
-    except Exception as e:
-        # Si el anterior falla, intentamos con el alias 'gemini-1.5-flash-latest'
+    # Lista de nombres de modelos para probar (de más nuevo a más compatible)
+    modelos_a_probar = [
+        'gemini-1.5-flash',        # Ruta estándar
+        'models/gemini-1.5-flash', # Ruta técnica completa
+        'gemini-pro'               # Ruta clásica estable
+    ]
+    
+    ultimo_error = ""
+    
+    for nombre_modelo in modelos_a_probar:
         try:
-            model_alt = genai.GenerativeModel('gemini-1.5-flash-latest')
-            response = model_alt.generate_content(f"Idioma {idioma}: {prompt}")
-            return response.text
-        except Exception as e_alt:
-            return f"ERROR_SISTEMA: {str(e_alt)}"
+            model = genai.GenerativeModel(nombre_modelo)
+            prompt_final = f"Como experto inmobiliario, escribe en {idioma}: {prompt}"
+            response = model.generate_content(prompt_final)
+            
+            if response and response.text:
+                return response.text
+        except Exception as e:
+            ultimo_error = str(e)
+            continue # Si falla uno, intenta el siguiente
+            
+    return f"ERROR_SISTEMA: No se pudo conectar con ningún modelo. Último error: {ultimo_error}" {str(e_alt)}"
 # --- 2. CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="IA Realty Pro", page_icon="🏢", layout="wide")
 
