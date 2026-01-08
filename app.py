@@ -285,12 +285,14 @@ st.markdown("""
 # --- 6. SECCIÓN CENTRAL ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
-    st.markdown(f'''
-        <div class="video-placeholder">
-            <div class="dynamic-tag">{L["p_destacada"]}</div>
-            <div class="carousel-label">{L["comunidad"]}</div>
-        </div>
-    ''', unsafe_allow_html=True)
+    # Empezamos directamente con el contenedor de la IA, sin el placeholder de video
+    st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
+    
+    user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
+    
+    # Aquí iría el botón que ya centramos antes...
+    # (El resto del código de ejecución)
+   
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
