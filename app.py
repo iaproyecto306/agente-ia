@@ -1,19 +1,28 @@
-import os
-from dotenv import load_dotenv
+import streamlit as st
+from openai import OpenAI
 
-# Esto busca la clave en el archivo oculto .env
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
+# --- 1. CONFIGURACIÓN DE IA SEGURA ---
+# Intentamos obtener la clave de los secretos de Streamlit
+try:
+    api_key = st.secrets["OPENAI_API_KEY"]
+    client = OpenAI(api_key=api_key)
+except Exception:
+    st.warning("⚠️ Configuración pendiente: Por favor, añade la API Key en los Secrets de Streamlit.")
+    st.stop()
 
-client = OpenAI(api_key=api_key)
 def generar_texto(prompt):
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(prompt)
-        return response.text
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "Eres un experto inmobiliario de lujo."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7
+        )
+        return response.choices[0].message.content
     except Exception as e:
         return f"ERROR_TECNICO: {str(e)}"
-
 # --- 2. CONFIGURACIÓN INICIAL ---
 st.set_page_config(
     page_title="IA Realty Pro",
