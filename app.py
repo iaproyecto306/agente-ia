@@ -8,13 +8,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. ESTILOS CSS (RESTAURANDO TODO EL COLOR Y AURA) ---
+# --- 2. ESTILOS CSS (SIN CAMBIOS, SOLO AJUSTE DE ALTURA) ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
     .header-logo { font-size: 1.5rem; font-weight: 700; color: #fff; display: flex; align-items: center; }
     
-    /* FRASE PRINCIPAL CON COLOR Y AURA RESTAURADOS */
     .neon-title { 
         font-size: 3.5rem; 
         font-weight: 800; 
@@ -29,7 +28,6 @@ st.markdown("""
     }
     .subtitle { text-align: center; font-size: 1.2rem; color: #aaa; margin-bottom: 40px; }
     
-    /* TOOLTIPS */
     .info-icon {
         display: inline-block;
         width: 14px; height: 14px;
@@ -51,7 +49,6 @@ st.markdown("""
         border: 1px solid rgba(255,255,255,0.1);
     }
 
-    /* CARRUSEL PUBLICITARIO */
     .video-placeholder {
         border: 1px solid rgba(0, 210, 255, 0.2);
         border-radius: 12px; height: 220px;
@@ -70,11 +67,9 @@ st.markdown("""
     .ad-badge { position: absolute; top: 15px; left: 15px; background: rgba(0, 210, 255, 0.9); color: black; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; }
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
 
-    /* CONTENEDOR DE INPUT */
     .glass-container { background: rgba(38, 39, 48, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; }
     .stTextArea textarea { background-color: rgba(0,0,0,0.3) !important; border: 1px solid #444 !important; color: #eee !important; }
 
-    /* BOTONES */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; 
         border: none !important; 
@@ -84,15 +79,21 @@ st.markdown("""
     }
     div.stButton > button[kind="primary"]:hover { transform: scale(1.05) !important; box-shadow: 0 0 30px rgba(0, 210, 255, 0.7) !important; }
 
-    /* TARJETAS DE PLANES */
-    .free-card, .pro-card, .agency-card { transition: all 0.4s ease-out !important; }
+    /* AJUSTE DE ALTURA PARA QUE TODOS TERMINEN IGUAL */
+    .free-card, .pro-card, .agency-card { 
+        transition: all 0.4s ease-out !important; 
+        min-height: 380px !important; /* Forzamos altura mínima igual para todos */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+    
     .free-card:hover { transform: translateY(-10px) !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; }
     .pro-card { border: 1px solid rgba(0, 210, 255, 0.3) !important; }
     .pro-card:hover { transform: translateY(-10px) !important; border-color: #00d2ff !important; box-shadow: 0 0 40px rgba(0, 210, 255, 0.4) !important; }
     .agency-card { border: 1px solid rgba(221, 160, 221, 0.3) !important; }
     .agency-card:hover { transform: translateY(-10px) !important; border-color: #DDA0DD !important; box-shadow: 0 0 40px rgba(221, 160, 221, 0.4) !important; }
 
-    /* BOTONES DE COMPRA */
     [data-testid="column"]:nth-child(1) button { border: 1px solid #444 !important; color: #888 !important; }
     [data-testid="column"]:nth-child(2) button { border: 2px solid #00d2ff !important; color: #00d2ff !important; }
     [data-testid="column"]:nth-child(3) button { border: 2px solid #DDA0DD !important; color: #DDA0DD !important; }
@@ -102,7 +103,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. LOGICA DE IDIOMAS ---
+# --- 3. LÓGICA DE IDIOMAS ---
 if "idioma" not in st.session_state:
     st.session_state.idioma = "Español"
 
@@ -114,7 +115,6 @@ with col_lang:
     idioma_selec = st.selectbox("", ["Español", "English", "Português"], label_visibility="collapsed")
     st.session_state.idioma = idioma_selec
 
-# Traducciones rápidas
 textos = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
@@ -147,7 +147,7 @@ with c2:
     st.button("✨ GENERAR DESCRIPCIÓN", type="primary")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 6. PLANES CON TOOLTIPS ---
+# --- 6. PLANES ---
 desc_free = """
 3 descripciones / día <span class="info-icon" data-tooltip="Límite diario de generaciones para probar la herramienta.">i</span><br>
 Soporte Básico <span class="info-icon" data-tooltip="Ayuda técnica vía email con respuesta en 48hs.">i</span><br>
