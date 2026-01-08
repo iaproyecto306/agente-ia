@@ -10,7 +10,6 @@ try:
 except Exception as e:
     st.error(f"Error de configuración: {e}")
 
-# CORRECCIÓN AQUÍ: Ahora acepta 'idioma' para evitar el TypeError
 def generar_texto(prompt, idioma):
     # Lista de nombres de modelos para probar
     modelos_a_probar = [
@@ -29,8 +28,11 @@ def generar_texto(prompt, idioma):
             if response and response.text:
                 return response.text
         except Exception as e:
+            # Aquí estaba el error, ahora está alineado con el código de arriba
             ultimo_error = str(e)
             continue 
+            
+    return f"ERROR_SISTEMA: No se pudo conectar. Último error: {ultimo_error}"
             
     # Línea corregida (sin la llave extra al final)
     return f"ERROR_SISTEMA: No se pudo conectar. Último error: {ultimo_error}"
