@@ -295,6 +295,16 @@ with c2:
     
     st.markdown('</div>', unsafe_allow_html=True)
 
+# --- NUEVA SECCIÓN: CÓMO FUNCIONA ---
+st.markdown("<br><br><h2 style='text-align:center; color:white;'>¿Cómo funciona IA Realty Pro?</h2>", unsafe_allow_html=True)
+c1, c2, c3 = st.columns(3)
+with c1:
+    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>Pega el Link</b><br>O escribe una descripción breve.</p></div>", unsafe_allow_html=True)
+with c2:
+    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>IA Analiza</b><br>Optimizamos para SEO y ventas.</p></div>", unsafe_allow_html=True)
+with c3:
+    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>Publica</b><br>Copia el texto y atrae clientes.</p></div>", unsafe_allow_html=True)
+
 # --- AGREGADO: ESTADÍSTICAS (Impacto) ---
 st.markdown("<br>", unsafe_allow_html=True)
 col_stat1, col_stat2, col_stat3 = st.columns(3)
@@ -322,15 +332,7 @@ with col_stat3:
             <p style="color:#aaa; font-size:0.9rem;">Más Consultas</p>
         </div>
     """, unsafe_allow_html=True)
-# --- NUEVA SECCIÓN: CÓMO FUNCIONA ---
-st.markdown("<br><br><h2 style='text-align:center; color:white;'>¿Cómo funciona IA Realty Pro?</h2>", unsafe_allow_html=True)
-c1, c2, c3 = st.columns(3)
-with c1:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>Pega el Link</b><br>O escribe una descripción breve.</p></div>", unsafe_allow_html=True)
-with c2:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>IA Analiza</b><br>Optimizamos para SEO y ventas.</p></div>", unsafe_allow_html=True)
-with c3:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>Publica</b><br>Copia el texto y atrae clientes.</p></div>", unsafe_allow_html=True)
+
 # --- 7. PLANES ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
