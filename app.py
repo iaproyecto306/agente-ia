@@ -211,6 +211,40 @@ st.markdown("""
         55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
         80%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
     }
+    /* --- COMIENZO DE NUEVAS ANIMACIONES DE SCROLL --- */
+    
+    /* 1. Animación de aparición suave */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Aplicamos la aparición a las columnas y tarjetas al cargar/scrollear */
+    .stColumn, .card-wrapper, .glass-container {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    /* 2. Resplandor interactivo en el cuadro de texto */
+    textarea:focus {
+        border-color: #00d2ff !important;
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.3) !important;
+        background: rgba(255, 255, 255, 0.07) !important;
+        transition: all 0.3s ease;
+    }
+
+    /* 3. Refuerzo de brillo en hover para Planes */
+    .pro-card:hover { 
+        border: 1px solid rgba(0, 210, 255, 0.8) !important;
+    }
+    .agency-card:hover { 
+        border: 1px solid rgba(221, 160, 221, 0.8) !important;
+    }
+
+    /* --- FIN DE NUEVAS ANIMACIONES --- */
+
+    /* ESTO ES LO QUE YA TIENES (Mantenlo abajo): */
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
+</style>
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
 </style>
 """, unsafe_allow_html=True)
