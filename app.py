@@ -317,7 +317,7 @@ with c2:
                     st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
         else:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
-    st.markdown('</div>', unsafe_allow_html=True)
+    
     # --- AGREGADO: ESTADÍSTICAS (Impacto) ---
 st.markdown("<br>", unsafe_allow_html=True)
 col_stat1, col_stat2, col_stat3 = st.columns(3)
