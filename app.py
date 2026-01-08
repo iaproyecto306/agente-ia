@@ -281,18 +281,27 @@ with c2:
     user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
     if st.button(L['btn_gen'], key="main_gen", type="primary"):
+       user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
+    
+    # Esto crea el centrado del botón
+    st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
+    col_aux1, col_aux2, col_aux3 = st.columns([1, 2, 1])
+    
+    with col_aux2:
+        ejecutar = st.button(L['btn_gen'], key="main_gen", type="primary")
+
+    if ejecutar:
         if user_input:
             with st.spinner("Generando..."):
                 prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
                 resultado = generar_texto(prompt)
                 
                 if "ERROR_TECNICO" in resultado:
-                    st.error("Hubo un problema de conexión. Por favor, verifica tu API Key en la configuración.")
+                    st.error("Hubo un problema de conexión. Por favor, verifica tu API Key.")
                 else:
                     st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
         else:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
-    
     st.markdown('</div>', unsafe_allow_html=True)
     # --- AGREGADO: ESTADÍSTICAS (Impacto) ---
 st.markdown("<br>", unsafe_allow_html=True)
