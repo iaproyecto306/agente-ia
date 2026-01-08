@@ -231,16 +231,16 @@ st.markdown("""
 
   @keyframes auraChange {
         /* Cian: de la imagen 1 a la 3 */
-        0%, 64% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
+        0%, 60% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
         /* Violeta: Justo cuando entra la imagen 4 */
-        65%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
+        60%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
     }
 
     @keyframes tagColorChange {
         /* Cian: de la imagen 1 a la 3 */
-        0%, 64% { background: rgba(0, 210, 255, 1); } 
+        0%, 60% { background: rgba(0, 210, 255, 1); } 
         /* Violeta: Justo cuando entra la imagen 4 */
-        65%, 100% { background: rgba(221, 160, 221, 1); } 
+        60%, 100% { background: rgba(221, 160, 221, 1); } 
     }
 
     @keyframes adCarousel {
