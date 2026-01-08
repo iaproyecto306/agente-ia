@@ -1,5 +1,6 @@
 import streamlit as st
 import time
+from openai import OpenAI
 
 # --- 1. CONFIGURACIÓN INICIAL ---
 st.set_page_config(
@@ -9,310 +10,148 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. ESTILOS CSS ---
+# --- 2. CONEXIÓN CON EL CEREBRO (OPENAI) ---
+try:
+    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+except Exception:
+    client = None
+
+# --- 3. ESTILOS CSS (ESTÉTICA FINAL CON AURAS) ---
 st.markdown("""
 <style>
-    /* FONDO GENERAL */
-    .stApp {
-        background-color: #0e1117;
-        color: #FFFFFF;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    .header-logo { font-size: 1.5rem; font-weight: 700; color: #fff; display: flex; align-items: center; }
+    .neon-title { font-size: 3.5rem; font-weight: 800; text-align: center; margin-top: 20px; color: white; text-shadow: 0 0 25px rgba(0, 210, 255, 0.5); }
+    .neon-highlight { color: #00d2ff; text-shadow: 0 0 40px rgba(0, 210, 255, 0.8); }
+    .subtitle { text-align: center; font-size: 1.2rem; color: #aaa; margin-bottom: 40px; }
+    
+    .glass-container { 
+        background: rgba(38, 39, 48, 0.6); 
+        border: 1px solid rgba(255, 255, 255, 0.1); 
+        border-radius: 12px; padding: 30px; 
+        height: 100%; text-align: center; 
+        transition: all 0.3s ease; position: relative; 
     }
     
-    /* CABECERA */
-    .header-logo {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #fff;
-        display: flex;
-        align-items: center;
-    }
-    .header-logo span { margin-right: 10px; }
-
-    /* TÍTULOS */
-    .neon-title {
-        font-size: 3.5rem;
-        font-weight: 800;
-        text-align: center;
-        margin-top: 20px;
-        margin-bottom: 10px;
-        color: white;
-        text-shadow: 0 0 25px rgba(0, 210, 255, 0.5);
-    }
-    .neon-highlight {
-        color: #00d2ff;
-        text-shadow: 0 0 40px rgba(0, 210, 255, 0.8);
-    }
-    .subtitle {
-        text-align: center;
-        font-size: 1.2rem;
-        color: #aaa;
-        margin-bottom: 40px;
-        font-weight: 300;
-    }
-
-    /* CAJAS DE CRISTAL (BASE) */
-    .glass-container {
-        background: rgba(38, 39, 48, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 30px;
-        height: 100%;
-        text-align: center;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-    /* Hover genérico (para la gratis) */
-    .glass-container:hover {
-        transform: translateY(-5px);
-        border-color: rgba(255,255,255,0.2);
-    }
-
-    /* INPUT TEXTAREA */
-    .stTextArea textarea {
-        background-color: rgba(0,0,0,0.3) !important;
-        border: 1px solid #444 !important;
-        color: #eee !important;
-    }
-    .stTextArea textarea:focus {
-        border-color: #00d2ff !important;
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.3) !important;
-    }
-
-    /* BOTÓN GENERAR PRINCIPAL */
-    button[kind="primary"] {
-        background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important;
-        border: none !important;
-        color: white !important;
-        font-weight: 700 !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.4) !important;
-    }
-    button[kind="primary"]:hover {
-        transform: scale(1.03) !important;
-        box-shadow: 0 0 30px rgba(0, 210, 255, 0.7) !important;
-    }
-
-    /* --- ESTILOS DE AURAS PARA TARJETAS DE PRECIOS --- */
-
-    /* PRO CARD (CIAN) - Base */
-    .pro-card {
-        border: 1px solid #00d2ff !important;
-        background: rgba(0, 210, 255, 0.05) !important;
-    }
-    /* AURA CIAN al pasar el mouse */
-    .pro-card:hover {
-        box-shadow: 0 0 50px rgba(0, 210, 255, 0.5) !important; /* AURA FUERTE */
-        border-color: #00d2ff !important;
-        transform: translateY(-10px) !important;
-    }
-    .pro-text { color: #00d2ff; font-weight: bold; }
-
-    /* AGENCY CARD (VIOLETA) - Base */
-    .agency-card {
-        border: 1px solid #DDA0DD !important;
-        background: rgba(221, 160, 221, 0.05) !important;
-    }
-    /* AURA VIOLETA al pasar el mouse */
-    .agency-card:hover {
-        box-shadow: 0 0 50px rgba(221, 160, 221, 0.5) !important; /* AURA FUERTE */
-        border-color: #DDA0DD !important;
-        transform: translateY(-10px) !important;
-    }
-
-    /* CARTEL "MÁS POPULAR" */
-    .popular-badge {
-        position: absolute;
-        top: -12px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #00d2ff;
-        color: black;
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 800;
-        letter-spacing: 1px;
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
-        white-space: nowrap;
-        z-index: 10;
-    }
-
-    /* --- ANIMACIÓN Y BRILLO DE BOTONES --- */
+    .stTextArea textarea { background-color: rgba(0,0,0,0.3) !important; border: 1px solid #444 !important; color: #eee !important; }
     
-    div.stButton > button {
-        background: transparent;
-        border: 1px solid #555;
-        color: #ddd;
-        border-radius: 6px;
-        width: 100%;
-        transition: all 0.3s ease;
-        font-weight: 600;
-    }
+    button[kind="primary"] { background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; border: none !important; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4) !important; }
+    button[kind="primary"]:hover { transform: scale(1.03) !important; box-shadow: 0 0 30px rgba(0, 210, 255, 0.7) !important; }
 
-    /* 1. Botón GRATIS */
-    [data-testid="column"]:nth-child(1) div.stButton > button:hover {
-        background-color: rgba(255,255,255,0.1) !important;
-        border-color: white !important;
-        color: white !important;
-        transform: scale(1.05);
-    }
-
-    /* 2. Botón PRO (Brillo CIAN) */
-    [data-testid="column"]:nth-child(2) div.stButton > button { border-color: #00d2ff; color: #00d2ff; }
-    [data-testid="column"]:nth-child(2) div.stButton > button:hover {
-        background-color: #00d2ff !important; 
-        color: black !important;
-        box-shadow: 0 0 30px rgba(0, 210, 255, 0.8) !important;
-        transform: scale(1.05) !important;
-        border-color: #00d2ff !important;
-    }
-
-    /* 3. Botón AGENCIA (Brillo VIOLETA) */
-    [data-testid="column"]:nth-child(3) div.stButton > button { border-color: #DDA0DD; color: #DDA0DD; }
-    [data-testid="column"]:nth-child(3) div.stButton > button:hover {
-        background-color: #DDA0DD !important;
-        color: black !important;
-        box-shadow: 0 0 30px rgba(221, 160, 221, 0.8) !important;
-        transform: scale(1.05) !important;
-        border-color: #DDA0DD !important;
-    }
-
-    /* ANIMACIÓN RESULTADO */
-    @keyframes flash {
-        0% { border-color: #fff; box-shadow: 0 0 20px #fff; }
-        100% { border-color: #00d2ff; box-shadow: 0 0 10px rgba(0,210,255,0.3); }
-    }
-    .result-box {
-        border: 1px solid #00d2ff;
-        padding: 20px;
-        border-radius: 10px;
-        background: rgba(0,0,0,0.2);
-        animation: flash 1s ease-out;
-    }
-
+    /* PLANES CON AURAS Y ANIMACIÓN */
+    .pro-card { border: 1px solid #00d2ff !important; }
+    .pro-card:hover { box-shadow: 0 0 50px rgba(0, 210, 255, 0.5) !important; transform: translateY(-10px) !important; }
+    
+    .agency-card { border: 1px solid #DDA0DD !important; }
+    .agency-card:hover { box-shadow: 0 0 50px rgba(221, 160, 221, 0.5) !important; transform: translateY(-10px) !important; }
+    
+    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; }
+    
+    div.stButton > button { background: transparent; border: 1px solid #555; color: #ddd; width: 100%; transition: all 0.3s ease; }
+    .result-box { border: 1px solid #00d2ff; padding: 20px; border-radius: 10px; background: rgba(0,0,0,0.2); margin-top: 20px; white-space: pre-wrap; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. BARRA SUPERIOR ---
-col_logo, col_space, col_lang = st.columns([2, 4, 1])
-with col_logo:
-    st.markdown('<div class="header-logo"><span>🏢</span> IA REALTY PRO</div>', unsafe_allow_html=True)
-with col_lang:
-    idioma = st.selectbox("", ["🇺🇸 English", "🇪🇸 Español"], label_visibility="collapsed")
-
-# --- 4. HERO SECTION ---
-st.markdown("<br>", unsafe_allow_html=True)
-
-if "Español" in idioma:
-    st.markdown(f"<h1 class='neon-title'>Convierte Anuncios Aburridos en <br><span class='neon-highlight'>Imanes de Ventas</span></h1>", unsafe_allow_html=True)
-    st.markdown(f"<p class='subtitle'>La herramienta IA secreta de los agentes top productores.</p>", unsafe_allow_html=True)
-    placeholder_text = "Pegá el link de la propiedad o escribí los detalles: Ej: Casa en Miami, 3 habitaciones..."
-    btn_text = "✨ GENERAR DESCRIPCIÓN"
-    badge_text = "MÁS POPULAR"
+# --- 4. TRADUCCIONES ---
+if "Español" in st.session_state.get('idioma_selec', "🇪🇸 Español"):
+    t = {
+        "title1": "Convierte Anuncios Aburridos en",
+        "title2": "Imanes de Ventas",
+        "sub": "La herramienta IA secreta de los agentes top productores.",
+        "placeholder": "Pega el link o detalles de la propiedad...",
+        "btn_gen": "✨ GENERAR DESCRIPCIÓN",
+        "p1_name": "Inicial",
+        "p1_desc": "3 descripciones / día<br>Soporte Básico<br>Marca de Agua",
+        "p1_btn": "REGISTRO GRATIS",
+        "p2_name": "Agente Pro",
+        "p2_desc": "<b>Generaciones Ilimitadas</b><br>Pack Redes Sociales (IG/FB)<br>Optimización SEO",
+        "p2_btn": "MEJORAR AHORA",
+        "p3_name": "Agencia",
+        "p3_desc": "5 Usuarios / Cuentas<br>Panel de Equipo<br>Acceso vía API",
+        "p3_btn": "CONTACTAR VENTAS",
+        "popular": "MÁS POPULAR"
+    }
 else:
-    st.markdown(f"<h1 class='neon-title'>Turn Boring Listings into <br><span class='neon-highlight'>Sales Magnets</span></h1>", unsafe_allow_html=True)
-    st.markdown(f"<p class='subtitle'>The secret AI tool used by top producers.</p>", unsafe_allow_html=True)
-    placeholder_text = "Paste property link or type details: Ex: House in Miami, 3 bedrooms..."
-    btn_text = "✨ GENERATE DESCRIPTION"
-    badge_text = "MOST POPULAR"
+    t = {
+        "title1": "Turn Boring Listings into",
+        "title2": "Sales Magnets",
+        "sub": "The secret AI tool used by top producers.",
+        "placeholder": "Paste link or property details...",
+        "btn_gen": "✨ GENERATE DESCRIPTION",
+        "p1_name": "Starter",
+        "p1_desc": "3 descriptions / day<br>Basic Support<br>Watermark",
+        "p1_btn": "FREE SIGN UP",
+        "p2_name": "Agent Pro",
+        "p2_desc": "<b>Unlimited Generations</b><br>Social Media Pack (IG/FB)<br>SEO Optimization",
+        "p2_btn": "UPGRADE NOW",
+        "p3_name": "Agency",
+        "p3_desc": "5 Users / Accounts<br>Team Dashboard<br>API Access",
+        "p3_btn": "CONTACT SALES",
+        "popular": "MOST POPULAR"
+    }
 
-# --- 5. ÁREA DE INPUT ---
+# --- 5. INTERFAZ ---
+col_logo, _, col_lang = st.columns([2, 4, 1.5])
+with col_logo: 
+    st.markdown('<div class="header-logo">🏢 IA REALTY PRO</div>', unsafe_allow_html=True)
+with col_lang: 
+    idioma = st.selectbox("", ["🇪🇸 Español", "🇺🇸 English"], label_visibility="collapsed", key="idioma_selec")
+
+st.markdown(f"<h1 class='neon-title'>{t['title1']} <br><span class='neon-highlight'>{t['title2']}</span></h1>", unsafe_allow_html=True)
+st.markdown(f"<p class='subtitle'>{t['sub']}</p>", unsafe_allow_html=True)
+
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
-    st.markdown('<div class="glass-container" style="padding-bottom: 10px;">', unsafe_allow_html=True)
-    user_input = st.text_area("", height=120, placeholder=placeholder_text)
-    st.markdown("<br>", unsafe_allow_html=True)
-    gen_btn = st.button(btn_text, type="primary")
+    st.markdown('<div class="glass-container">', unsafe_allow_html=True)
+    user_input = st.text_area("", height=120, placeholder=t['placeholder'], label_visibility="collapsed")
+    gen_btn = st.button(t['btn_gen'], type="primary")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 6. RESULTADO ---
-if 'generated' not in st.session_state: st.session_state.generated = False
+    if gen_btn and user_input:
+        with st.spinner("..."):
+            # Aquí iría la lógica de OpenAI cuando tengas la Key
+            time.sleep(1)
+            st.markdown(f'<div class="result-box">Contenido generado profesionalmente...</div>', unsafe_allow_html=True)
 
-if gen_btn and user_input:
-    with c2:
-        with st.spinner("Analyzing property details..."):
-            time.sleep(1.5)
-            st.session_state.generated = True
-            if "Español" in idioma:
-                mock_res = f"""
-                🔥 **¡OFERTA IRRESISTIBLE!**
-                Descubre el lujo accesible. Esta propiedad no es solo una casa, es el estilo de vida que mereces.
-                ✅ **Espacios:** {user_input[:15]}... amplitud y diseño.
-                *Agenda tu visita hoy.*
-                """
-            else:
-                mock_res = f"""
-                🔥 **IRRESISTIBLE OFFER!**
-                Discover accessible luxury. This property is not just a house, it's the lifestyle you deserve.
-                ✅ **Spaces:** {user_input[:15]}... spacious design.
-                *Schedule your visit today.*
-                """
-
-if st.session_state.generated:
-    st.markdown("<br>", unsafe_allow_html=True)
-    col_r1, col_r2, col_r3 = st.columns([1, 2, 1])
-    with col_r2:
-        st.markdown(f'<div class="result-box">{mock_res}</div>', unsafe_allow_html=True)
-
-# --- 7. PLANES DE PRECIOS ---
+# --- 6. SECCIÓN DE PLANES ARREGLADA ---
 st.markdown("<br><br><br>", unsafe_allow_html=True)
+p1, p2, p3 = st.columns(3)
 
-p1, p2, p3 = st.columns([1, 1, 1])
-
-# PLAN GRATIS
 with p1:
-    st.markdown("""
+    st.markdown(f"""
     <div class='glass-container'>
-        <h3 style='color: #ccc; margin-top:0;'>Starter</h3>
+        <h3 style='color: #ccc; margin-top:0;'>{t['p1_name']}</h3>
         <h1 style='font-size: 3rem; margin: 10px 0;'>$0</h1>
-        <p style='color: #aaa;'>Trial / Prueba</p>
         <hr style='border-color: #444; opacity: 0.3;'>
-        <p style='line-height: 1.6;'>
-            3 Descripciones / día<br>
-            Soporte Básico<br>
-            Marca de Agua
-        </p>
+        <p style='line-height: 1.6;'>{t['p1_desc']}</p>
         <br>
     </div>
     """, unsafe_allow_html=True)
-    st.button("FREE SIGN UP" if "English" in idioma else "REGISTRO GRATIS")
+    st.button(t['p1_btn'], key="btn_p1")
 
-# PLAN PRO (CON AURA CIAN)
 with p2:
     st.markdown(f"""
     <div class='glass-container pro-card'>
-        <div class='popular-badge'>{badge_text}</div>
-        <h3 class='pro-text' style='margin-top:10px;'>AGENTE PRO</h3>
-        <h1 style='font-size: 3rem; margin: 10px 0;'>$49<small style='font-size:1rem'>/mo</small></h1>
-        <p style='color: #00d2ff;'>Top Seller Choice</p>
+        <div class='popular-badge'>{t['popular']}</div>
+        <h3 style='color: #00d2ff; margin-top:10px;'>{t['p2_name']}</h3>
+        <h1 style='font-size: 3rem; margin: 10px 0;'>$49</h1>
         <hr style='border-color: #00d2ff; opacity: 0.3;'>
-        <p style='line-height: 1.6;'>
-            <b>Generaciones Ilimitadas</b><br>
-            Pack Redes Sociales (IG/FB)<br>
-            SEO Optimization
-        </p>
+        <p style='line-height: 1.6;'>{t['p2_desc']}</p>
         <br>
     </div>
     """, unsafe_allow_html=True)
-    st.button("UPGRADE NOW" if "English" in idioma else "MEJORAR AHORA")
+    st.button(t['p2_btn'], key="btn_p2")
 
-# PLAN AGENCIA (CON AURA VIOLETA)
 with p3:
-    st.markdown("""
+    st.markdown(f"""
     <div class='glass-container agency-card'>
-        <h3 style='color: #DDA0DD; margin-top:0;'>Agency</h3>
-        <h1 style='font-size: 3rem; margin: 10px 0;'>$199<small style='font-size:1rem'>/mo</small></h1>
-        <p style='color: #aaa;'>Teams / Equipos</p>
+        <h3 style='color: #DDA0DD; margin-top:0;'>{t['p3_name']}</h3>
+        <h1 style='font-size: 3rem; margin: 10px 0;'>$199</h1>
         <hr style='border-color: #DDA0DD; opacity: 0.3;'>
-        <p style='line-height: 1.6;'>
-            5 Usuarios / Users<br>
-            Panel de Equipo<br>
-            API Access
-        </p>
+        <p style='line-height: 1.6;'>{t['p3_desc']}</p>
         <br>
     </div>
     """, unsafe_allow_html=True)
-    st.button("CONTACT SALES" if "English" in idioma else "CONTACTAR VENTAS")
+    st.button(t['p3_btn'], key="btn_p3")
 
 st.markdown("<br><br>", unsafe_allow_html=True)
