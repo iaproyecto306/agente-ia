@@ -278,11 +278,6 @@ with c2:
         </div>
     ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
-    
-  # ... (Caja de texto user_input)
-    user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
-    
- st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
     if st.button(L['btn_gen'], key="main_gen", type="primary"):
@@ -299,42 +294,7 @@ with c2:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
     
     st.markdown('</div>', unsafe_allow_html=True)
-    # --- AGREGADO: ESTADÍSTICAS (Impacto) ---
-st.markdown("<br>", unsafe_allow_html=True)
-col_stat1, col_stat2, col_stat3 = st.columns(3)
 
-with col_stat1:
-    st.markdown("""
-        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
-            <h2 style="color:#00d2ff; margin:0;">+10k</h2>
-            <p style="color:#aaa; font-size:0.9rem;">Anuncios Optimizados</p>
-        </div>
-    """, unsafe_allow_html=True)
-
-with col_stat2:
-    st.markdown("""
-        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
-            <h2 style="color:#00d2ff; margin:0;">-80%</h2>
-            <p style="color:#aaa; font-size:0.9rem;">Tiempo Ahorrado</p>
-        </div>
-    """, unsafe_allow_html=True)
-
-with col_stat3:
-    st.markdown("""
-        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
-            <h2 style="color:#00d2ff; margin:0;">+45%</h2>
-            <p style="color:#aaa; font-size:0.9rem;">Más Consultas</p>
-        </div>
-    """, unsafe_allow_html=True)
-# --- NUEVA SECCIÓN: CÓMO FUNCIONA ---
-st.markdown("<br><br><h2 style='text-align:center; color:white;'>¿Cómo funciona IA Realty Pro?</h2>", unsafe_allow_html=True)
-c1, c2, c3 = st.columns(3)
-with c1:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>Pega el Link</b><br>O escribe una descripción breve.</p></div>", unsafe_allow_html=True)
-with c2:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>IA Analiza</b><br>Optimizamos para SEO y ventas.</p></div>", unsafe_allow_html=True)
-with c3:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>Publica</b><br>Copia el texto y atrae clientes.</p></div>", unsafe_allow_html=True)
 # --- 7. PLANES ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
@@ -353,34 +313,3 @@ with col3:
     desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
     st.button(L['btn3'], key="btn_a")
-    # --- AGREGADO: TESTIMONIOS (Glassmorphism) ---
-st.markdown("<br><br><h2 style='text-align:center; color:white;'>Lo que dicen los Expertos</h2>", unsafe_allow_html=True)
-ct1, ct2, ct3 = st.columns(3)
-
-testimonio_style = """
-    <div style="padding:20px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); height:180px; transition: 0.3s;">
-        <p style="font-style:italic; color:#ddd; font-size:0.9rem;">"{texto}"</p>
-        <p style="color:#00d2ff; font-weight:bold; margin-top:15px;">- {autor}</p>
-    </div>
-"""
-
-with ct1:
-    st.markdown(testimonio_style.format(texto="Mis ventas en Instagram subieron un 50% desde que uso la IA para los copies.", autor="Carlos R. (RE/MAX)"), unsafe_allow_html=True)
-with ct2:
-    st.markdown(testimonio_style.format(texto="Increíble cómo resume las características de los links de portales. Ahorro horas.", autor="Ana M. (Century 21)"), unsafe_allow_html=True)
-with ct3:
-    st.markdown(testimonio_style.format(texto="La mejor inversión para mi agencia este año. El plan Pro vale cada centavo.", autor="Luis P. (Independiente)"), unsafe_allow_html=True)
-    # --- AGREGADO: FOOTER ---
-st.markdown("""
-    <br><br><br>
-    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;">
-        <div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 IA REALTY PRO</div>
-        <p style="color:#666; font-size:0.8rem;">
-            © 2026 IA Realty Pro - Herramientas de Inteligencia Artificial para Inmuebles.<br>
-            Términos de Servicio | Política de Privacidad | Soporte
-        </p>
-        <div style="margin-top:15px; color:#00d2ff; font-size:1.2rem;">
-            🌐 📸 🐦 💼
-        </div>
-    </div>
-""", unsafe_allow_html=True)
