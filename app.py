@@ -1,16 +1,12 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- 1. CONFIGURACIÓN DE IA (Corregida para estabilidad) ---
-# RECUERDA: Si esta clave sigue dando error, reemplázala por la nueva que generes en AI Studio
+# --- 1. CONFIGURACIÓN DE IA ---
 API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
-
 genai.configure(api_key=API_KEY)
 
-# Usamos una función para llamar al modelo y evitar errores de sesión
 def generar_texto(prompt):
     try:
-        # Forzamos la selección del modelo flash que es el que permite el plan gratuito
         model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(prompt)
         return response.text
@@ -25,7 +21,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 3. DICCIONARIO MAESTRO (Traducciones Completas) ---
+# --- 3. DICCIONARIO MAESTRO ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
@@ -75,8 +71,8 @@ traducciones = {
         "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
         "desc1": "3 descrições / día", "t1_1": "Limite diário de gerações para nuevos usuários.",
-        "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail con resposta em menos de 48 horas.",
-        "desc3": "Marca d'Água", "t1_3": "Os textos incluem uma pequena menção à nossa plataforma.",
+        "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail com resposta em menos de 48 horas.",
+        "desc3": "Marca d'Água", "t1_3": "Os textos incluyen uma pequena menção à nossa plataforma.",
         "desc4": "Gerações Ilimitadas", "t2_1": "Crie quantas descrições precisar, sem restrições.",
         "desc5": "Pack Redes Sociais", "t2_2": "Gere automaticamente posts para Instagram, Facebook e TikTok com hashtags.",
         "desc6": "Optimización SEO", "t2_3": "Textos estruturados para aparecer primeiro nos motores de busca.",
@@ -103,23 +99,23 @@ traducciones = {
         "desc7": "主页横幅", "t2_4": "您的精选房产将在我们的主页上轮播展示。",
         "desc8": "5 个用户/账户", "t3_1": "房产团队中最多 5 名成员的个人访问权限。",
         "desc9": "团队面板", "t3_2": "监控并管理您的经纪人创建的描述。",
-        "desc10": "API 访问", "t3_3": "将我们的人工智能直接与您自己的软件或 CRM 连接。",
+        "desc10": "API 访问", "t3_3": "将我们的人工智能直接与您自己的软件 or CRM 连接。",
         "desc11": "横幅优先级", "t3_4": "您的广告在主页上出现的频率将增加一倍。",
         "btn1": "免费注册", "btn2": "立即升级", "btn3": "联系销售"
     },
     "Français": {
         "title1": "Transformez vos Annonces en", "title2": "Aimants à Ventes",
         "sub": "L'outil IA secret des agents immobiliers les plus performants.",
-        "placeholder": "🏠 Collez le lien de la propiedad ou décrivez brièvement...",
+        "placeholder": "🏠 Collez le lien de la propriété ou décrivez brièvement...",
         "btn_gen": "✨ GÉNÉRER LA DESCRIPTION", "p_destacada": "PROPRIÉTÉ À LA UNE",
         "comunidad": "Propriétés de la Communauté", "popular": "PLUS POPULAIRE",
         "plan1": "Initial", "plan2": "Agent Pro", "plan3": "Agence",
         "desc1": "3 descriptions / jour", "t1_1": "Limite quotidienne de générations pour les nouveaux utilisateurs.",
-        "desc2": "Support de Base", "t1_2": "Aide technique par e-mail con réponse en moins de 48 heures.",
+        "desc2": "Support de Base", "t1_2": "Aide technique par e-mail avec réponse en moins de 48 heures.",
         "desc3": "Filigrane", "t1_3": "Les textes incluent une petite mention de notre plateforme.",
         "desc4": "Générations Illimitées", "t2_1": "Créez autant de descriptions que nécessaire sans restrictions.",
         "desc5": "Pack Réseaux Sociaux", "t2_2": "Générez automatiquement des posts pour Instagram, Facebook et TikTok avec hashtags.",
-        "desc6": "Optimisation SEO", "t2_3": "Textos structurés pour apparaître en premier dans les moteurs de recherche.",
+        "desc6": "Optimisation SEO", "t2_3": "Textes structurés pour apparaître en premier dans les moteurs de recherche.",
         "desc7": "Bannière Principale", "t2_4": "Vos propriétés à la une tourneront sur notre page d'accueil.",
         "desc8": "5 Utilisateurs / Comptes", "t3_1": "Accès individuel pour jusqu'à 5 membres de votre équipe immobilière.",
         "desc9": "Tableau de Bord Équipe", "t3_2": "Supervisez et gérez les descriptions créées par vos agents.",
@@ -157,7 +153,6 @@ st.markdown("""
     .neon-highlight { color: #00d2ff; text-shadow: 0 0 40px rgba(0, 210, 255, 0.8); }
     .subtitle { text-align: center; font-size: 1.2rem; color: #aaa; margin-bottom: 40px; }
 
-    /* BOTÓN GENERAR */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; border: none !important; 
         box-shadow: 0 0 20px rgba(0, 210, 255, 0.4) !important; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important; 
@@ -170,7 +165,6 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
-    /* PLANES */
     .card-wrapper { transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); border-radius: 12px; height: 480px; }
     .card-wrapper:hover { transform: translateY(-15px); }
     .glass-container { background: rgba(38, 39, 48, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; height: 100%; }
@@ -182,7 +176,6 @@ st.markdown("""
     .agency-card { border: 1px solid rgba(221, 160, 221, 0.4) !important; box-shadow: 0 0 25px rgba(221, 160, 221, 0.15); }
     .agency-card:hover { box-shadow: 0 15px 60px rgba(221, 160, 221, 0.5); }
 
-    /* TOOLTIPS */
     .info-icon { display: inline-block; width: 16px; height: 16px; border-radius: 50%; text-align: center; font-size: 11px; line-height: 16px; margin-left: 8px; cursor: help; position: relative; font-weight: bold; }
     .i-free { background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
     .i-pro { background-color: rgba(0, 210, 255, 0.15); color: #00d2ff; border: 1px solid rgba(0, 210, 255, 0.5); }
@@ -197,39 +190,17 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-    /* VIDEO CARRUSEL MEJORADO (Ajustado para ocultar texto de carga) */
     .video-placeholder {
-        border-radius: 12px; 
-        height: 230px; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: flex-end;
-        margin-bottom: 25px; 
-        position: relative; 
-        overflow: hidden; 
-        background-size: cover; 
-        background-position: center;
-        transition: all 0.8s ease-in-out;
-        animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
+        border-radius: 12px; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+        margin-bottom: 25px; position: relative; overflow: hidden; background-size: cover; background-position: center;
+        transition: all 0.8s ease-in-out; animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
         border: 1px solid rgba(255,255,255,0.1);
-        color: transparent; /* Oculta cualquier texto residual de la URL */
-        text-indent: -9999px; /* Asegura que el texto no se vea */
     }
 
     .dynamic-tag {
-        position: absolute; top: 15px; left: 15px; 
-        color: black; padding: 5px 14px; border-radius: 4px; 
-        font-size: 0.75rem; font-weight: 900;
-        transition: background-color 0.8s ease;
+        position: absolute; top: 15px; left: 15px; color: black; padding: 5px 14px; border-radius: 4px; 
+        font-size: 0.75rem; font-weight: 900; transition: background-color 0.8s ease;
         animation: tagColorChange 24s infinite alternate;
-        text-indent: 0px; color: black; /* Restaura visibilidad para el tag */
-    }
-
-    .carousel-label {
-        background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); 
-        width: 100%; padding: 20px; text-align: center; color: white;
-        text-indent: 0px; /* Restaura visibilidad para el label */
     }
 
     @keyframes auraChange {
@@ -268,60 +239,7 @@ L = traducciones[st.session_state.idioma]
 st.markdown(f"<h1 class='neon-title'>{L['title1']} <br><span class='neon-highlight'>{L['title2']}</span></h1>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
-st.markdown("""
-    <style>
-    /* 1. Elimina el espacio extra entre bloques de Streamlit */
-    [data-testid="stVerticalBlock"] {
-        gap: 0rem !important;
-    }
-    
-    /* 2. Ajusta el margen superior del contenedor de la IA */
-    .glass-container {
-        margin-top: -20px !important; /* Mueve el cuadro hacia arriba */
-        padding-top: 10px !important; /* Achica el espacio interno */
-    }
-    </style>
-""", unsafe_allow_html=True)
-# --- 6. SECCIÓN CENTRAL ---
-c1, c2, c3 = st.columns([1, 2, 1])
-with c2:
-    st.markdown(f'''
-        <div class="video-placeholder">
-            <div class="dynamic-tag">{L["p_destacada"]}</div>
-            <div class="carousel-label">{L["comunidad"]}</div>
-        </div>
-    ''', unsafe_allow_html=True)
-    st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
-    user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
-    
-    if st.button(L['btn_gen'], key="main_gen", type="primary"):
-        if user_input:
-            with st.spinner("Generando..."):
-                prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
-                resultado = generar_texto(prompt)
-                
-                if "ERROR_TECNICO" in resultado:
-                    st.error("Hubo un problema de conexión. Por favor, verifica tu API Key en la configuración.")
-                else:
-                    st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
-        else:
-            st.warning("Por favor, ingresa los detalles de la propiedad.")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    # Cerramos el contenedor una sola vez
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# --- NUEVA SECCIÓN: CÓMO FUNCIONA ---
-st.markdown("<br><br><h2 style='text-align:center; color:white;'>¿Cómo funciona IA Realty Pro?</h2>", unsafe_allow_html=True)
-c1, c2, c3 = st.columns(3)
-with c1:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>Pega el Link</b><br>O escribe una descripción breve.</p></div>", unsafe_allow_html=True)
-with c2:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>IA Analiza</b><br>Optimizamos para SEO y ventas.</p></div>", unsafe_allow_html=True)
-with c3:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>Publica</b><br>Copia el texto y atrae clientes.</p></div>", unsafe_allow_html=True)
-
-# --- AGREGADO 1: ESTADÍSTICAS (Impacto) ---
+# --- AGREGADO: ESTADÍSTICAS (Impacto) ---
 st.markdown("<br>", unsafe_allow_html=True)
 col_stat1, col_stat2, col_stat3 = st.columns(3)
 
@@ -348,6 +266,44 @@ with col_stat3:
             <p style="color:#aaa; font-size:0.9rem;">Más Consultas</p>
         </div>
     """, unsafe_allow_html=True)
+
+# --- 6. SECCIÓN CENTRAL ---
+c1, c2, c3 = st.columns([1, 2, 1])
+with c2:
+    st.markdown(f'''
+        <div class="video-placeholder">
+            <div class="dynamic-tag">{L["p_destacada"]}</div>
+            <div style="background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); width: 100%; padding: 20px; text-align: center; color: white;">{L["comunidad"]}</div>
+        </div>
+    ''', unsafe_allow_html=True)
+    st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
+    user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
+    
+    if st.button(L['btn_gen'], key="main_gen", type="primary"):
+        if user_input:
+            with st.spinner("Generando..."):
+                prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
+                resultado = generar_texto(prompt)
+                
+                if "ERROR_TECNICO" in resultado:
+                    st.error("Hubo un problema de conexión. Por favor, verifica tu API Key en la configuración.")
+                else:
+                    st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
+        else:
+            st.warning("Por favor, ingresa los detalles de la propiedad.")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# --- NUEVA SECCIÓN: CÓMO FUNCIONA ---
+st.markdown("<br><br><h2 style='text-align:center; color:white;'>¿Cómo funciona IA Realty Pro?</h2>", unsafe_allow_html=True)
+cf1, cf2, cf3 = st.columns(3)
+with cf1:
+    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>Pega el Link</b><br>O escribe una descripción breve.</p></div>", unsafe_allow_html=True)
+with cf2:
+    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>IA Analiza</b><br>Optimizamos para SEO y ventas.</p></div>", unsafe_allow_html=True)
+with cf3:
+    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>Publica</b><br>Copia el texto y atrae clientes.</p></div>", unsafe_allow_html=True)
+
 # --- 7. PLANES ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
@@ -366,25 +322,8 @@ with col3:
     desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
     st.button(L['btn3'], key="btn_a")
-# --- AGREGADO 2: TESTIMONIOS (Glassmorphism) ---
-st.markdown("<br><br><h2 style='text-align:center; color:white;'>Lo que dicen los Expertos</h2>", unsafe_allow_html=True)
-ct1, ct2, ct3 = st.columns(3)
 
-testimonio_style = """
-    <div style="padding:20px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); height:180px;">
-        <p style="font-style:italic; color:#ddd; font-size:0.9rem;">"{texto}"</p>
-        <p style="color:#00d2ff; font-weight:bold; margin-top:15px;">- {autor}</p>
-    </div>
-"""
-
-with ct1:
-    st.markdown(testimonio_style.format(texto="Mis ventas en Instagram subieron un 50% desde que uso la IA para los copies.", autor="Carlos R. (RE/MAX)"), unsafe_allow_html=True)
-with ct2:
-    st.markdown(testimonio_style.format(texto="Increíble cómo resume las características de los links de portales. Ahorro horas.", autor="Ana M. (Century 21)"), unsafe_allow_html=True)
-with ct3:
-    st.markdown(testimonio_style.format(texto="La mejor inversión para mi agencia este año. El plan Pro vale cada centavo.", autor="Luis P. (Independiente)"), unsafe_allow_html=True)
-
-# --- AGREGADO 3: FOOTER ---
+# --- AGREGADO: FOOTER ---
 st.markdown("""
     <br><br><br>
     <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;">
