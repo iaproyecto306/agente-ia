@@ -10,18 +10,19 @@ try:
 except Exception as e:
     st.error(f"Error al configurar la API: {e}")
 
-def generar_texto(prompt):
+def generar_texto(prompt, idioma_usuario):
     try:
-        # Usamos 1.5-flash que es el que tienes activo en tu panel gratuito
+        # Usamos 1.5-flash que es el modelo gratuito y estable
         model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(prompt)
+        # Añadimos el idioma al prompt para asegurar que responda correctamente
+        instruccion = f"Responde estrictamente en idioma {idioma_usuario}. {prompt}"
+        response = model.generate_content(instruccion)
         
         if response and response.text:
             return response.text
         else:
-            return "La IA no devolvió texto. Revisa la descripción."
+            return "La IA no devolvió texto. Intenta con una descripción más detallada."
     except Exception as e:
-        # Esto nos dirá el error REAL (ej: 403 Forbidden o 429 Limit)
         return f"ERROR_TECNICO_DETALLADO: {str(e)}"
 
 # --- 2. CONFIGURACIÓN INICIAL ---
