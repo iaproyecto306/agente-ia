@@ -8,7 +8,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. ESTILOS CSS (SIN CAMBIOS, SOLO AJUSTE DE ALTURA) ---
+# --- 2. ESTILOS CSS (CORRECCIÓN DE ALTURA SIMÉTRICA) ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -79,10 +79,16 @@ st.markdown("""
     }
     div.stButton > button[kind="primary"]:hover { transform: scale(1.05) !important; box-shadow: 0 0 30px rgba(0, 210, 255, 0.7) !important; }
 
-    /* AJUSTE DE ALTURA PARA QUE TODOS TERMINEN IGUAL */
+    /* --- CORRECCIÓN DEFINITIVA DE ALTURA --- */
+    .card-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
     .free-card, .pro-card, .agency-card { 
         transition: all 0.4s ease-out !important; 
-        min-height: 380px !important; /* Forzamos altura mínima igual para todos */
+        height: 420px !important; /* Altura fija para asegurar simetría total */
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
@@ -94,6 +100,7 @@ st.markdown("""
     .agency-card { border: 1px solid rgba(221, 160, 221, 0.3) !important; }
     .agency-card:hover { transform: translateY(-10px) !important; border-color: #DDA0DD !important; box-shadow: 0 0 40px rgba(221, 160, 221, 0.4) !important; }
 
+    [data-testid="column"] button { width: 100% !important; }
     [data-testid="column"]:nth-child(1) button { border: 1px solid #444 !important; color: #888 !important; }
     [data-testid="column"]:nth-child(2) button { border: 2px solid #00d2ff !important; color: #00d2ff !important; }
     [data-testid="column"]:nth-child(3) button { border: 2px solid #DDA0DD !important; color: #DDA0DD !important; }
@@ -103,7 +110,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. LÓGICA DE IDIOMAS ---
+# --- 3. LOGICA DE IDIOMAS ---
 if "idioma" not in st.session_state:
     st.session_state.idioma = "Español"
 
@@ -170,13 +177,13 @@ st.markdown("<br><br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.markdown(f"<div class='glass-container free-card'><h3>Inicial</h3><h1>$0</h1><hr style='opacity:0.2;'><p>{desc_free}</p></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='card-wrapper'><div class='glass-container free-card'><h3>Inicial</h3><h1>$0</h1><hr style='opacity:0.2;'><p>{desc_free}</p></div></div>", unsafe_allow_html=True)
     st.button("REGISTRO GRATIS", key="f1")
 
 with col2:
-    st.markdown(f"<div class='glass-container pro-card'><div class='popular-badge'>MÁS POPULAR</div><h3 style='color:#00d2ff;'>Agente Pro</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'><p>{desc_pro}</p></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='card-wrapper'><div class='glass-container pro-card'><div class='popular-badge'>MÁS POPULAR</div><h3 style='color:#00d2ff;'>Agente Pro</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'><p>{desc_pro}</p></div></div>", unsafe_allow_html=True)
     st.button("MEJORAR AHORA", key="f2")
 
 with col3:
-    st.markdown(f"<div class='glass-container agency-card'><h3 style='color:#DDA0DD;'>Agencia</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'><p>{desc_agency}</p></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='card-wrapper'><div class='glass-container agency-card'><h3 style='color:#DDA0DD;'>Agencia</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'><p>{desc_agency}</p></div></div>", unsafe_allow_html=True)
     st.button("CONTACTAR VENTAS", key="f3")
