@@ -1,18 +1,17 @@
 import streamlit as st
 from google import genai
-from google.genai import types
 
-# --- CONFIGURACIÓN DE IA ---
+# --- 1. CONFIGURACIÓN DE IA ---
 API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 
-# Forzamos al cliente a usar la versión 'v1' de la API para evitar el error 404
+# Conexión estable v1
 client = genai.Client(api_key=API_KEY, http_options={'api_version': 'v1'})
 
 def generar_texto(prompt, idioma):
-    # Lista de nombres técnicos exactos que Google acepta en el nivel gratuito
-    modelos_maestros = [
-        'gemini-1.5-flash-002', 
+    # Lista corregida de nombres de modelos
+    modelos_a_probar = [
         'gemini-1.5-flash',
+        'gemini-1.5-flash-002',
         'gemini-1.5-pro'
     ]
     
@@ -20,10 +19,9 @@ def generar_texto(prompt, idioma):
     
     for nombre in modelos_a_probar:
         try:
-            # Quitamos el prefijo 'models/' porque el SDK nuevo lo pone solo
             response = client.models.generate_content(
                 model=nombre,
-                contents=f"Como experto inmobiliario, escribe en {idioma}: {prompt}"
+                contents=f"Actúa como experto inmobiliario. Escribe en {idioma}: {prompt}"
             )
             if response and response.text:
                 return response.text
@@ -31,27 +29,35 @@ def generar_texto(prompt, idioma):
             ultimo_error = str(e)
             continue
             
-    # SI TODO FALLA: Este bloque nos dirá EXACTAMENTE qué modelos tienes tú permitidos
+    # SI TODO FALLA: Esto nos dirá qué modelos tienes tú permitidos exactamente
     try:
-        modelos_disponibles = [m.name for m in client.models.list()]
-        return f"ERROR_SISTEMA: No encontré el modelo. Tus modelos permitidos son: {modelos_disponibles}"
+        modelos_reales = [m.name for m in client.models.list()]
+        return f"ERROR_SISTEMA: No se encontró el modelo. Modelos disponibles en tu cuenta: {modelos_reales}"
     except:
-        return f"ERROR_SISTEMA: Error crítico de conexión. {ultimo_error}"
+        return f"ERROR_SISTEMA: Error crítico. Detalle: {ultimo_error}"
 
-# --- INTERFAZ SIMPLIFICADA PARA PRUEBAS ---
+# --- 2. INTERFAZ ---
+st.set_page_config(page_title="IA Realty Pro", layout="centered")
 st.title("🏢 IA Realty Pro")
 
 if "idioma" not in st.session_state:
     st.session_state.idioma = "Español"
 
-user_input = st.text_area("Describe la propiedad:")
+idioma = st.radio("Idioma:", ["Español", "English"], horizontal=True)
+st.session_state.idioma = idioma
 
-if st.button("GENERAR"):
+user_input = st.text_area("Describe la propiedad (ej: Apartamento moderno en el centro):")
+
+if st.button("✨ GENERAR ANUNCIO"):
     if user_input:
-        with st.spinner("Conectando..."):
+        with st.spinner("Buscando el modelo correcto en tu cuenta..."):
             resultado = generar_texto(user_input, st.session_state.idioma)
+            
             if "ERROR_SISTEMA" in resultado:
-                st.error(f"Error técnico: {resultado}")
+                st.error("Error de configuración de Google")
+                st.info(resultado)
             else:
-                st.success("¡Éxito!")
+                st.success("¡Anuncio generado!")
                 st.write(resultado)
+    else:
+        st.warning("Por favor, ingresa una descripción.")
