@@ -3,7 +3,7 @@ import requests
 import json
 
 # --- CONFIGURACIÓN ---
-API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
+API_KEY = "AIzaSyDft6Yxc6BDF8s_k7DzjM4ahBAbW6KJYPQ"
 
 def obtener_modelo_y_generar(prompt):
     # PASO 1: Preguntar a Google qué modelos tienes disponibles
