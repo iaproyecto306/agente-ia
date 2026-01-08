@@ -32,13 +32,7 @@ def generar_texto(prompt, idioma):
             ultimo_error = str(e)
             continue 
             
-    return f"ERROR_SISTEMA: No se pudo conectar. Último error: {ultimo_error}"
-            
-    # Línea corregida (sin la llave extra al final)
-    return f"ERROR_SISTEMA: No se pudo conectar. Último error: {ultimo_error}"
-            continue # Si falla uno, intenta el siguiente
-            
-    return f"ERROR_SISTEMA: No se pudo conectar con ningún modelo. Último error: {ultimo_error}" {str(e_alt)}"
+   
 # --- 2. CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="IA Realty Pro", page_icon="🏢", layout="wide")
 
