@@ -1,11 +1,11 @@
-import streamlit as st
-import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
-# --- 1. CONFIGURACIÓN DE IA (Corregida para estabilidad) ---
-API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
+# Esto busca la clave en el archivo oculto .env
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
 
-genai.configure(api_key=API_KEY)
-
+client = OpenAI(api_key=api_key)
 def generar_texto(prompt):
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
