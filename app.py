@@ -229,31 +229,35 @@ st.markdown("""
         text-indent: 0px;
     }
 
-    @keyframes auraChange {
-        /* Cian para las primeras 3 imágenes (0% a 70%) */
-        0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
-        /* Cambio a Violeta para la última imagen (75% a 100%) */
+  @keyframes auraChange {
+        /* Cian: de la imagen 1 a la 3 */
+        0%, 74% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
+        /* Violeta: Justo cuando entra la imagen 4 */
         75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
     }
 
     @keyframes tagColorChange {
-        /* Cian para las primeras 3 imágenes */
-        0%, 70% { background: rgba(0, 210, 255, 1); } 
-        /* Violeta para la última imagen */
+        /* Cian: de la imagen 1 a la 3 */
+        0%, 74% { background: rgba(0, 210, 255, 1); } 
+        /* Violeta: Justo cuando entra la imagen 4 */
         75%, 100% { background: rgba(221, 160, 221, 1); } 
     }
 
     @keyframes adCarousel {
+        /* Imagen 1 */
         0%, 20% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        24%, 26% { opacity: 0.8; }
-        30%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        49%, 51% { opacity: 0.8; }
-        55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        74%, 76% { opacity: 0.8; }
-        /* La última imagen coincide con el cambio de color a violeta */
-        80%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        24% { opacity: 0.8; }
+        /* Imagen 2 */
+        25%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        49% { opacity: 0.8; }
+        /* Imagen 3 */
+        50%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        74% { opacity: 0.8; }
+        /* Imagen 4 - CAMBIO A VIOLETA SIMULTÁNEO (75%) */
+        75%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
     }
-   @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
+    
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
 </style>
 """, unsafe_allow_html=True)
 
