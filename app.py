@@ -8,59 +8,57 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. ESTILOS CSS (AÑADIENDO TOOLTIPS) ---
+# --- 2. ESTILOS CSS (RESTAURANDO TODO EL COLOR Y AURA) ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    .header-logo { font-size: 1.5rem; font-weight: 700; color: #fff; display: flex; align-items: center; }
     
-    /* ESTILO PARA LOS TOOLTIPS (EXPLICACIONES) */
+    /* FRASE PRINCIPAL CON COLOR Y AURA RESTAURADOS */
+    .neon-title { 
+        font-size: 3.5rem; 
+        font-weight: 800; 
+        text-align: center; 
+        margin-top: 20px; 
+        color: white; 
+        text-shadow: 0 0 25px rgba(0, 210, 255, 0.5); 
+    }
+    .neon-highlight { 
+        color: #00d2ff; 
+        text-shadow: 0 0 40px rgba(0, 210, 255, 0.8); 
+    }
+    .subtitle { text-align: center; font-size: 1.2rem; color: #aaa; margin-bottom: 40px; }
+    
+    /* TOOLTIPS */
     .info-icon {
         display: inline-block;
-        width: 14px;
-        height: 14px;
+        width: 14px; height: 14px;
         background-color: rgba(255, 255, 255, 0.2);
-        color: #fff;
-        border-radius: 50%;
-        text-align: center;
-        font-size: 10px;
-        line-height: 14px;
-        margin-left: 5px;
-        cursor: help;
-        position: relative;
+        color: #fff; border-radius: 50%;
+        text-align: center; font-size: 10px;
+        line-height: 14px; margin-left: 5px;
+        cursor: help; position: relative;
     }
-    
     .info-icon:hover::after {
         content: attr(data-tooltip);
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
+        position: absolute; bottom: 20px; left: 50%;
         transform: translateX(-50%);
-        background-color: #333;
-        color: #fff;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        white-space: normal;
-        width: 180px;
-        z-index: 100;
+        background-color: #333; color: #fff;
+        padding: 8px 12px; border-radius: 6px;
+        font-size: 12px; white-space: normal;
+        width: 180px; z-index: 100;
         box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         border: 1px solid rgba(255,255,255,0.1);
     }
 
-    /* RECTÁNGULO DE VIDEO / PUBLICIDAD */
+    /* CARRUSEL PUBLICITARIO */
     .video-placeholder {
         border: 1px solid rgba(0, 210, 255, 0.2);
-        border-radius: 12px;
-        height: 220px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-end;
-        margin-bottom: 20px;
-        position: relative;
-        overflow: hidden;
-        background-size: cover;
-        background-position: center;
+        border-radius: 12px; height: 220px;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: flex-end;
+        margin-bottom: 20px; position: relative;
+        overflow: hidden; background-size: cover; background-position: center;
         animation: float 4s ease-in-out infinite, adCarousel 15s infinite;
     }
     @keyframes adCarousel {
@@ -82,8 +80,7 @@ st.markdown("""
         border: none !important; 
         box-shadow: 0 0 15px rgba(0, 210, 255, 0.4) !important;
         transition: all 0.4s ease !important;
-        color: white !important;
-        font-weight: 700 !important;
+        color: white !important; font-weight: 700 !important;
     }
     div.stButton > button[kind="primary"]:hover { transform: scale(1.05) !important; box-shadow: 0 0 30px rgba(0, 210, 255, 0.7) !important; }
 
@@ -99,27 +96,69 @@ st.markdown("""
     [data-testid="column"]:nth-child(1) button { border: 1px solid #444 !important; color: #888 !important; }
     [data-testid="column"]:nth-child(2) button { border: 2px solid #00d2ff !important; color: #00d2ff !important; }
     [data-testid="column"]:nth-child(3) button { border: 2px solid #DDA0DD !important; color: #DDA0DD !important; }
-    div.stButton > button:hover { transform: translateY(-5px) !important; }
+    div.stButton > button:hover { transform: translateY(-5px) !important; background: transparent !important; }
 
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; z-index: 10; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. CONTENIDO CON EXPLICACIONES (TOOLTIPS) ---
-# Aquí definimos el HTML para cada lista de beneficios con sus tooltips
+# --- 3. LOGICA DE IDIOMAS ---
+if "idioma" not in st.session_state:
+    st.session_state.idioma = "Español"
+
+# --- 4. INTERFAZ SUPERIOR ---
+col_logo, _, col_lang = st.columns([2, 4, 1.5])
+with col_logo:
+    st.markdown('<div class="header-logo">🏢 IA REALTY PRO</div>', unsafe_allow_html=True)
+with col_lang:
+    idioma_selec = st.selectbox("", ["Español", "English", "Português"], label_visibility="collapsed")
+    st.session_state.idioma = idioma_selec
+
+# Traducciones rápidas
+textos = {
+    "Español": {
+        "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
+        "sub": "La herramienta IA secreta de los agentes top productores.",
+        "placeholder": "🏠 Pega el link de la propiedad o describe brevemente los ambientes y detalles..."
+    },
+    "English": {
+        "title1": "Turn Boring Listings into", "title2": "Sales Magnets",
+        "sub": "The secret AI tool used by top producers.",
+        "placeholder": "🏠 Paste the property link or briefly describe the rooms and details..."
+    },
+    "Português": {
+        "title1": "Transforme Anúncios Chatos em", "title2": "Ímãs de Vendas",
+        "sub": "A ferramenta de IA secreta dos principais corretores.",
+        "placeholder": "🏠 Cole o link do imóvel ou descreva brevemente os cômodos e detalhes..."
+    }
+}
+
+L = textos[st.session_state.idioma]
+
+st.markdown(f"<h1 class='neon-title'>{L['title1']} <br><span class='neon-highlight'>{L['title2']}</span></h1>", unsafe_allow_html=True)
+st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
+
+# --- 5. CUERPO PRINCIPAL ---
+c1, c2, c3 = st.columns([1, 2, 1])
+with c2:
+    st.markdown('<div class="video-placeholder"><div class="ad-badge">PROPIEDAD DESTACADA</div><div class="ad-overlay">Propiedades de la Comunidad</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="glass-container">', unsafe_allow_html=True)
+    st.text_area("", placeholder=L['placeholder'], label_visibility="collapsed")
+    st.button("✨ GENERAR DESCRIPCIÓN", type="primary")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# --- 6. PLANES CON TOOLTIPS ---
 desc_free = """
 3 descripciones / día <span class="info-icon" data-tooltip="Límite diario de generaciones para probar la herramienta.">i</span><br>
 Soporte Básico <span class="info-icon" data-tooltip="Ayuda técnica vía email con respuesta en 48hs.">i</span><br>
 Marca de Agua <span class="info-icon" data-tooltip="Los textos incluyen una pequeña mención a nuestra web.">i</span>
 """
-
 desc_pro = """
 <b>Generaciones Ilimitadas</b> <span class="info-icon" data-tooltip="Sin límites. Genera todas las descripciones que necesites.">i</span><br>
 Pack Redes Sociales <span class="info-icon" data-tooltip="Crea automáticamente el post para Instagram y Facebook con hashtags.">i</span><br>
 Optimización SEO <span class="info-icon" data-tooltip="Textos redactados para aparecer primero en Google y portales.">i</span><br>
 ✨ <b>Banner Principal</b> <span class="info-icon" data-tooltip="Tus propiedades rotarán en la página de inicio para todos los usuarios.">i</span>
 """
-
 desc_agency = """
 5 Usuarios / Cuentas <span class="info-icon" data-tooltip="Acceso individual para 5 miembros de tu inmobiliaria.">i</span><br>
 Panel de Equipo <span class="info-icon" data-tooltip="Gestiona y supervisa el trabajo de todos tus agentes.">i</span><br>
@@ -127,21 +166,6 @@ Acceso vía API <span class="info-icon" data-tooltip="Conecta nuestra IA directa
 🔥 <b>Prioridad en Banner</b> <span class="info-icon" data-tooltip="Tus anuncios aparecerán con el doble de frecuencia en la home.">i</span>
 """
 
-# --- 4. INTERFAZ ---
-st.markdown('<div class="header-logo">🏢 IA REALTY PRO</div>', unsafe_allow_html=True)
-st.markdown(f"<h1 class='neon-title'>Convierte Anuncios Aburridos en <br><span class='neon-highlight'>Imanes de Ventas</span></h1>", unsafe_allow_html=True)
-st.markdown(f"<p class='subtitle'>La herramienta IA secreta de los agentes top productores.</p>", unsafe_allow_html=True)
-
-# BANNER
-c1, c2, c3 = st.columns([1, 2, 1])
-with c2:
-    st.markdown('<div class="video-placeholder"><div class="ad-badge">PROPIEDAD DESTACADA</div><div class="ad-overlay">Propiedades de la Comunidad</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="glass-container">', unsafe_allow_html=True)
-    st.text_area("", placeholder="Pega el link aquí...", label_visibility="collapsed")
-    st.button("✨ GENERAR DESCRIPCIÓN", type="primary")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# PLANES
 st.markdown("<br><br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
