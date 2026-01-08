@@ -2,18 +2,19 @@ import streamlit as st
 import google.generativeai as genai
 
 # --- 1. CONFIGURACIÓN DE IA ---
-# Tu clave nueva de AI Studio
+# Tu clave es válida según el panel de control.
 API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 
 genai.configure(api_key=API_KEY)
 
 def generar_texto(prompt):
     try:
-        # Usamos 1.5-flash que es el modelo más estable para el plan gratuito
+        # Usamos 1.5-flash: es el más rápido y compatible con el nivel gratuito que tienes activo.
         model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
+        # Esto te mostrará el error exacto si vuelve a fallar
         return f"ERROR_TECNICO: {str(e)}"
 
 # --- 2. CONFIGURACIÓN INICIAL ---
