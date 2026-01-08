@@ -13,27 +13,26 @@ except Exception as e:
 # CORRECCIÓN AQUÍ: Ahora acepta 'idioma' para evitar el TypeError
 def generar_texto(prompt, idioma):
     try:
-        # Cambiamos a 'gemini-pro' que es el nombre universal estable
-        # Si prefieres flash, el nombre exacto suele ser 'models/gemini-1.5-flash-latest'
-        model = genai.GenerativeModel('gemini-pro') 
+        # Usamos el nombre técnico completo para evitar el error 404
+        # Esta ruta es compatible con todas las versiones de la API
+        model = genai.GenerativeModel('models/gemini-1.5-flash') 
         
-        prompt_final = f"Escribe una descripción inmobiliaria profesional en {idioma}. Datos: {prompt}"
+        prompt_final = f"Actúa como experto inmobiliario. Escribe en {idioma}: {prompt}"
         
         response = model.generate_content(prompt_final)
         
         if response and response.text:
             return response.text
         else:
-            return "La IA no devolvió contenido. Intenta ser más específico."
+            return "El modelo no devolvió texto. Prueba describiendo más la propiedad."
     except Exception as e:
-        # Si gemini-pro también falla, intentamos con la ruta completa de flash
+        # Si el anterior falla, intentamos con el alias 'gemini-1.5-flash-latest'
         try:
             model_alt = genai.GenerativeModel('gemini-1.5-flash-latest')
-            response = model_alt.generate_content(f"En {idioma}: {prompt}")
+            response = model_alt.generate_content(f"Idioma {idioma}: {prompt}")
             return response.text
-        except:
-            return f"ERROR_SISTEMA: {str(e)}"
-
+        except Exception as e_alt:
+            return f"ERROR_SISTEMA: {str(e_alt)}"
 # --- 2. CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="IA Realty Pro", page_icon="🏢", layout="wide")
 
