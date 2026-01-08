@@ -10,13 +10,16 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CONEXIÓN CON OPENAI (Se activará cuando pongas la Key en Secrets) ---
-try:
-    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-except Exception:
-    client = None
+# --- 2. CONEXIÓN SEGURA (ARREGLADA PARA QUE NO DE ERROR) ---
+# Si la llave existe en Secrets, la cargamos. Si no, client es None y la página sigue funcionando.
+client = None
+if "OPENAI_API_KEY" in st.secrets:
+    try:
+        client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+    except Exception:
+        client = None
 
-# --- 3. ESTILOS CSS (DISEÑO PREMIUM + AURAS + TRADUCCIÓN) ---
+# --- 3. ESTILOS CSS (DISEÑO PREMIUM CON AURAS) ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -33,10 +36,8 @@ st.markdown("""
         transition: all 0.3s ease; position: relative; 
     }
     
-    /* INPUT TEXTAREA */
     .stTextArea textarea { background-color: rgba(0,0,0,0.3) !important; border: 1px solid #444 !important; color: #eee !important; }
     
-    /* BOTÓN GENERAR */
     button[kind="primary"] { background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; border: none !important; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4) !important; }
     button[kind="primary"]:hover { transform: scale(1.03) !important; box-shadow: 0 0 30px rgba(0, 210, 255, 0.7) !important; }
 
@@ -55,7 +56,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 4. DICCIONARIO DE TRADUCCIÓN ---
-# Detectamos el idioma del selector
 if "idioma_selec" not in st.session_state:
     st.session_state.idioma_selec = "🇪🇸 Español"
 
@@ -66,18 +66,9 @@ if "Español" in st.session_state.idioma_selec:
         "sub": "La herramienta IA secreta de los agentes top productores.",
         "placeholder": "Pega el link o detalles de la propiedad...",
         "btn_gen": "✨ GENERAR DESCRIPCIÓN",
-        "p1_name": "Inicial",
-        "p1_price": "$0",
-        "p1_desc": "3 descripciones / día<br>Soporte Básico<br>Marca de Agua",
-        "p1_btn": "REGISTRO GRATIS",
-        "p2_name": "Agente Pro",
-        "p2_price": "$49",
-        "p2_desc": "<b>Generaciones Ilimitadas</b><br>Pack Redes Sociales (IG/FB)<br>Optimización SEO",
-        "p2_btn": "MEJORAR AHORA",
-        "p3_name": "Agencia",
-        "p3_price": "$199",
-        "p3_desc": "5 Usuarios / Cuentas<br>Panel de Equipo<br>Acceso vía API",
-        "p3_btn": "CONTACTAR VENTAS",
+        "p1_name": "Inicial", "p1_price": "$0", "p1_desc": "3 descripciones / día<br>Soporte Básico<br>Marca de Agua", "p1_btn": "REGISTRO GRATIS",
+        "p2_name": "Agente Pro", "p2_price": "$49", "p2_desc": "<b>Generaciones Ilimitadas</b><br>Pack Redes Sociales (IG/FB)<br>Optimización SEO", "p2_btn": "MEJORAR AHORA",
+        "p3_name": "Agencia", "p3_price": "$199", "p3_desc": "5 Usuarios / Cuentas<br>Panel de Equipo<br>Acceso vía API", "p3_btn": "CONTACTAR VENTAS",
         "popular": "MÁS POPULAR"
     }
 else:
@@ -87,18 +78,9 @@ else:
         "sub": "The secret AI tool used by top producers.",
         "placeholder": "Paste link or property details...",
         "btn_gen": "✨ GENERATE DESCRIPTION",
-        "p1_name": "Starter",
-        "p1_price": "$0",
-        "p1_desc": "3 descriptions / day<br>Basic Support<br>Watermark",
-        "p1_btn": "FREE SIGN UP",
-        "p2_name": "Agent Pro",
-        "p2_price": "$49",
-        "p2_desc": "<b>Unlimited Generations</b><br>Social Media Pack (IG/FB)<br>SEO Optimization",
-        "p2_btn": "UPGRADE NOW",
-        "p3_name": "Agency",
-        "p3_price": "$199",
-        "p3_desc": "5 Users / Accounts<br>Team Dashboard<br>API Access",
-        "p3_btn": "CONTACT SALES",
+        "p1_name": "Starter", "p1_price": "$0", "p1_desc": "3 descriptions / day<br>Basic Support<br>Watermark", "p1_btn": "FREE SIGN UP",
+        "p2_name": "Agent Pro", "p2_price": "$49", "p2_desc": "<b>Unlimited Generations</b><br>Social Media Pack (IG/FB)<br>SEO Optimization", "p2_btn": "UPGRADE NOW",
+        "p3_name": "Agency", "p3_price": "$199", "p3_desc": "5 Users / Accounts<br>Team Dashboard<br>API Access", "p3_btn": "CONTACT SALES",
         "popular": "MOST POPULAR"
     }
 
@@ -123,48 +105,33 @@ with c2:
     if gen_btn and user_input:
         with st.spinner("..."):
             time.sleep(1)
-            # Aquí se activará la respuesta real cuando tengas la API Key
-            st.markdown(f'<div class="result-box">Análisis completado. Generando contenido profesional...</div>', unsafe_allow_html=True)
+            # Verificación de llave
+            if client:
+                try:
+                    res = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[{"role": "user", "content": f"Escribe una descripción de venta inmobiliaria en {st.session_state.idioma_selec}: {user_input}"}]
+                    )
+                    st.markdown(f'<div class="result-box">{res.choices[0].message.content}</div>', unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Error al conectar con la IA: {e}")
+            else:
+                st.info("ℹ️ El motor de IA se activará cuando configures tu API Key.")
 
-# --- 7. SECCIÓN DE PLANES (TRADUCCIÓN ARREGLADA) ---
+# --- 7. SECCIÓN DE PLANES ---
 st.markdown("<br><br><br>", unsafe_allow_html=True)
 p1, p2, p3 = st.columns(3)
 
 with p1:
-    st.markdown(f"""
-    <div class='glass-container'>
-        <h3 style='color: #ccc; margin-top:0;'>{t['p1_name']}</h3>
-        <h1 style='font-size: 3rem; margin: 10px 0;'>{t['p1_price']}</h1>
-        <hr style='border-color: #444; opacity: 0.3;'>
-        <p style='line-height: 1.6;'>{t['p1_desc']}</p>
-        <br>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"<div class='glass-container'><h3 style='color: #ccc; margin-top:0;'>{t['p1_name']}</h3><h1 style='font-size: 3rem; margin: 10px 0;'>{t['p1_price']}</h1><hr style='border-color: #444; opacity: 0.3;'><p style='line-height: 1.6;'>{t['p1_desc']}</p><br></div>", unsafe_allow_html=True)
     st.button(t['p1_btn'], key="btn_p1")
 
 with p2:
-    st.markdown(f"""
-    <div class='glass-container pro-card'>
-        <div class='popular-badge'>{t['popular']}</div>
-        <h3 style='color: #00d2ff; margin-top:10px;'>{t['p2_name']}</h3>
-        <h1 style='font-size: 3rem; margin: 10px 0;'>{t['p2_price']}</h1>
-        <hr style='border-color: #00d2ff; opacity: 0.3;'>
-        <p style='line-height: 1.6;'>{t['p2_desc']}</p>
-        <br>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"<div class='glass-container pro-card'><div class='popular-badge'>{t['popular']}</div><h3 style='color: #00d2ff; margin-top:10px;'>{t['p2_name']}</h3><h1 style='font-size: 3rem; margin: 10px 0;'>{t['p2_price']}</h1><hr style='border-color: #00d2ff; opacity: 0.3;'><p style='line-height: 1.6;'>{t['p2_desc']}</p><br></div>", unsafe_allow_html=True)
     st.button(t['p2_btn'], key="btn_p2")
 
 with p3:
-    st.markdown(f"""
-    <div class='glass-container agency-card'>
-        <h3 style='color: #DDA0DD; margin-top:0;'>{t['p3_name']}</h3>
-        <h1 style='font-size: 3rem; margin: 10px 0;'>{t['p3_price']}</h1>
-        <hr style='border-color: #DDA0DD; opacity: 0.3;'>
-        <p style='line-height: 1.6;'>{t['p3_desc']}</p>
-        <br>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"<div class='glass-container agency-card'><h3 style='color: #DDA0DD; margin-top:0;'>{t['p3_name']}</h3><h1 style='font-size: 3rem; margin: 10px 0;'>{t['p3_price']}</h1><hr style='border-color: #DDA0DD; opacity: 0.3;'><p style='line-height: 1.6;'>{t['p3_desc']}</p><br></div>", unsafe_allow_html=True)
     st.button(t['p3_btn'], key="btn_p3")
 
 st.markdown("<br><br>", unsafe_allow_html=True)
