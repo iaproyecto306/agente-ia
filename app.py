@@ -12,11 +12,10 @@ except Exception as e:
 
 # CORRECCIÓN AQUÍ: Ahora acepta 'idioma' para evitar el TypeError
 def generar_texto(prompt, idioma):
-    # Lista de nombres de modelos para probar (de más nuevo a más compatible)
+    # Lista de nombres de modelos para probar
     modelos_a_probar = [
-        'gemini-1.5-flash',        # Ruta estándar
-        'models/gemini-1.5-flash', # Ruta técnica completa
-        'gemini-pro'               # Ruta clásica estable
+        'gemini-1.5-flash',
+        'gemini-pro'
     ]
     
     ultimo_error = ""
@@ -31,6 +30,10 @@ def generar_texto(prompt, idioma):
                 return response.text
         except Exception as e:
             ultimo_error = str(e)
+            continue 
+            
+    # Línea corregida (sin la llave extra al final)
+    return f"ERROR_SISTEMA: No se pudo conectar. Último error: {ultimo_error}"
             continue # Si falla uno, intenta el siguiente
             
     return f"ERROR_SISTEMA: No se pudo conectar con ningún modelo. Último error: {ultimo_error}" {str(e_alt)}"
