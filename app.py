@@ -294,6 +294,33 @@ with c2:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
     
     st.markdown('</div>', unsafe_allow_html=True)
+    # --- AGREGADO: ESTADÍSTICAS (Impacto) ---
+st.markdown("<br>", unsafe_allow_html=True)
+col_stat1, col_stat2, col_stat3 = st.columns(3)
+
+with col_stat1:
+    st.markdown("""
+        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
+            <h2 style="color:#00d2ff; margin:0;">+10k</h2>
+            <p style="color:#aaa; font-size:0.9rem;">Anuncios Optimizados</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col_stat2:
+    st.markdown("""
+        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
+            <h2 style="color:#00d2ff; margin:0;">-80%</h2>
+            <p style="color:#aaa; font-size:0.9rem;">Tiempo Ahorrado</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col_stat3:
+    st.markdown("""
+        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
+            <h2 style="color:#00d2ff; margin:0;">+45%</h2>
+            <p style="color:#aaa; font-size:0.9rem;">Más Consultas</p>
+        </div>
+    """, unsafe_allow_html=True)
 # --- NUEVA SECCIÓN: CÓMO FUNCIONA ---
 st.markdown("<br><br><h2 style='text-align:center; color:white;'>¿Cómo funciona IA Realty Pro?</h2>", unsafe_allow_html=True)
 c1, c2, c3 = st.columns(3)
