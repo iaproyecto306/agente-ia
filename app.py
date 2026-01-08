@@ -1,36 +1,43 @@
 import streamlit as st
-from google import genai
+import google.generativeai as genai
 
-# --- 1. CONFIGURACIÓN ---
-# PEGA AQUÍ LA NUEVA CLAVE QUE CREASTE EN EL PASO ANTERIOR
-API_KEY = "AIzaSyArgWsV8c3_AAZRLIjcU0gykhbnKtZApW0"
+# --- CONFIGURACIÓN ---
+# Asegúrate de que esta clave sea una NUEVA creada en AI Studio
+API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 
-client = genai.Client(api_key=API_KEY)
+genai.configure(api_key=API_KEY)
 
 def generar_texto(prompt, idioma):
+    # Intentamos con las 3 variantes de nombre que Google acepta según la región
+    modelos = ['gemini-1.5-flash', 'gemini-1.5-flash-latest', 'models/gemini-1.5-flash']
+    
+    for m in modelos:
+        try:
+            model = genai.GenerativeModel(m)
+            response = model.generate_content(f"Escribe en {idioma}: {prompt}")
+            if response.text:
+                return response.text
+        except Exception:
+            continue
+            
+    # Si llega aquí, es que no encontró el modelo. Vamos a listar qué ve la clave:
     try:
-        # Usamos el nombre estándar. Si la clave es nueva y de AI Studio, 
-        # este nombre funcionará sí o sí.
-        response = client.models.generate_content(
-            model="gemini-1.5-flash",
-            contents=f"Escribe un anuncio inmobiliario profesional en {idioma} para: {prompt}"
-        )
-        return response.text
+        disponibles = [m.name for m in genai.list_models() if 'generateContent' in m.supported_methods]
+        return f"ERROR_MODELO: No se halló Flash. Modelos que tu clave SÍ ve: {disponibles}"
     except Exception as e:
-        return f"ERROR_SISTEMA: {str(e)}"
+        return f"ERROR_CRITICO: {str(e)}"
 
-# --- 2. INTERFAZ ---
+# --- INTERFAZ ---
 st.title("🏢 IA Realty Pro")
-user_input = st.text_area("Describe la propiedad:")
+user_input = st.text_area("Descripción:")
 
 if st.button("GENERAR"):
     if user_input:
-        with st.spinner("Generando anuncio..."):
-            resultado = generar_texto(user_input, "Español")
-            if "ERROR_SISTEMA" in resultado:
-                st.error("Error de permisos")
-                st.info("La API sigue rechazando la conexión. Verifica que la clave sea de 'AI Studio'.")
-                st.code(resultado)
+        with st.spinner("Conectando..."):
+            res = generar_texto(user_input, "Español")
+            if "ERROR" in res:
+                st.error("Fallo de conexión")
+                st.code(res)
             else:
-                st.success("¡Funciona!")
-                st.write(resultado)
+                st.success("¡Logrado!")
+                st.write(res)
