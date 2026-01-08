@@ -279,23 +279,30 @@ with c2:
     ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     
-    # El área de texto ocupa todo el ancho del contenedor gris
+  # ... (Caja de texto user_input)
     user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
-  # --- BOTÓN CENTRADO POR CSS (Sustituye a las col_aux) ---
+    # --- CSS PARA CENTRADO ABSOLUTO Y SIMÉTRICO ---
     st.markdown("""
         <style>
-        /* Forzamos que el contenedor del botón use Flexbox para centrarlo */
-        div.stButton {
-            text-align: center;
+        /* Seleccionamos el contenedor del botón dentro de esta sección */
+        [data-testid="stVerticalBlock"] > div:has(div.stButton) {
             display: flex;
             justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        /* Ajustamos el ancho del botón para que no intente ocupar todo el espacio */
+        div.stButton > button {
+            width: auto !important;
+            min-width: 300px; /* Ancho mínimo para que se vea importante */
+            margin: 0 auto;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # Ahora el botón se dibuja solo, y el CSS de arriba lo centra
-    ejecutar = st.button(L['btn_gen'], key="main_gen_v3", type="primary")
+    # El botón ahora aparecerá en el centro exacto
+    ejecutar = st.button(L['btn_gen'], key="main_gen_final", type="primary")
 
     if ejecutar:
         if user_input:
@@ -309,7 +316,6 @@ with c2:
                     st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
         else:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
-   
             
     st.markdown('</div>', unsafe_allow_html=True)
     # --- AGREGADO: ESTADÍSTICAS (Impacto) ---
