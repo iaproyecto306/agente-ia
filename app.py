@@ -282,42 +282,23 @@ with c2:
   # ... (Caja de texto user_input)
     user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
-  # --- CSS AGRESIVO PARA BOTÓN CORTO Y CENTRADO ---
-    st.markdown("""
-        <style>
-        /* 1. Forzamos al contenedor a no dejar que el botón se estire */
-        div.stButton {
-            display: flex !important;
-            justify-content: center !important;
-            width: 100% !important;
-        }
-        
-        /* 2. Forzamos al botón físico a medir solo el 50% y centrarse */
-        div.stButton > button {
-            width: 50% !important; 
-            max-width: 50% !important; /* Añadimos max-width para asegurar */
-            display: block !important;
-            margin: 0 auto !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-    # Cambiamos la key a v5 para refrescar el elemento por completo
-    ejecutar = st.button(L['btn_gen'], key="main_gen_v5", type="primary")
-
-    if ejecutar:
+ st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
+    user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
+    
+    if st.button(L['btn_gen'], key="main_gen", type="primary"):
         if user_input:
             with st.spinner("Generando..."):
                 prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
                 resultado = generar_texto(prompt)
                 
                 if "ERROR_TECNICO" in resultado:
-                    st.error("Hubo un problema de conexión. Por favor, verifica tu API Key.")
+                    st.error("Hubo un problema de conexión. Por favor, verifica tu API Key en la configuración.")
                 else:
                     st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
         else:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
     
+    st.markdown('</div>', unsafe_allow_html=True)
     # --- AGREGADO: ESTADÍSTICAS (Impacto) ---
 st.markdown("<br>", unsafe_allow_html=True)
 col_stat1, col_stat2, col_stat3 = st.columns(3)
