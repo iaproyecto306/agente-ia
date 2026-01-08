@@ -3,7 +3,7 @@ import google.generativeai as genai
 
 # --- 1. CONFIGURACIÓN DE IA (Corregida para estabilidad) ---
 # RECUERDA: Si esta clave sigue dando error, reemplázala por la nueva que generes en AI Studio
-API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
+API_KEY = "AIzaSyBjitYtu7A03WgAfccYzBbn5PhJNnNEgzs"
 
 genai.configure(api_key=API_KEY)
 
