@@ -51,7 +51,7 @@ st.markdown("""
         font-weight: 300;
     }
 
-    /* CAJAS DE CRISTAL */
+    /* CAJAS DE CRISTAL (BASE) */
     .glass-container {
         background: rgba(38, 39, 48, 0.6);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -60,7 +60,7 @@ st.markdown("""
         height: 100%;
         text-align: center;
         transition: transform 0.3s ease;
-        position: relative; /* Necesario para el cartel de Popular */
+        position: relative;
     }
     .glass-container:hover {
         transform: translateY(-5px);
@@ -92,7 +92,42 @@ st.markdown("""
         box-shadow: 0 0 30px rgba(0, 210, 255, 0.7) !important;
     }
 
-    /* --- ANIMACIÓN Y BRILLO DE BOTONES DE PLANES --- */
+    /* --- ESTILOS ESPECÍFICOS DE LAS TARJETAS DE PRECIOS --- */
+
+    /* PRO CARD (CIAN) */
+    .pro-card {
+        border: 1px solid #00d2ff !important;
+        background: rgba(0, 210, 255, 0.05) !important;
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
+    }
+    .pro-text { color: #00d2ff; font-weight: bold; }
+
+    /* AGENCY CARD (VIOLETA - NUEVO BRILLO AGREGADO) */
+    .agency-card {
+        border: 1px solid #DDA0DD !important;
+        background: rgba(221, 160, 221, 0.05) !important;
+        box-shadow: 0 0 20px rgba(221, 160, 221, 0.15); /* Brillo violeta elegante */
+    }
+
+    /* CARTEL "MÁS POPULAR" */
+    .popular-badge {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #00d2ff;
+        color: black;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
+        white-space: nowrap;
+        z-index: 10;
+    }
+
+    /* --- ANIMACIÓN Y BRILLO DE BOTONES --- */
     
     div.stButton > button {
         background: transparent;
@@ -112,11 +147,8 @@ st.markdown("""
         transform: scale(1.05);
     }
 
-    /* 2. Botón PRO (Brillo CIAN Intenso) */
-    [data-testid="column"]:nth-child(2) div.stButton > button {
-        border-color: #00d2ff;
-        color: #00d2ff;
-    }
+    /* 2. Botón PRO (Brillo CIAN) */
+    [data-testid="column"]:nth-child(2) div.stButton > button { border-color: #00d2ff; color: #00d2ff; }
     [data-testid="column"]:nth-child(2) div.stButton > button:hover {
         background-color: #00d2ff !important; 
         color: black !important;
@@ -125,43 +157,14 @@ st.markdown("""
         border-color: #00d2ff !important;
     }
 
-    /* 3. Botón AGENCIA (Brillo VIOLETA Intenso) */
-    [data-testid="column"]:nth-child(3) div.stButton > button {
-        border-color: #DDA0DD;
-        color: #DDA0DD;
-    }
+    /* 3. Botón AGENCIA (Brillo VIOLETA) */
+    [data-testid="column"]:nth-child(3) div.stButton > button { border-color: #DDA0DD; color: #DDA0DD; }
     [data-testid="column"]:nth-child(3) div.stButton > button:hover {
         background-color: #DDA0DD !important;
         color: black !important;
         box-shadow: 0 0 30px rgba(221, 160, 221, 0.8) !important;
         transform: scale(1.05) !important;
         border-color: #DDA0DD !important;
-    }
-
-    /* PRO CARD DESTACADA */
-    .pro-card {
-        border: 1px solid #00d2ff !important;
-        background: rgba(0, 210, 255, 0.05) !important;
-        box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
-    }
-    .pro-text { color: #00d2ff; font-weight: bold; }
-
-    /* CARTEL "MÁS POPULAR" (CSS PURO) */
-    .popular-badge {
-        position: absolute;
-        top: -12px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #00d2ff;
-        color: black;
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 800;
-        letter-spacing: 1px;
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
-        white-space: nowrap;
-        z-index: 10;
     }
 
     /* ANIMACIÓN RESULTADO */
@@ -264,7 +267,7 @@ with p1:
     """, unsafe_allow_html=True)
     st.button("FREE SIGN UP" if "English" in idioma else "REGISTRO GRATIS")
 
-# PLAN PRO (CON CARTEL MÁS POPULAR)
+# PLAN PRO
 with p2:
     st.markdown(f"""
     <div class='glass-container pro-card'>
@@ -283,14 +286,14 @@ with p2:
     """, unsafe_allow_html=True)
     st.button("UPGRADE NOW" if "English" in idioma else "MEJORAR AHORA")
 
-# PLAN AGENCIA
+# PLAN AGENCIA (NUEVO: Usa la clase 'agency-card' para el brillo violeta)
 with p3:
     st.markdown("""
-    <div class='glass-container'>
+    <div class='glass-container agency-card'>
         <h3 style='color: #DDA0DD; margin-top:0;'>Agency</h3>
         <h1 style='font-size: 3rem; margin: 10px 0;'>$199<small style='font-size:1rem'>/mo</small></h1>
         <p style='color: #aaa;'>Teams / Equipos</p>
-        <hr style='border-color: #444; opacity: 0.3;'>
+        <hr style='border-color: #DDA0DD; opacity: 0.3;'>
         <p style='line-height: 1.6;'>
             5 Usuarios / Users<br>
             Panel de Equipo<br>
