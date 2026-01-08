@@ -9,27 +9,34 @@ API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 client = genai.Client(api_key=API_KEY, http_options={'api_version': 'v1'})
 
 def generar_texto(prompt, idioma):
-    try:
-        # Probamos con el nombre corto primero
-        response = client.models.generate_content(
-            model="gemini-1.5-flash",
-            contents=f"Escribe un anuncio inmobiliario en {idioma}: {prompt}"
-        )
-        
-        if response and response.text:
-            return response.text
-        return "ERROR_SISTEMA: Respuesta vacía."
-            
-    except Exception as e:
-        # Si vuelve a dar 404, intentamos con la ruta técnica completa
+    # Lista de nombres técnicos exactos que Google acepta en el nivel gratuito
+    modelos_maestros = [
+        'gemini-1.5-flash-002', 
+        'gemini-1.5-flash',
+        'gemini-1.5-pro'
+    ]
+    
+    ultimo_error = ""
+    
+    for nombre in modelos_a_probar:
         try:
-            response_alt = client.models.generate_content(
-                model="models/gemini-1.5-flash",
-                contents=f"Escribe en {idioma}: {prompt}"
+            # Quitamos el prefijo 'models/' porque el SDK nuevo lo pone solo
+            response = client.models.generate_content(
+                model=nombre,
+                contents=f"Como experto inmobiliario, escribe en {idioma}: {prompt}"
             )
-            return response_alt.text
-        except Exception as e_alt:
-            return f"ERROR_SISTEMA: {str(e_alt)}"
+            if response and response.text:
+                return response.text
+        except Exception as e:
+            ultimo_error = str(e)
+            continue
+            
+    # SI TODO FALLA: Este bloque nos dirá EXACTAMENTE qué modelos tienes tú permitidos
+    try:
+        modelos_disponibles = [m.name for m in client.models.list()]
+        return f"ERROR_SISTEMA: No encontré el modelo. Tus modelos permitidos son: {modelos_disponibles}"
+    except:
+        return f"ERROR_SISTEMA: Error crítico de conexión. {ultimo_error}"
 
 # --- INTERFAZ SIMPLIFICADA PARA PRUEBAS ---
 st.title("🏢 IA Realty Pro")
