@@ -365,3 +365,17 @@ with ct2:
     st.markdown(testimonio_style.format(texto="Increíble cómo resume las características de los links de portales. Ahorro horas.", autor="Ana M. (Century 21)"), unsafe_allow_html=True)
 with ct3:
     st.markdown(testimonio_style.format(texto="La mejor inversión para mi agencia este año. El plan Pro vale cada centavo.", autor="Luis P. (Independiente)"), unsafe_allow_html=True)
+    # --- AGREGADO: FOOTER ---
+st.markdown("""
+    <br><br><br>
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;">
+        <div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 IA REALTY PRO</div>
+        <p style="color:#666; font-size:0.8rem;">
+            © 2026 IA Realty Pro - Herramientas de Inteligencia Artificial para Inmuebles.<br>
+            Términos de Servicio | Política de Privacidad | Soporte
+        </p>
+        <div style="margin-top:15px; color:#00d2ff; font-size:1.2rem;">
+            🌐 📸 🐦 💼
+        </div>
+    </div>
+""", unsafe_allow_html=True)
