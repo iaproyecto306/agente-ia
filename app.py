@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. ESTILOS CSS (DISEÑO FINAL CORREGIDO) ---
+# --- 2. ESTILOS CSS (FORZANDO COLORES Y AURAS POR COLUMNA) ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -67,29 +67,33 @@ st.markdown("""
     .agency-card { border: 1px solid #DDA0DD !important; }
     .agency-card:hover { box-shadow: 0 0 50px rgba(221, 160, 221, 0.5) !important; transform: translateY(-10px) !important; transition: 0.3s; }
 
-    /* ESTILO INDIVIDUAL PARA BOTONES DE COMPRA */
-    /* Usamos selectores de atributo para evitar conflictos */
-    
-    /* Botón Inicial (Free) */
-    div.stButton > button[key="btn_free"] { border: 1px solid #444 !important; color: #999 !important; background: transparent !important; }
-    div.stButton > button[key="btn_free"]:hover { transform: translateY(-5px) !important; border-color: #fff !important; color: #fff !important; }
+    /* --- BOTONES DE COMPRA (FORZADOS POR POSICIÓN) --- */
+    div.stButton > button { width: 100%; height: 3.5rem; font-weight: 700; transition: all 0.3s ease !important; }
 
-    /* Botón Pro (Cian) */
-    div.stButton > button[key="btn_pro"] { border: 2px solid #00d2ff !important; color: #00d2ff !important; background: transparent !important; }
-    div.stButton > button[key="btn_pro"]:hover { 
-        transform: translateY(-5px) !important; 
-        background: #00d2ff !important; 
-        color: #000 !important; 
-        box-shadow: 0 0 25px rgba(0, 210, 255, 0.8) !important; 
+    /* Columna 1: Botón Inicial */
+    [data-testid="stVerticalBlock"] > div:nth-child(2) [data-testid="column"]:nth-child(1) button {
+        background: transparent !important; border: 1px solid #444 !important; color: #999 !important;
+    }
+    [data-testid="stVerticalBlock"] > div:nth-child(2) [data-testid="column"]:nth-child(1) button:hover {
+        transform: translateY(-5px) !important; border-color: #fff !important; color: #fff !important;
     }
 
-    /* Botón Agencia (Violeta) */
-    div.stButton > button[key="btn_agency"] { border: 2px solid #DDA0DD !important; color: #DDA0DD !important; background: transparent !important; }
-    div.stButton > button[key="btn_agency"]:hover { 
-        transform: translateY(-5px) !important; 
-        background: #DDA0DD !important; 
-        color: #000 !important; 
-        box-shadow: 0 0 25px rgba(221, 160, 221, 0.8) !important; 
+    /* Columna 2: Botón Pro (Cian) */
+    [data-testid="stVerticalBlock"] > div:nth-child(2) [data-testid="column"]:nth-child(2) button {
+        background: transparent !important; border: 2px solid #00d2ff !important; color: #00d2ff !important;
+    }
+    [data-testid="stVerticalBlock"] > div:nth-child(2) [data-testid="column"]:nth-child(2) button:hover {
+        transform: translateY(-5px) !important; background: #00d2ff !important; color: #000 !important;
+        box-shadow: 0 0 30px rgba(0, 210, 255, 0.9) !important;
+    }
+
+    /* Columna 3: Botón Agencia (Violeta) */
+    [data-testid="stVerticalBlock"] > div:nth-child(2) [data-testid="column"]:nth-child(3) button {
+        background: transparent !important; border: 2px solid #DDA0DD !important; color: #DDA0DD !important;
+    }
+    [data-testid="stVerticalBlock"] > div:nth-child(2) [data-testid="column"]:nth-child(3) button:hover {
+        transform: translateY(-5px) !important; background: #DDA0DD !important; color: #000 !important;
+        box-shadow: 0 0 30px rgba(221, 160, 221, 0.9) !important;
     }
 
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; z-index: 10; }
@@ -138,19 +142,15 @@ with c2:
 
 # --- 6. SECCIÓN DE PLANES ---
 st.markdown("<br><br><br>", unsafe_allow_html=True)
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.markdown(f"<div class='glass-container free-card'><h3>{t['p1_name']}</h3><h1>$0</h1><hr style='opacity:0.2;'><p>{t['p1_desc']}</p></div>", unsafe_allow_html=True)
-    # ASIGNAMOS KEY PARA EL CSS
-    st.button(t['p1_btn'], key="btn_free")
-
-with col2:
-    st.markdown(f"<div class='glass-container pro-card'><div class='popular-badge'>{t['popular']}</div><h3 style='color:#00d2ff;'>{t['p2_name']}</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'><p>{t['p2_desc']}</p></div>", unsafe_allow_html=True)
-    # ASIGNAMOS KEY PARA EL CSS
-    st.button(t['p2_btn'], key="btn_pro")
-
-with col3:
-    st.markdown(f"<div class='glass-container agency-card'><h3 style='color:#DDA0DD;'>{t['p3_name']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'><p>{t['p3_desc']}</p></div>", unsafe_allow_html=True)
-    # ASIGNAMOS KEY PARA EL CSS
-    st.button(t['p3_btn'], key="btn_agency")
+planes_container = st.container()
+with planes_container:
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"<div class='glass-container free-card'><h3>{t['p1_name']}</h3><h1>$0</h1><hr style='opacity:0.2;'><p>{t['p1_desc']}</p></div>", unsafe_allow_html=True)
+        st.button(t['p1_btn'], key="f1")
+    with col2:
+        st.markdown(f"<div class='glass-container pro-card'><div class='popular-badge'>{t['popular']}</div><h3 style='color:#00d2ff;'>{t['p2_name']}</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'><p>{t['p2_desc']}</p></div>", unsafe_allow_html=True)
+        st.button(t['p2_btn'], key="f2")
+    with col3:
+        st.markdown(f"<div class='glass-container agency-card'><h3 style='color:#DDA0DD;'>{t['p3_name']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'><p>{t['p3_desc']}</p></div>", unsafe_allow_html=True)
+        st.button(t['p3_btn'], key="f3")
