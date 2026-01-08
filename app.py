@@ -348,3 +348,20 @@ with col3:
     desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
     st.button(L['btn3'], key="btn_a")
+    # --- AGREGADO: TESTIMONIOS (Glassmorphism) ---
+st.markdown("<br><br><h2 style='text-align:center; color:white;'>Lo que dicen los Expertos</h2>", unsafe_allow_html=True)
+ct1, ct2, ct3 = st.columns(3)
+
+testimonio_style = """
+    <div style="padding:20px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); height:180px; transition: 0.3s;">
+        <p style="font-style:italic; color:#ddd; font-size:0.9rem;">"{texto}"</p>
+        <p style="color:#00d2ff; font-weight:bold; margin-top:15px;">- {autor}</p>
+    </div>
+"""
+
+with ct1:
+    st.markdown(testimonio_style.format(texto="Mis ventas en Instagram subieron un 50% desde que uso la IA para los copies.", autor="Carlos R. (RE/MAX)"), unsafe_allow_html=True)
+with ct2:
+    st.markdown(testimonio_style.format(texto="Increíble cómo resume las características de los links de portales. Ahorro horas.", autor="Ana M. (Century 21)"), unsafe_allow_html=True)
+with ct3:
+    st.markdown(testimonio_style.format(texto="La mejor inversión para mi agencia este año. El plan Pro vale cada centavo.", autor="Luis P. (Independiente)"), unsafe_allow_html=True)
