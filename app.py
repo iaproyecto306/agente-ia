@@ -45,9 +45,6 @@ st.markdown("""
     .neon-highlight { color: #00d2ff; text-shadow: 0 0 40px rgba(0, 210, 255, 0.8); }
     .subtitle { text-align: center; font-size: 1.2rem; color: #aaa; margin-bottom: 40px; }
 
-    /* BOTONES DE PLANES Y ANCHORS */
-    [data-testid="stHeaderActionElements"] { display: none; }
-
     /* BOTÓN GENERAR */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; border: none !important; 
@@ -88,7 +85,7 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-    /* VIDEO CARRUSEL CON AURA Y ETIQUETA DINÁMICA */
+    /* VIDEO CARRUSEL SINCRONIZADO (4 PASOS: 3 PRO, 1 AGENCIA) */
     .video-placeholder {
         border-radius: 12px; 
         height: 230px; 
@@ -101,8 +98,8 @@ st.markdown("""
         overflow: hidden; 
         background-size: cover; 
         background-position: center;
-        /* Sincronizamos animaciones: float, cambio de fotos y CAMBIO DE AURA */
-        animation: float 5s ease-in-out infinite, adCarousel 18s infinite, auraChange 18s infinite;
+        /* Sincronización total a 24s para que cada foto dure 6s */
+        animation: float 5s ease-in-out infinite, adCarousel 24s infinite, auraChange 24s infinite;
         border: 1px solid rgba(255,255,255,0.1);
     }
 
@@ -110,28 +107,29 @@ st.markdown("""
         position: absolute; top: 15px; left: 15px; 
         color: black; padding: 5px 14px; border-radius: 4px; 
         font-size: 0.75rem; font-weight: 900;
-        animation: tagColorChange 18s infinite;
+        animation: tagColorChange 24s infinite;
     }
 
-    /* ANIMACIÓN DEL COLOR DEL AURA */
+    /* CAMBIO DE AURA: 0-75% PRO, 75-100% AGENCIA */
     @keyframes auraChange {
-        0%, 30% { box-shadow: 0 0 35px rgba(0, 210, 255, 0.4); border-color: rgba(0, 210, 255, 0.3); } /* Color PRO */
-        33%, 63% { box-shadow: 0 0 35px rgba(221, 160, 221, 0.4); border-color: rgba(221, 160, 221, 0.3); } /* Color AGENCIA */
-        66%, 100% { box-shadow: 0 0 35px rgba(0, 210, 255, 0.4); border-color: rgba(0, 210, 255, 0.3); } /* Color PRO */
+        0%, 74% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
+        75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
     }
 
-    /* ANIMACIÓN DEL COLOR DE LA ETIQUETA */
+    /* CAMBIO COLOR ETIQUETA: 0-75% PRO, 75-100% AGENCIA */
     @keyframes tagColorChange {
-        0%, 30% { background: rgba(0, 210, 255, 1); } 
-        33%, 63% { background: rgba(221, 160, 221, 1); } 
-        66%, 100% { background: rgba(0, 210, 255, 1); }
+        0%, 74% { background: rgba(0, 210, 255, 1); } 
+        75%, 100% { background: rgba(221, 160, 221, 1); } 
     }
 
+    /* CARRUSEL DE FOTOS: 3 FOTOS PRO, 1 AGENCIA */
     @keyframes adCarousel {
-        0%, 30% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); }
-        33%, 63% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); }
-        66%, 100% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); }
+        0%, 24% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); }
+        25%, 49% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); }
+        50%, 74% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); }
+        75%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); }
     }
+    
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
 </style>
 """, unsafe_allow_html=True)
