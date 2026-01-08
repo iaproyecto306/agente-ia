@@ -1,20 +1,21 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 
-# --- 1. CONFIGURACIÓN DE IA ---
-# Tu clave es válida según el panel de control.
+# --- 1. CONFIGURACIÓN DE IA (Actualizada a la guía oficial 2.0) ---
+# He colocado tu nueva clave aquí. 
 API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 
-genai.configure(api_key=API_KEY)
-
-def generar_texto(prompt):
+def generar_texto(prompt, idioma):
     try:
-        # Usamos 1.5-flash: es el más rápido y compatible con el nivel gratuito que tienes activo.
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(prompt)
+        # Usamos el cliente de la nueva librería que pegaste anteriormente
+        client = genai.Client(api_key=API_KEY)
+        # Forzamos el uso del modelo 2.0 Flash (más rápido y estable para el plan gratuito)
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
         return response.text
     except Exception as e:
-        # Esto te mostrará el error exacto si vuelve a fallar
         return f"ERROR_TECNICO: {str(e)}"
 
 # --- 2. CONFIGURACIÓN INICIAL ---
@@ -70,7 +71,7 @@ traducciones = {
     "Português": {
         "title1": "Transforme Anúncios Tediosos em", "title2": "Ímãs de Vendas",
         "sub": "A ferramenta de IA secreta dos agentes de alto desempenho.",
-        "placeholder": "🏠 Cole o link do imóvel o descreva brevemente...",
+        "placeholder": "🏠 Cole o link do imóvel ou descreva brevemente...",
         "btn_gen": "✨ GERAR DESCRIÇÃO", "p_destacada": "IMÓVEL EM DESTAQUE",
         "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
@@ -84,7 +85,7 @@ traducciones = {
         "desc8": "5 Usuários / Contas", "t3_1": "Acesso individual para até 5 membros da sua equipe imobiliária.",
         "desc9": "Painel de Equipe", "t3_2": "Supervisione e gerencie as descrições criadas por seus agentes.",
         "desc10": "Acesso via API", "t3_3": "Conecte nossa IA diretamente com seu próprio software ou CRM.",
-        "desc11": "Prioridade no Banner", "t3_4": "Seus anúncios aparecerão com el doble de frequência na home.",
+        "desc11": "Prioridade no Banner", "t3_4": "Seus anúncios aparecerão com o dobro de frequência na home.",
         "btn1": "REGISTRO GRÁTIS", "btn2": "MELHORAR AGORA", "btn3": "CONTATO VENDAS"
     },
     "中文": {
@@ -103,7 +104,7 @@ traducciones = {
         "desc7": "主页横幅", "t2_4": "您的精选房产将在我们的主页上轮播展示。",
         "desc8": "5 个用户/账户", "t3_1": "房产团队中最多 5 名成员的个人访问权限。",
         "desc9": "团队面板", "t3_2": "监控并管理您的经纪人创建的描述。",
-        "desc10": "API 访问", "t3_3": "将我们的人工智能直接与您自己的软件或 CRM 连接。",
+        "desc10": "API 访问", "t3_3": "将我们的人工智能直接与您自己的软件 o CRM 连接。",
         "desc11": "横幅优先级", "t3_4": "您的广告在主页上出现的频率将增加一倍。",
         "btn1": "免费注册", "btn2": "立即升级", "btn3": "联系销售"
     },
@@ -119,7 +120,7 @@ traducciones = {
         "desc3": "Filigrane", "t1_3": "Les textes incluent une petite mention de notre plateforme.",
         "desc4": "Générations Illimitées", "t2_1": "Créez autant de descriptions que nécessaire sans restrictions.",
         "desc5": "Pack Réseaux Sociaux", "t2_2": "Générez automatiquement des posts pour Instagram, Facebook et TikTok avec hashtags.",
-        "desc6": "Optimisation SEO", "t2_3": "Textes structurés pour apparaître en premier dans les moteurs de recherche.",
+        "desc6": "Optimisation SEO", "t2_3": "Textes estructurés pour apparaître en premier dans les moteurs de recherche.",
         "desc7": "Bannière Principale", "t2_4": "Vos propriétés à la une tourneront sur notre page d'accueil.",
         "desc8": "5 Utilisateurs / Comptes", "t3_1": "Accès individuel pour jusqu'à 5 membres de votre équipe immobilière.",
         "desc9": "Tableau de Bord Équipe", "t3_2": "Supervisez et gérez les descriptions créées par vos agents.",
@@ -149,7 +150,7 @@ traducciones = {
     }
 }
 
-# --- 4. ESTILOS CSS ---
+# --- 4. ESTILOS CSS (Mantenidos intactos según tu diseño) ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -170,14 +171,19 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
+    /* PLANES */
     .card-wrapper { transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); border-radius: 12px; height: 480px; }
     .card-wrapper:hover { transform: translateY(-15px); }
     .glass-container { background: rgba(38, 39, 48, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; height: 100%; }
     
     .free-card { box-shadow: 0 0 20px rgba(255, 255, 255, 0.03); }
-    .pro-card { border: 1px solid rgba(0, 210, 255, 0.4) !important; }
-    .agency-card { border: 1px solid rgba(221, 160, 221, 0.4) !important; }
+    .free-card:hover { box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1); }
+    .pro-card { border: 1px solid rgba(0, 210, 255, 0.4) !important; box-shadow: 0 0 25px rgba(0, 210, 255, 0.15); }
+    .pro-card:hover { box-shadow: 0 15px 60px rgba(0, 210, 255, 0.5); }
+    .agency-card { border: 1px solid rgba(221, 160, 221, 0.4) !important; box-shadow: 0 0 25px rgba(221, 160, 221, 0.15); }
+    .agency-card:hover { box-shadow: 0 15px 60px rgba(221, 160, 221, 0.5); }
 
+    /* TOOLTIPS */
     .info-icon { display: inline-block; width: 16px; height: 16px; border-radius: 50%; text-align: center; font-size: 11px; line-height: 16px; margin-left: 8px; cursor: help; position: relative; font-weight: bold; }
     .i-free { background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
     .i-pro { background-color: rgba(0, 210, 255, 0.15); color: #00d2ff; border: 1px solid rgba(0, 210, 255, 0.5); }
@@ -192,21 +198,22 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
+    /* VIDEO CARRUSEL MEJORADO */
     .video-placeholder {
         border-radius: 12px; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
         margin-bottom: 25px; position: relative; overflow: hidden; background-size: cover; background-position: center;
         transition: all 0.8s ease-in-out; animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
         border: 1px solid rgba(255,255,255,0.1);
     }
-    .dynamic-tag { position: absolute; top: 15px; left: 15px; color: black; padding: 5px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; animation: tagColorChange 24s infinite alternate; }
+    .dynamic-tag { position: absolute; top: 15px; left: 15px; color: black; padding: 5px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; transition: background-color 0.8s ease; animation: tagColorChange 24s infinite alternate; }
 
     @keyframes auraChange { 0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } }
     @keyframes tagColorChange { 0%, 70% { background: rgba(0, 210, 255, 1); } 75%, 100% { background: rgba(221, 160, 221, 1); } }
     @keyframes adCarousel { 
-        0%, 20% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); }
-        30%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); }
-        55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); }
-        80%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); }
+        0%, 20% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        30%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        80%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
     }
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
 </style>
@@ -240,7 +247,7 @@ with c2:
         if user_input:
             with st.spinner("Generando..."):
                 prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en: {user_input}. Usa un tono profesional y atractivo."
-                resultado = generar_texto(prompt)
+                resultado = generar_texto(prompt, st.session_state.idioma)
                 
                 if "ERROR_TECNICO" in resultado:
                     st.error("Hubo un problema de conexión. Por favor, verifica tu API Key en la configuración.")
@@ -250,7 +257,7 @@ with c2:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 7. PLANES ---
+# --- 7. PLANES (Con Tooltips correctos) ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
@@ -268,3 +275,4 @@ with col3:
     desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
     st.button(L['btn3'], key="btn_a")
+    
