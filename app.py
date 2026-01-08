@@ -278,17 +278,19 @@ with c2:
         </div>
     ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
+    
+    # El área de texto ocupa todo el ancho del contenedor gris
     user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
-   ejecutar = st.button(L['btn_gen'], key="main_gen_v2", type="primary")
-       user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
-    
-    # Esto crea el centrado del botón
+    # Margen superior para separar el botón del texto
     st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
+    
+    # Sub-columnas para centrar el botón exactamente en el medio
     col_aux1, col_aux2, col_aux3 = st.columns([1, 2, 1])
     
     with col_aux2:
-        ejecutar = st.button(L['btn_gen'], key="main_gen", type="primary")
+        # Se usa key="main_gen_v2" para evitar el error de duplicado
+        ejecutar = st.button(L['btn_gen'], key="main_gen_v2", type="primary")
 
     if ejecutar:
         if user_input:
@@ -302,6 +304,7 @@ with c2:
                     st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
         else:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
+            
     st.markdown('</div>', unsafe_allow_html=True)
     # --- AGREGADO: ESTADÍSTICAS (Impacto) ---
 st.markdown("<br>", unsafe_allow_html=True)
