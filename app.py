@@ -10,13 +10,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CONEXIÓN CON EL CEREBRO (OPENAI) ---
+# --- 2. CONEXIÓN CON OPENAI (Se activará cuando pongas la Key en Secrets) ---
 try:
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 except Exception:
     client = None
 
-# --- 3. ESTILOS CSS (ESTÉTICA FINAL CON AURAS) ---
+# --- 3. ESTILOS CSS (DISEÑO PREMIUM + AURAS + TRADUCCIÓN) ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -33,12 +33,14 @@ st.markdown("""
         transition: all 0.3s ease; position: relative; 
     }
     
+    /* INPUT TEXTAREA */
     .stTextArea textarea { background-color: rgba(0,0,0,0.3) !important; border: 1px solid #444 !important; color: #eee !important; }
     
+    /* BOTÓN GENERAR */
     button[kind="primary"] { background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; border: none !important; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4) !important; }
     button[kind="primary"]:hover { transform: scale(1.03) !important; box-shadow: 0 0 30px rgba(0, 210, 255, 0.7) !important; }
 
-    /* PLANES CON AURAS Y ANIMACIÓN */
+    /* PLANES CON AURAS */
     .pro-card { border: 1px solid #00d2ff !important; }
     .pro-card:hover { box-shadow: 0 0 50px rgba(0, 210, 255, 0.5) !important; transform: translateY(-10px) !important; }
     
@@ -52,8 +54,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 4. TRADUCCIONES ---
-if "Español" in st.session_state.get('idioma_selec', "🇪🇸 Español"):
+# --- 4. DICCIONARIO DE TRADUCCIÓN ---
+# Detectamos el idioma del selector
+if "idioma_selec" not in st.session_state:
+    st.session_state.idioma_selec = "🇪🇸 Español"
+
+if "Español" in st.session_state.idioma_selec:
     t = {
         "title1": "Convierte Anuncios Aburridos en",
         "title2": "Imanes de Ventas",
@@ -61,12 +67,15 @@ if "Español" in st.session_state.get('idioma_selec', "🇪🇸 Español"):
         "placeholder": "Pega el link o detalles de la propiedad...",
         "btn_gen": "✨ GENERAR DESCRIPCIÓN",
         "p1_name": "Inicial",
+        "p1_price": "$0",
         "p1_desc": "3 descripciones / día<br>Soporte Básico<br>Marca de Agua",
         "p1_btn": "REGISTRO GRATIS",
         "p2_name": "Agente Pro",
+        "p2_price": "$49",
         "p2_desc": "<b>Generaciones Ilimitadas</b><br>Pack Redes Sociales (IG/FB)<br>Optimización SEO",
         "p2_btn": "MEJORAR AHORA",
         "p3_name": "Agencia",
+        "p3_price": "$199",
         "p3_desc": "5 Usuarios / Cuentas<br>Panel de Equipo<br>Acceso vía API",
         "p3_btn": "CONTACTAR VENTAS",
         "popular": "MÁS POPULAR"
@@ -79,27 +88,31 @@ else:
         "placeholder": "Paste link or property details...",
         "btn_gen": "✨ GENERATE DESCRIPTION",
         "p1_name": "Starter",
+        "p1_price": "$0",
         "p1_desc": "3 descriptions / day<br>Basic Support<br>Watermark",
         "p1_btn": "FREE SIGN UP",
         "p2_name": "Agent Pro",
+        "p2_price": "$49",
         "p2_desc": "<b>Unlimited Generations</b><br>Social Media Pack (IG/FB)<br>SEO Optimization",
         "p2_btn": "UPGRADE NOW",
         "p3_name": "Agency",
+        "p3_price": "$199",
         "p3_desc": "5 Users / Accounts<br>Team Dashboard<br>API Access",
         "p3_btn": "CONTACT SALES",
         "popular": "MOST POPULAR"
     }
 
-# --- 5. INTERFAZ ---
+# --- 5. INTERFAZ SUPERIOR ---
 col_logo, _, col_lang = st.columns([2, 4, 1.5])
 with col_logo: 
     st.markdown('<div class="header-logo">🏢 IA REALTY PRO</div>', unsafe_allow_html=True)
 with col_lang: 
-    idioma = st.selectbox("", ["🇪🇸 Español", "🇺🇸 English"], label_visibility="collapsed", key="idioma_selec")
+    st.selectbox("", ["🇪🇸 Español", "🇺🇸 English"], label_visibility="collapsed", key="idioma_selec")
 
 st.markdown(f"<h1 class='neon-title'>{t['title1']} <br><span class='neon-highlight'>{t['title2']}</span></h1>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>{t['sub']}</p>", unsafe_allow_html=True)
 
+# --- 6. ÁREA DE TRABAJO ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
     st.markdown('<div class="glass-container">', unsafe_allow_html=True)
@@ -109,11 +122,11 @@ with c2:
 
     if gen_btn and user_input:
         with st.spinner("..."):
-            # Aquí iría la lógica de OpenAI cuando tengas la Key
             time.sleep(1)
-            st.markdown(f'<div class="result-box">Contenido generado profesionalmente...</div>', unsafe_allow_html=True)
+            # Aquí se activará la respuesta real cuando tengas la API Key
+            st.markdown(f'<div class="result-box">Análisis completado. Generando contenido profesional...</div>', unsafe_allow_html=True)
 
-# --- 6. SECCIÓN DE PLANES ARREGLADA ---
+# --- 7. SECCIÓN DE PLANES (TRADUCCIÓN ARREGLADA) ---
 st.markdown("<br><br><br>", unsafe_allow_html=True)
 p1, p2, p3 = st.columns(3)
 
@@ -121,7 +134,7 @@ with p1:
     st.markdown(f"""
     <div class='glass-container'>
         <h3 style='color: #ccc; margin-top:0;'>{t['p1_name']}</h3>
-        <h1 style='font-size: 3rem; margin: 10px 0;'>$0</h1>
+        <h1 style='font-size: 3rem; margin: 10px 0;'>{t['p1_price']}</h1>
         <hr style='border-color: #444; opacity: 0.3;'>
         <p style='line-height: 1.6;'>{t['p1_desc']}</p>
         <br>
@@ -134,7 +147,7 @@ with p2:
     <div class='glass-container pro-card'>
         <div class='popular-badge'>{t['popular']}</div>
         <h3 style='color: #00d2ff; margin-top:10px;'>{t['p2_name']}</h3>
-        <h1 style='font-size: 3rem; margin: 10px 0;'>$49</h1>
+        <h1 style='font-size: 3rem; margin: 10px 0;'>{t['p2_price']}</h1>
         <hr style='border-color: #00d2ff; opacity: 0.3;'>
         <p style='line-height: 1.6;'>{t['p2_desc']}</p>
         <br>
@@ -146,7 +159,7 @@ with p3:
     st.markdown(f"""
     <div class='glass-container agency-card'>
         <h3 style='color: #DDA0DD; margin-top:0;'>{t['p3_name']}</h3>
-        <h1 style='font-size: 3rem; margin: 10px 0;'>$199</h1>
+        <h1 style='font-size: 3rem; margin: 10px 0;'>{t['p3_price']}</h1>
         <hr style='border-color: #DDA0DD; opacity: 0.3;'>
         <p style='line-height: 1.6;'>{t['p3_desc']}</p>
         <br>
