@@ -280,7 +280,7 @@ with c2:
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
-    if st.button(L['btn_gen'], key="main_gen", type="primary"):
+   ejecutar = st.button(L['btn_gen'], key="main_gen_v2", type="primary")
        user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
     # Esto crea el centrado del botón
