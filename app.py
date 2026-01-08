@@ -9,181 +9,205 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- ESTILOS CSS PREMIUM (GLASSMORPHISM + NEON) ---
+# --- INYECCIÓN DE VIDEO DE FONDO Y ESTILOS ---
+# Nota: He puesto un video de ejemplo. Luego puedes cambiar el link por el que quieras.
 st.markdown("""
 <style>
-    /* FONDO DEGRADADO PROFESIONAL */
+    /* 1. FONDO NEGRO PROFUNDO (PARA QUE NO CANSE LA VISTA) */
     .stApp {
-        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        background-color: #050505; /* Casi negro absoluto */
         color: #FAFAFA;
         font-family: 'Helvetica Neue', sans-serif;
     }
-    
-    /* ELIMINAR ELEMENTOS MOLESTOS */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
 
-    /* EFECTO CRISTAL (GLASSMORPHISM) PARA CONTENEDORES */
+    /* 2. VIDEO DE FONDO (FIJO Y DETRÁS DE TODO) */
+    #myVideo {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        min-width: 100%; 
+        min-height: 100%;
+        z-index: -1; /* Se va al fondo */
+        opacity: 0.4; /* Transparencia para que no moleste al leer */
+        filter: grayscale(100%) contrast(1.2); /* Lo hacemos más "tech" y serio */
+    }
+
+    /* 3. CONTENEDORES DE CRISTAL OSCURO (MÁS ELEGANTES) */
     .glass-container {
-        background: rgba(255, 255, 255, 0.05);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(20, 20, 20, 0.7); /* Mucho más oscuro */
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
         padding: 25px;
         margin-bottom: 20px;
-        transition: all 0.3s ease;
     }
 
-    /* BOTÓN CON EFECTO GLOW */
-    div.stButton > button {
-        background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 0.6em 1.2em;
-        font-size: 1.1em;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        width: 100%;
-        box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
-    }
-    div.stButton > button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0 20px rgba(0, 210, 255, 0.7);
-    }
-
-    /* TÍTULOS NEÓN */
+    /* 4. TÍTULOS */
     .neon-title {
         font-size: 3.5rem;
         font-weight: 800;
         text-align: center;
-        margin-bottom: 10px;
-    }
-    .neon-highlight {
-        color: #00d2ff;
-        text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        background: -webkit-linear-gradient(#eee, #333);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
-    /* TARJETA DESTACADA (PRO PLAN) */
-    .pro-card {
-        border: 2px solid #00d2ff !important;
-        box-shadow: 0 0 20px rgba(0, 210, 255, 0.2) !important;
-        transform: scale(1.02);
+    /* 5. JERARQUÍA DE BOTONES (ANIMACIONES PROGRESIVAS) */
+    
+    /* Clase común para todos los botones */
+    div.stButton > button {
+        width: 100%;
+        border-radius: 8px;
+        font-weight: 700;
+        padding: 0.8em 1.2em;
+        transition: all 0.4s ease;
+        background-color: transparent;
+        color: white;
+        border: 1px solid #333;
     }
 
-    /* INPUT FIELDS TRANSPARENTES */
+    /* ANIMACIÓN DEL BOTÓN DE GENERAR (El principal) */
+    div.stButton > button:first-child {
+         border: 1px solid #00FFFF;
+         box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    }
+    div.stButton > button:first-child:hover {
+         background: rgba(0, 255, 255, 0.1);
+         box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+         transform: scale(1.02);
+    }
+    
+    /* EFECTO GLITCH EN INPUTS */
     .stTextInput > div > div > input, .stTextArea > div > div > textarea {
-        background-color: rgba(0, 0, 0, 0.3) !important;
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background-color: rgba(10, 10, 10, 0.8) !important;
+        border: 1px solid #333 !important;
+        color: #00FFFF !important; /* Texto neón al escribir */
     }
+    .stTextInput > div > div > input:focus, .stTextArea > div > div > textarea:focus {
+        border-color: #00FFFF !important;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    }
+
 </style>
+
+<video autoplay muted loop id="myVideo">
+  <source src="https://v4.cdnpk.net/videvo_files/video/free/2017-12/large_watermarked/171124_H1_006_preview.mp4" type="video/mp4">
+</video>
 """, unsafe_allow_html=True)
 
-# --- variables de estado ---
+# --- variables ---
 if 'generated' not in st.session_state: st.session_state.generated = False
 
 # --- HERO SECTION ---
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown(f"<h1 class='neon-title'>Convierte Anuncios Aburridos en <br><span class='neon-highlight'>Imanes de Ventas</span></h1>", unsafe_allow_html=True)
-st.markdown(f"<p style='text-align: center; font-size: 1.3rem; color: #aab2bd;'>La herramienta IA secreta de los agentes top productores.</p>", unsafe_allow_html=True)
+st.markdown(f"<h1 class='neon-title'>IA REALTY <span style='color: #00FFFF; -webkit-text-fill-color: #00FFFF;'>PRO</span></h1>", unsafe_allow_html=True)
+st.markdown(f"<p style='text-align: center; font-size: 1.2rem; color: #888;'>Convierte datos fríos en historias que venden.</p>", unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- ÁREA DE INPUT PRINCIPAL (CRISTAL) ---
+# --- ÁREA INPUT ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
     st.markdown('<div class="glass-container">', unsafe_allow_html=True)
-    user_input = st.text_area("Pega los detalles de la propiedad o link aquí:", height=120, placeholder="Ej: Casa en Miami, 3 habitaciones, piscina, cocina renovada...")
+    user_input = st.text_area("Datos de la propiedad:", height=100, placeholder="Pega el link de Zillow o escribe: 3 habs, 2 baños, vista al mar...")
     st.markdown("<br>", unsafe_allow_html=True)
-    generate_btn = st.button("✨ Generar Descripción Mágica")
+    # Este botón tomará el estilo "principal" definido en CSS
+    generate_btn = st.button("⚡ GENERAR DESCRIPCIÓN") 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- LÓGICA DE GENERACIÓN (SIMULADA) ---
+# --- RESPUESTA IA ---
 if generate_btn and user_input:
     with c2:
-        with st.spinner("Analizando el mercado... Redactando texto persuasivo..."):
-            time.sleep(2)
+        with st.spinner("Conectando con la Matrix inmobiliaria..."):
+            time.sleep(1.5)
             st.session_state.generated = True
             mock_response = f"""
-            🌟 **¡VIVE EL LUJO EN SU MÁXIMA EXPRESIÓN!** 🌟
+            🔥 **OPORTUNIDAD EXCLUSIVA** 🔥
             
-            Descubre el equilibrio perfecto entre estilo y confort en esta residencia soñada.
+            No es solo una casa, es tu próximo capítulo.
             
-            ✅ **Elegancia Moderna:** {user_input if len(user_input) > 5 else "Interiores amplios y luminosos..."}
-            ✅ **Cocina de Chef:** Ideal para entretener invitados.
-            ✅ **Oasis Privado:** Tu refugio personal con piscina.
+            🔹 **Diseño:** {user_input if len(user_input) > 5 else "Espacios abiertos..."}
+            🔹 **Estilo de Vida:** Lujo y confort en cada rincón.
             
-            *No pierdas esta oportunidad. ¡Agenda tu visita privada hoy mismo!*
-            #BienesRaices #CasaDeEnsueño #LuxuryLiving
+            *Agenda tu visita antes de que desaparezca del mercado.*
             """
 
 if st.session_state.generated:
     st.markdown("<br>", unsafe_allow_html=True)
-    c1_r, c2_r, c3_r = st.columns([1, 2, 1])
-    with c2_r:
-        st.markdown(f'<div class="glass-container"><h3>Tu Descripción Premium:</h3>{mock_response}</div>', unsafe_allow_html=True)
-        st.button("📋 Copiar Texto")
+    c1r, c2r, c3r = st.columns([1, 2, 1])
+    with c2r:
+        st.markdown(f'<div class="glass-container" style="border: 1px solid #00FFFF;">{mock_response}</div>', unsafe_allow_html=True)
 
-# --- PRUEBA SOCIAL ---
-st.markdown("<br><br>", unsafe_allow_html=True)
-col_sp1, col_sp2, col_sp3, col_sp4 = st.columns(4)
-with col_sp1: st.markdown("<h4 style='text-align: center; color: #6E7681; opacity: 0.6;'>RE/MAX</h4>", unsafe_allow_html=True)
-with col_sp2: st.markdown("<h4 style='text-align: center; color: #6E7681; opacity: 0.6;'>KELLER W.</h4>", unsafe_allow_html=True)
-with col_sp3: st.markdown("<h4 style='text-align: center; color: #6E7681; opacity: 0.6;'>CENTURY 21</h4>", unsafe_allow_html=True)
-with col_sp4: st.markdown("<h4 style='text-align: center; color: #6E7681; opacity: 0.6;'>SOTHEBY'S</h4>", unsafe_allow_html=True)
-
-# --- SECCIÓN DE PRECIOS (CRISTAL) ---
-st.markdown("<br><br><h2 style='text-align: center; font-weight: 800;'>Planes Flexibles</h2><br>", unsafe_allow_html=True)
+# --- PRECIOS (JERARQUÍA DE BRILLO) ---
+st.markdown("<br><br><br>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center; color: white;'>PLANES</h2><br>", unsafe_allow_html=True)
 
 p1, p2, p3 = st.columns([1, 1, 1])
 
+# PLAN GRATIS (Brillo bajo)
 with p1:
     st.markdown("""
-    <div class='glass-container' style='text-align: center;'>
-        <h3>Gratis</h3>
+    <div class='glass-container' style='text-align: center; opacity: 0.8;'>
+        <h3 style='color: #888;'>Starter</h3>
         <h1>$0</h1>
-        <p>Para probar</p>
-        <hr style='border-color: rgba(255,255,255,0.1);'>
-        <p>3 Descripciones / día</p>
-        <p>Soporte Básico</p>
-        <br>
-        <button style='background: transparent; border: 1px solid white; color: white; padding: 10px; border-radius: 8px; width:100%;'>Registrarse Gratis</button>
+        <p style='font-size: 0.9em; color: #666;'>3 descripciones / día</p>
+        <button style='
+            background: transparent; 
+            border: 1px solid #444; 
+            color: #aaa; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            margin-top: 10px;
+            width: 100%;
+            cursor: pointer;'>
+            Empezar Gratis
+        </button>
     </div>
     """, unsafe_allow_html=True)
 
+# PLAN PRO (Brillo MEDIO - CIAN - EL QUE QUEREMOS VENDER)
 with p2:
-    # Plan destacado PRO
     st.markdown("""
-    <div class='glass-container pro-card' style='text-align: center; position: relative;'>
-        <span style='position: absolute; top: -15px; right: 25%; background: #00d2ff; padding: 5px 15px; border-radius: 20px; font-size: 0.8em; font-weight: bold;'>MÁS POPULAR</span>
-        <h3 style='color: #00d2ff;'>Agente PRO 🚀</h3>
-        <h1>$49<small>/mes</small></h1>
-        <p>Para top producers</p>
-        <hr style='border-color: rgba(255,255,255,0.1);'>
-        <p><b>Generaciones Ilimitadas</b></p>
-        <p>Textos para Instagram/FB Ads</p>
-        <p>Optimización SEO</p>
-        <br>
+    <div class='glass-container' style='text-align: center; border: 1px solid #00FFFF; box-shadow: 0 0 15px rgba(0, 255, 255, 0.15); transform: scale(1.05);'>
+        <h3 style='color: #00FFFF;'>AGENTE PRO 🚀</h3>
+        <h1 style='color: white;'>$49<span style='font-size:0.5em'>/mes</span></h1>
+        <p style='font-size: 0.9em; color: #ccc;'>Ilimitado + Instagram</p>
+        <button style='
+            background: rgba(0, 255, 255, 0.1); 
+            border: 1px solid #00FFFF; 
+            color: #00FFFF; 
+            padding: 12px 20px; 
+            border-radius: 5px; 
+            margin-top: 10px;
+            width: 100%;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            cursor: pointer;'>
+            MEJORAR AHORA
+        </button>
     </div>
     """, unsafe_allow_html=True)
-    st.button("Empezar Ahora ($49)", key="btn_pro")
 
+# PLAN AGENCIA (Brillo ALTO - VIOLETA - EL MÁS CARO)
 with p3:
     st.markdown("""
     <div class='glass-container' style='text-align: center;'>
-        <h3>Agencia</h3>
-        <h1>$199<small>/mes</small></h1>
-        <p>Para equipos</p>
-        <hr style='border-color: rgba(255,255,255,0.1);'>
-        <p>Hasta 5 Usuarios</p>
-        <p>Acceso a API</p>
-        <p>Soporte Prioritario</p>
-        <br>
-        <button style='background: transparent; border: 1px solid white; color: white; padding: 10px; border-radius: 8px; width:100%;'>Contactar Ventas</button>
+        <h3 style='color: #DDA0DD;'>Agencia</h3>
+        <h1>$199</h1>
+        <p style='font-size: 0.9em; color: #ccc;'>Para equipos de 5+</p>
+        <button style='
+            background: transparent; 
+            border: 1px solid #DDA0DD; 
+            color: #DDA0DD; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            margin-top: 10px;
+            width: 100%;
+            box-shadow: 0 0 15px rgba(221, 160, 221, 0.5);
+            cursor: pointer;'>
+            Contactar Ventas
+        </button>
     </div>
     """, unsafe_allow_html=True)
 
