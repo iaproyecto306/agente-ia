@@ -85,7 +85,7 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-    /* VIDEO CARRUSEL (CORREGIDO SIN CORTES) */
+    /* VIDEO CARRUSEL MEJORADO (SOLO FADE) */
     .video-placeholder {
         border-radius: 12px; 
         height: 230px; 
@@ -98,20 +98,20 @@ st.markdown("""
         overflow: hidden; 
         background-size: cover; 
         background-position: center;
-        /* Quitamos 'alternate' para que fluya siempre en un sentido y no pegue saltos al regresar */
-        animation: float 5s ease-in-out infinite, adCarousel 20s infinite, auraChange 20s infinite;
+        /* Quitamos 'alternate' para evitar desincronía */
+        animation: float 5s ease-in-out infinite, adCarousel 24s infinite, auraChange 24s infinite;
         border: 1px solid rgba(255,255,255,0.1);
-        transition: opacity 0.5s ease-in-out;
+        transition: background-image 1.2s ease-in-out;
     }
 
     .dynamic-tag {
         position: absolute; top: 15px; left: 15px; 
         color: black; padding: 5px 14px; border-radius: 4px; 
         font-size: 0.75rem; font-weight: 900;
-        animation: tagColorChange 20s infinite;
+        animation: tagColorChange 24s infinite;
     }
 
-    /* COLORES: Los primeros 3/4 son Cian (Pro), el último 1/4 es Violeta (Agencia) */
+    /* SINCRONIZACIÓN: 0-75% Cian, 75-100% Violeta */
     @keyframes auraChange {
         0%, 74.9% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
         75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
@@ -122,23 +122,12 @@ st.markdown("""
         75%, 100% { background: rgba(221, 160, 221, 1); } 
     }
 
-    /* CARRUSEL: Cada imagen tiene un 25% del tiempo total y un fundido (opacity) en cada cambio */
+    /* CARRUSEL: Solo cambios de imagen en puntos exactos */
     @keyframes adCarousel {
-        /* Imagen 1 (Pro) */
-        0%, 20% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        24%, 25% { opacity: 0.3; } /* Transición suave */
-
-        /* Imagen 2 (Pro) */
-        26%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        49%, 50% { opacity: 0.3; } /* Transición suave */
-
-        /* Imagen 3 (Pro) */
-        51%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        74%, 75% { opacity: 0.3; } /* Transición suave */
-
-        /* Imagen 4 (Agencia) */
-        76%, 95% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        99%, 100% { opacity: 0.3; } /* Transición suave al volver al inicio */
+        0%, 25% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); }
+        25.1%, 50% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); }
+        50.1%, 75% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); }
+        75.1%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); }
     }
     
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
