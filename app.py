@@ -1,38 +1,32 @@
 import streamlit as st
 import google.generativeai as genai
+from google.generativeai.types import RequestOptions
 
 # --- CONFIGURACIÓN ---
 API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 
-# Configuramos la API de forma directa
+# Configuramos la clave
 genai.configure(api_key=API_KEY)
 
 def generar_texto(prompt, idioma):
     try:
-        # Usamos el nombre 'gemini-1.5-flash-latest' que es el más robusto actualmente
-        model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        # FORZAMOS LA VERSIÓN V1 PARA EVITAR EL ERROR 404 DE V1BETA
+        # Esta es la configuración técnica que "salta" el error que tienes
+        opciones = RequestOptions(api_version='v1')
         
-        # Agregamos una instrucción de sistema explícita
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
         response = model.generate_content(
-            f"Como experto inmobiliario, escribe exclusivamente en {idioma}: {prompt}"
+            f"Como experto inmobiliario, escribe en {idioma}: {prompt}",
+            request_options=opciones
         )
         
-        if response and response.text:
+        if response.text:
             return response.text
-        else:
-            return "ERROR_INTERNO: La IA no generó texto."
+        return "ERROR: Respuesta vacía."
             
     except Exception as e:
-        error_str = str(e)
-        # Si falla por el 404, intentamos con el modelo Pro (que a veces tiene rutas distintas)
-        if "404" in error_str:
-            try:
-                model_pro = genai.GenerativeModel('gemini-1.5-pro')
-                res_pro = model_pro.generate_content(f"Escribe en {idioma}: {prompt}")
-                return res_pro.text
-            except:
-                return f"ERROR_TECNICO: {error_str}"
-        return f"ERROR_TECNICO: {error_str}"
+        return f"ERROR_TECNICO: {str(e)}"
 
 # --- INTERFAZ ---
 st.title("🏢 IA Realty Pro")
@@ -40,12 +34,11 @@ user_input = st.text_area("Describe la propiedad:")
 
 if st.button("✨ GENERAR ANUNCIO"):
     if user_input:
-        with st.spinner("Conectando con Google..."):
+        with st.spinner("Conectando con la versión estable..."):
             resultado = generar_texto(user_input, "Español")
             if "ERROR" in resultado:
-                st.error("Sigue habiendo un problema con la API")
-                st.info("Esto puede deberse a que la API Key necesita ser regenerada en AI Studio.")
+                st.error("Fallo persistente de la API")
                 st.code(resultado)
             else:
-                st.success("¡Anuncio generado!")
+                st.success("¡Logrado!")
                 st.write(resultado)
