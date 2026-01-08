@@ -8,7 +8,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. DICCIONARIO MAESTRO (6 IDIOMAS) ---
+# --- 2. DICCIONARIO MAESTRO (Traducciones Completas) ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
@@ -30,11 +30,106 @@ traducciones = {
         "desc11": "Prioridad en Banner", "t3_4": "Tus anuncios aparecerán con el doble de frecuencia en la home.",
         "btn1": "REGISTRO GRATIS", "btn2": "MEJORAR AHORA", "btn3": "CONTACTAR VENTAS"
     },
-    "English": { "title1": "Turn Boring Listings into", "title2": "Sales Magnets", "sub": "The secret AI tool used by top producers.", "placeholder": "🏠 Paste link...", "btn_gen": "✨ GENERATE", "p_destacada": "FEATURED", "comunidad": "Community", "popular": "MOST POPULAR", "plan1": "Starter", "plan2": "Pro", "plan3": "Agency", "desc1": "3/day", "t1_1": "Limit.", "desc2": "Basic", "t1_2": "48h response.", "desc3": "Watermark", "t1_3": "Site mention.", "desc4": "Unlimited", "t2_1": "No limits.", "desc5": "Social Pack", "t2_2": "Auto posts.", "desc6": "SEO", "t2_3": "Rank higher.", "desc7": "Banner", "t2_4": "Home rotation.", "desc8": "5 Users", "t3_1": "5 members.", "desc9": "Team Panel", "t3_2": "Manage agents.", "desc10": "API", "t3_3": "CRM link.", "desc11": "Priority", "t3_4": "Double visibility.", "btn1": "SIGN UP", "btn2": "UPGRADE", "btn3": "CONTACT" },
-    "Português": { "title1": "Anúncios em", "title2": "Ímãs de Vendas", "sub": "Ferramenta secreta.", "placeholder": "🏠 Cole o link...", "btn_gen": "✨ GERAR", "p_destacada": "DESTAQUE", "comunidad": "Comunidade", "popular": "POPULAR", "plan1": "Inicial", "plan2": "Pro", "plan3": "Agência", "desc1": "3 p/ dia", "t1_1": "Limite.", "desc2": "Suporte", "t1_2": "48h.", "desc3": "Marca", "t1_3": "Menção.", "desc4": "Ilimitado", "t2_1": "Sem limite.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Banner", "t2_4": "Home.", "desc8": "5 Contas", "t3_1": "5 membros.", "desc9": "Painel", "t3_2": "Gestão.", "desc10": "API", "t3_3": "CRM.", "desc11": "Prioridade", "t3_4": "Dobra.", "btn1": "GRÁTIS", "btn2": "UPGRADE", "btn3": "VENDAS" },
-    "中文": { "title1": "房产广告", "title2": "销售磁铁", "sub": "AI 工具。", "placeholder": "🏠 粘贴...", "btn_gen": "✨ 生成", "p_destacada": "精选", "comunidad": "社区", "popular": "最受欢迎", "plan1": "入门", "plan2": "专业", "plan3": "机构", "desc1": "3条/天", "t1_1": "限制。", "desc2": "支持", "t1_2": "48小时。", "desc3": "水印", "t1_3": "引用。", "desc4": "无限", "t2_1": "无限制。", "desc5": "社交", "t2_2": "帖子。", "desc6": "SEO", "t2_3": "优化。", "desc7": "横幅", "t2_4": "首页。", "desc8": "5用户", "t3_1": "5成员。", "desc9": "面板", "t3_2": "管理。", "desc10": "API", "t3_3": "CRM。", "desc11": "优先级", "t3_4": "双倍。", "btn1": "免费", "btn2": "升级", "btn3": "联系" },
-    "Français": { "title1": "Annonces", "title2": "Aimants à Ventes", "sub": "Outil secret.", "placeholder": "🏠 Collez...", "btn_gen": "✨ GÉNÉRER", "p_destacada": "VEDETTE", "communauté": "Communauté", "popular": "POPULAIRE", "plan1": "Initial", "plan2": "Pro", "plan3": "Agence", "desc1": "3 / jour", "t1_1": "Limite.", "desc2": "Support", "t1_2": "48h.", "desc3": "Filigrane", "t1_3": "Mention.", "desc4": "Illimité", "t2_1": "Sans limite.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Bannière", "t2_4": "Home.", "desc8": "5 Comptes", "t3_1": "5 membres.", "desc9": "Dashboard", "t3_2": "Gestion.", "desc10": "API", "t3_3": "CRM.", "desc11": "Priorité", "t3_4": "Fréquence.", "btn1": "GRATUIT", "btn2": "AMÉLIORER", "btn3": "VENTES" },
-    "Deutsch": { "title1": "Anzeigen in", "title2": "Verkaufsmagnete", "sub": "KI-Tool.", "placeholder": "🏠 Link...", "btn_gen": "✨ GENERIEREN", "p_destacada": "TOP", "comunidad": "Community", "popular": "BELIEBT", "plan1": "Basis", "plan2": "Pro", "plan3": "Agentur", "desc1": "3 / Tag", "t1_1": "Limit.", "desc2": "Support", "t1_2": "48h.", "desc3": "Wasserzeichen", "t1_3": "Link.", "desc4": "Unbegrenzt", "t2_1": "Keine Limits.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Banner", "t2_4": "Home.", "desc8": "5 Benutzer", "t3_1": "5 Mitglieder.", "desc9": "Panel", "t3_2": "Verwalten.", "desc10": "API", "t3_3": "CRM.", "desc11": "Priorität", "t3_4": "Häufigkeit.", "btn1": "ANMELDEN", "btn2": "UPGRADE", "btn3": "KONTAKT" }
+    "English": {
+        "title1": "Turn Boring Listings into", "title2": "Sales Magnets",
+        "sub": "The secret AI tool used by top producing agents.",
+        "placeholder": "🏠 Paste the property link or describe briefly...",
+        "btn_gen": "✨ GENERATE DESCRIPTION", "p_destacada": "FEATURED PROPERTY",
+        "comunidad": "Community Properties", "popular": "MOST POPULAR",
+        "plan1": "Starter", "plan2": "Pro Agent", "plan3": "Agency",
+        "desc1": "3 descriptions / day", "t1_1": "Daily generation limit for new users.",
+        "desc2": "Basic Support", "t1_2": "Technical help via email with response in less than 48 hours.",
+        "desc3": "Watermark", "t1_3": "Generated texts include a small mention of our platform.",
+        "desc4": "Unlimited Generations", "t2_1": "Create as many descriptions as you need without any restrictions.",
+        "desc5": "Social Media Pack", "t2_2": "Automatically generate posts for Instagram, Facebook, and TikTok with hashtags.",
+        "desc6": "SEO Optimization", "t2_3": "Structured texts designed to rank first in search engines.",
+        "desc7": "Main Banner", "t2_4": "Your featured properties will rotate on our homepage.",
+        "desc8": "5 Users / Accounts", "t3_1": "Individual access for up to 5 members of your real estate team.",
+        "desc9": "Team Dashboard", "t3_2": "Monitor and manage the descriptions created by your agents.",
+        "desc10": "API Access", "t3_3": "Connect our AI directly with your own software or CRM.",
+        "desc11": "Banner Priority", "t3_4": "Your listings will appear twice as often on the home screen.",
+        "btn1": "FREE SIGNUP", "btn2": "UPGRADE NOW", "btn3": "CONTACT SALES"
+    },
+    "Português": {
+        "title1": "Transforme Anúncios Tediosos em", "title2": "Ímãs de Vendas",
+        "sub": "A ferramenta de IA secreta dos agentes de alto desempenho.",
+        "placeholder": "🏠 Cole o link do imóvel ou descreva brevemente...",
+        "btn_gen": "✨ GERAR DESCRIÇÃO", "p_destacada": "IMÓVEL EM DESTAQUE",
+        "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
+        "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
+        "desc1": "3 descrições / dia", "t1_1": "Limite diário de gerações para novos usuários.",
+        "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail com resposta em menos de 48 horas.",
+        "desc3": "Marca d'Água", "t1_3": "Os textos incluem uma pequena menção à nossa plataforma.",
+        "desc4": "Gerações Ilimitadas", "t2_1": "Crie quantas descrições precisar, sem restrições.",
+        "desc5": "Pack Redes Sociais", "t2_2": "Gere automaticamente posts para Instagram, Facebook e TikTok com hashtags.",
+        "desc6": "Otimização SEO", "t2_3": "Textos estruturados para aparecer primeiro nos motores de busca.",
+        "desc7": "Banner Principal", "t2_4": "Seus imóveis de destaque rodarão em nossa página inicial.",
+        "desc8": "5 Usuários / Contas", "t3_1": "Acesso individual para até 5 membros da sua equipe imobiliária.",
+        "desc9": "Painel de Equipe", "t3_2": "Supervisione e gerencie as descrições criadas por seus agentes.",
+        "desc10": "Acesso via API", "t3_3": "Conecte nossa IA diretamente com seu próprio software ou CRM.",
+        "desc11": "Prioridade no Banner", "t3_4": "Seus anúncios aparecerão com o dobro de frequência na home.",
+        "btn1": "REGISTRO GRÁTIS", "btn2": "MELHORAR AGORA", "btn3": "CONTATO VENDAS"
+    },
+    "中文": {
+        "title1": "将枯燥的广告转化为", "title2": "销售磁铁",
+        "sub": "顶级房产经纪人的秘密人工智能工具。",
+        "placeholder": "🏠 粘贴房产链接或简要描述...",
+        "btn_gen": "✨ 生成描述", "p_destacada": "精选房产",
+        "comunidad": "社区房产", "popular": "最受欢迎",
+        "plan1": "基础版", "plan2": "专业经纪人", "plan3": "机构版",
+        "desc1": "每天 3 条描述", "t1_1": "新用户的每日生成限制。",
+        "desc2": "基础支持", "t1_2": "通过电子邮件提供技术帮助，48小时内回复。",
+        "desc3": "水印", "t1_3": "生成的文本包含对我们平台的简短提及。",
+        "desc4": "无限生成", "t2_1": "根据需要创建任意数量的描述，无任何限制。",
+        "desc5": "社交媒体包", "t2_2": "自动为 Instagram、Facebook 和 TikTok 生成带标签的帖子。",
+        "desc6": "SEO 优化", "t2_3": "结构化文本，旨在搜索引擎中排名第一。",
+        "desc7": "主页横幅", "t2_4": "您的精选房产将在我们的主页上轮播展示。",
+        "desc8": "5 个用户/账户", "t3_1": "房产团队中最多 5 名成员的个人访问权限。",
+        "desc9": "团队面板", "t3_2": "监控并管理您的经纪人创建的描述。",
+        "desc10": "API 访问", "t3_3": "将我们的人工智能直接与您自己的软件或 CRM 连接。",
+        "desc11": "横幅优先级", "t3_4": "您的广告在主页上出现的频率将增加一倍。",
+        "btn1": "免费注册", "btn2": "立即升级", "btn3": "联系销售"
+    },
+    "Français": {
+        "title1": "Transformez vos Annonces en", "title2": "Aimants à Ventes",
+        "sub": "L'outil IA secret des agents immobiliers les plus performants.",
+        "placeholder": "🏠 Collez le lien de la propriété ou décrivez brièvement...",
+        "btn_gen": "✨ GÉNÉRER LA DESCRIPTION", "p_destacada": "PROPRIÉTÉ À LA UNE",
+        "comunidad": "Propriétés de la Communauté", "popular": "PLUS POPULAIRE",
+        "plan1": "Initial", "plan2": "Agent Pro", "plan3": "Agence",
+        "desc1": "3 descriptions / jour", "t1_1": "Limite quotidienne de générations pour les nouveaux utilisateurs.",
+        "desc2": "Support de Base", "t1_2": "Aide technique par e-mail avec réponse en moins de 48 heures.",
+        "desc3": "Filigrane", "t1_3": "Les textes incluent une petite mention de notre plateforme.",
+        "desc4": "Générations Illimitées", "t2_1": "Créez autant de descriptions que nécessaire sans restrictions.",
+        "desc5": "Pack Réseaux Sociaux", "t2_2": "Générez automatiquement des posts pour Instagram, Facebook et TikTok avec hashtags.",
+        "desc6": "Optimisation SEO", "t2_3": "Textes structurés pour apparaître en premier dans les moteurs de recherche.",
+        "desc7": "Bannière Principale", "t2_4": "Vos propriétés à la une tourneront sur notre page d'accueil.",
+        "desc8": "5 Utilisateurs / Comptes", "t3_1": "Accès individuel pour jusqu'à 5 membres de votre équipe immobilière.",
+        "desc9": "Tableau de Bord Équipe", "t3_2": "Supervisez et gérez les descriptions créées par vos agents.",
+        "desc10": "Accès via API", "t3_3": "Connectez notre IA directement à votre propre logiciel ou CRM.",
+        "desc11": "Priorité Bannière", "t3_4": "Vos annonces apparaîtront deux fois plus souvent sur la page d'accueil.",
+        "btn1": "INSCRIPTION GRATUITE", "btn2": "AMÉLIORER MAINTENANT", "btn3": "CONTACTER VENTES"
+    },
+    "Deutsch": {
+        "title1": "Verwandeln Sie Anzeigen in", "title2": "Verkaufsmagnete",
+        "sub": "Das geheime KI-Tool der Top-Immobilienmakler.",
+        "placeholder": "🏠 Link einfügen oder kurz beschreiben...",
+        "btn_gen": "✨ BESCHREIBUNG GENERIEREN", "p_destacada": "TOP-IMMOBILIE",
+        "comunidad": "Community-Immobilien", "popular": "AM BELIEBTESTEN",
+        "plan1": "Basis", "plan2": "Pro Makler", "plan3": "Agentur",
+        "desc1": "3 Beschreibungen / Tag", "t1_1": "Tägliches Limit für neue Benutzer.",
+        "desc2": "Basis-Support", "t1_2": "Technische Hilfe per E-Mail mit Antwort in weniger als 48 Stunden.",
+        "desc3": "Wasserzeichen", "t1_3": "Die Texte enthalten einen kleinen Hinweis auf unsere Plattform.",
+        "desc4": "Unbegrenzte Generierungen", "t2_1": "Erstellen Sie so viele Beschreibungen wie nötig ohne Einschränkungen.",
+        "desc5": "Social Media Paket", "t2_2": "Erstellen Sie automatisch Posts für Instagram, Facebook und TikTok mit Hashtags.",
+        "desc6": "SEO-Optimierung", "t2_3": "Strukturierte Texte, um in Suchmaschinen ganz oben zu stehen.",
+        "desc7": "Haupt-Banner", "t2_4": "Ihre Top-Immobilien rotieren auf unserer Startseite.",
+        "desc8": "5 Benutzer / Konten", "t3_1": "Einzelzugriff für bis zu 5 Mitglieder Ihres Immobilienteams.",
+        "desc9": "Team-Panel", "t3_2": "Überwachen und verwalten Sie die von Ihren Maklern erstellten Beschreibungen.",
+        "desc10": "API-Zugang", "t3_3": "Verbinden Sie unsere KI direkt mit Ihrer eigenen Software oder Ihrem CRM.",
+        "desc11": "Banner-Priorität", "t3_4": "Ihre Anzeigen erscheinen doppelt so häufig auf der Startseite.",
+        "btn1": "GRATIS REGISTRIEREN", "btn2": "JETZT UPGRADEN", "btn3": "VERTRIEB KONTAKTIEREN"
+    }
 }
 
 # --- 3. ESTILOS CSS ---
@@ -85,7 +180,7 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-    /* VIDEO CARRUSEL MEJORADO (SUAVIDAD Y SINCRONÍA) */
+    /* VIDEO CARRUSEL MEJORADO */
     .video-placeholder {
         border-radius: 12px; 
         height: 230px; 
@@ -98,7 +193,6 @@ st.markdown("""
         overflow: hidden; 
         background-size: cover; 
         background-position: center;
-        /* Suavizamos la transición general */
         transition: all 0.8s ease-in-out;
         animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
         border: 1px solid rgba(255,255,255,0.1);
@@ -112,7 +206,6 @@ st.markdown("""
         animation: tagColorChange 24s infinite alternate;
     }
 
-    /* SINCRONÍA DE COLORES Y SUAVIZADO (FADE) */
     @keyframes auraChange {
         0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
         75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
@@ -123,10 +216,9 @@ st.markdown("""
         75%, 100% { background: rgba(221, 160, 221, 1); } 
     }
 
-    /* CARRUSEL CON FADE SUAVE EN LOS PUNTOS DE CAMBIO */
     @keyframes adCarousel {
         0%, 20% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        24%, 26% { opacity: 0.8; } /* Pequeño fade para suavizar transición */
+        24%, 26% { opacity: 0.8; }
         30%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
         49%, 51% { opacity: 0.8; }
         55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
