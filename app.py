@@ -1,7 +1,7 @@
 import streamlit as st
 import time
 
-# --- CONFIGURACIÓN DE PÁGINA (Icono Edificio y Nombre arriba a la izq) ---
+# --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
     page_title="IA Realty Pro",
     page_icon="🏢",
@@ -9,13 +9,15 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CSS MAESTRO (TIPOGRAFÍAS ORIGINALES + EFECTOS HOVER) ---
+# --- CSS MAESTRO (CON ANIMACIONES DE INPUT Y RESULTADO) ---
 st.markdown("""
 <style>
-    /* 1. FONDO Y TIPOGRAFÍA GENERAL */
+    /* 1. TIPOGRAFÍA BASE LIMPIA */
+    html, body, [class*="css"] {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    }
     .stApp {
-        background: rgba(0,0,0,0.8); /* Oscuro para contraste */
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Tipografía limpia profesional */
+        background: rgba(0,0,0,0.8);
         color: #FFFFFF;
     }
     
@@ -29,7 +31,7 @@ st.markdown("""
         z-index: -1;
     }
 
-    /* 2. TÍTULOS Y SUBTÍTULOS (ESTILO ORIGINAL RESTAURADO) */
+    /* 2. TÍTULOS ESTILO ORIGINAL */
     .neon-title {
         font-size: 3.8rem;
         font-weight: 800;
@@ -46,114 +48,93 @@ st.markdown("""
     .subtitle {
         text-align: center;
         font-size: 1.3rem;
-        color: #cfd8dc; /* Gris azulado profesional */
+        color: #cfd8dc;
         margin-top: 5px;
         margin-bottom: 40px;
         font-weight: 300;
     }
 
-    /* 3. CONTENEDORES GLASS (BASE) */
+    /* 3. CONTENEDORES GLASS BASE */
     .glass-container {
         background: rgba(30, 30, 30, 0.6);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 16px;
         padding: 30px;
-        transition: all 0.4s ease; /* Suavidad en la animación */
+        transition: all 0.4s ease;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
 
-    /* --- ANIMACIONES DE HOVER EN LOS PLANES --- */
-    
-    /* Plan GRATIS: Hover sutil */
-    .glass-container.plan-free:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.3);
+    /* --- INPUT BOX "VIVO" (Modificación pedida) --- */
+    .stTextArea textarea {
+        background-color: rgba(0,0,0,0.5) !important;
+        border: 1px solid #555 !important;
+        color: #ccc !important; /* Color gris claro cuando no está en foco */
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    /* Cuando haces clic para escribir: */
+    .stTextArea textarea:focus {
+        border-color: #00d2ff !important; /* Borde neón */
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.4) !important; /* Resplandor */
+        color: #00d2ff !important; /* Texto neón al escribir */
+        background-color: rgba(0,0,0,0.7) !important;
     }
 
-    /* Plan PRO: Hover INTENSO (Cian) */
-    .glass-container.plan-pro {
-        border: 1px solid rgba(0, 210, 255, 0.3); /* Borde sutil siempre visible */
-        background: rgba(0, 210, 255, 0.05);
+    /* --- ANIMACIÓN DE RESULTADO FINALIZADO (Modificación pedida) --- */
+    @keyframes finishFlash {
+        0% { box-shadow: 0 0 0 rgba(0, 210, 255, 0); border-color: #00d2ff; }
+        50% { box-shadow: 0 0 50px rgba(0, 210, 255, 1); border-color: white; } /* Flash intenso */
+        100% { box-shadow: 0 0 25px rgba(0, 210, 255, 0.5); border-color: #00d2ff; } /* Se queda brillando */
     }
-    .glass-container.plan-pro:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 0 30px rgba(0, 210, 255, 0.4);
-        border-color: #00d2ff;
-    }
-
-    /* Plan AGENCIA: Hover VIOLETA */
-    .glass-container.plan-agency:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 0 30px rgba(221, 160, 221, 0.4);
-        border-color: #DDA0DD;
+    .result-box {
+        background: rgba(20, 20, 20, 0.8);
+        backdrop-filter: blur(15px);
+        border-radius: 16px;
+        padding: 30px;
+        border: 1px solid #00d2ff;
+        /* Aplicamos la animación al aparecer */
+        animation: finishFlash 1.2s ease-out forwards;
     }
 
-    /* 4. TIPOGRAFÍA DE DESCRIPCIONES (Limpia y legible) */
+    /* --- TIPOGRAFÍA DE PLANES ARREGLADA --- */
     .plan-price {
         font-size: 3rem;
         font-weight: 700;
         margin: 15px 0;
-    }
-    .plan-price small {
-        font-size: 1rem;
-        color: #bbb;
-        font-weight: 400;
+        font-family: 'Helvetica Neue', sans-serif !important;
     }
     .benefit-list {
         text-align: left;
         margin-top: 20px;
-        font-size: 1rem; /* Tamaño legible */
+        font-size: 1.05rem;
         color: #e0e0e0;
-        line-height: 1.6;
-        font-family: 'Helvetica Neue', sans-serif;
+        line-height: 1.7;
+        /* Forzamos la tipografía correcta */
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important; 
+        letter-spacing: 0.3px;
     }
     .benefit-list div {
-        margin-bottom: 8px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
     }
+    .check-icon {margin-right: 10px;}
 
-    /* 5. BOTONES */
-    div.stButton > button {
-        background: transparent;
-        border: 1px solid white;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s;
-        width: 100%;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    div.stButton > button:hover {
-        background: rgba(255,255,255,0.1);
-        color: white;
-    }
+    /* --- HOVER EFFECTS PLANES (Mantenidos de V5) --- */
+    .glass-container.plan-free:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.3); }
+    .glass-container.plan-pro { border: 1px solid rgba(0, 210, 255, 0.3); background: rgba(0, 210, 255, 0.05); }
+    .glass-container.plan-pro:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 0 30px rgba(0, 210, 255, 0.4); border-color: #00d2ff; }
+    .glass-container.plan-agency:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 0 30px rgba(221, 160, 221, 0.4); border-color: #DDA0DD; }
 
-    /* BOTÓN "MEJORAR AHORA" (PRO) - ESTILO ÚNICO */
-    [data-testid="column"]:nth-of-type(2) div.stButton > button {
-        background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%); /* Gradiente Cian-Verde sutil */
-        border: none;
-        color: #000; /* Texto negro para contraste */
-        font-weight: 800;
-        box-shadow: 0 0 15px rgba(0, 201, 255, 0.4);
-    }
-    [data-testid="column"]:nth-of-type(2) div.stButton > button:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 30px rgba(0, 201, 255, 0.8);
-    }
-    
-    /* INPUTS */
-    .stTextArea textarea {
-        background-color: rgba(0,0,0,0.5) !important;
-        border: 1px solid #555 !important;
-        color: white !important;
-        font-size: 1.1rem;
-    }
+    /* BOTONES */
+    div.stButton > button { background: transparent; border: 1px solid white; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; transition: all 0.3s; width: 100%; text-transform: uppercase; letter-spacing: 0.5px; }
+    div.stButton > button:hover { background: rgba(255,255,255,0.1); }
+    [data-testid="column"]:nth-of-type(2) div.stButton > button { background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%); border: none; color: #000; font-weight: 800; box-shadow: 0 0 15px rgba(0, 201, 255, 0.4); }
+    [data-testid="column"]:nth-of-type(2) div.stButton > button:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 201, 255, 0.8); }
 </style>
 
 <video autoplay muted loop id="background-video">
@@ -161,15 +142,15 @@ st.markdown("""
 </video>
 """, unsafe_allow_html=True)
 
-# --- HEADER SECTION ---
+# --- HEADER ---
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown(f"<h1 class='neon-title'>Convierte Anuncios Aburridos en <br><span class='neon-highlight'>Imanes de Ventas</span></h1>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>La herramienta IA secreta de los agentes top productores.</p>", unsafe_allow_html=True)
 
-# --- ÁREA DE GENERACIÓN ---
+# --- INPUT AREA ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
-    st.markdown('<div class="glass-container">', unsafe_allow_html=True)
+    st.markdown('<div class="glass-container" style="justify-content: center;">', unsafe_allow_html=True)
     user_input = st.text_area("", height=120, placeholder="Ej: Casa en Dallas, 3 habitaciones, piscina renovada, cerca de colegios...")
     st.markdown("<br>", unsafe_allow_html=True)
     gen_btn = st.button("✨ GENERAR DESCRIPCIÓN MÁGICA")
@@ -198,7 +179,8 @@ if st.session_state.generated:
     st.markdown("<br>", unsafe_allow_html=True)
     col_r1, col_r2, col_r3 = st.columns([1, 2, 1])
     with col_r2:
-        st.markdown(f'<div class="glass-container" style="border-color: #00d2ff;">{mock_res}</div>', unsafe_allow_html=True)
+        # Usamos la nueva clase 'result-box' que tiene la animación
+        st.markdown(f'<div class="result-box">{mock_res}</div>', unsafe_allow_html=True)
 
 # --- PLANES DE PRECIOS ---
 st.markdown("<br><br><br>", unsafe_allow_html=True)
@@ -214,10 +196,10 @@ with p1:
         <hr style='border-color: #555; opacity: 0.5;'>
         
         <div class='benefit-list'>
-            <div>✅ 3 Descripciones / día</div>
-            <div>✅ Tono Estándar</div>
-            <div style='color: #666;'>❌ Optimización SEO</div>
-            <div style='color: #666;'>❌ Pack Redes Sociales</div>
+            <div><span class='check-icon'>✅</span> 3 Descripciones / día</div>
+            <div><span class='check-icon'>✅</span> Tono Estándar</div>
+            <div style='color: #666;'><span class='check-icon'>❌</span> Optimización SEO</div>
+            <div style='color: #666;'><span class='check-icon'>❌</span> Pack Redes Sociales</div>
         </div>
         <br>
     </div>
@@ -235,10 +217,10 @@ with p2:
         <hr style='border-color: #00d2ff; opacity: 0.5;'>
         
         <div class='benefit-list'>
-            <div>✅ <b>Generaciones ILIMITADAS</b></div>
-            <div>✅ <b>Pack Instagram & FB</b></div>
-            <div>✅ <b>Optimización SEO Google</b></div>
-            <div>✅ Email Follow-ups</div>
+            <div><span class='check-icon'>✅</span> <b>Generaciones ILIMITADAS</b></div>
+            <div><span class='check-icon'>✅</span> <b>Pack Instagram & FB</b></div>
+            <div><span class='check-icon'>✅</span> <b>Optimización SEO Google</b></div>
+            <div><span class='check-icon'>✅</span> Email Follow-ups</div>
         </div>
         <br>
     </div>
@@ -255,10 +237,10 @@ with p3:
         <hr style='border-color: #555; opacity: 0.5;'>
         
         <div class='benefit-list'>
-            <div>✅ Todo lo del plan PRO</div>
-            <div>✅ <b>Hasta 5 Usuarios</b></div>
-            <div>✅ Panel de Control</div>
-            <div>✅ Soporte Prioritario</div>
+            <div><span class='check-icon'>✅</span> Todo lo del plan PRO</div>
+            <div><span class='check-icon'>✅</span> <b>Hasta 5 Usuarios</b></div>
+            <div><span class='check-icon'>✅</span> Panel de Control</div>
+            <div><span class='check-icon'>✅</span> Soporte Prioritario</div>
         </div>
         <br>
     </div>
