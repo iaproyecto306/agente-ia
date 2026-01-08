@@ -194,7 +194,7 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-    /* VIDEO CARRUSEL (Timing Ajustado a 12s) */
+   /* VIDEO CARRUSEL (Timing 24s original con colores sincronizados) */
     .video-placeholder {
         border-radius: 12px; 
         height: 230px; 
@@ -208,7 +208,7 @@ st.markdown("""
         background-size: cover; 
         background-position: center;
         transition: all 0.8s ease-in-out;
-        animation: float 5s ease-in-out infinite, adCarousel 12s infinite alternate, auraChange 12s infinite alternate;
+        animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
         border: 1px solid rgba(255,255,255,0.1);
         color: transparent;
         text-indent: -9999px;
@@ -219,7 +219,7 @@ st.markdown("""
         color: black; padding: 5px 14px; border-radius: 4px; 
         font-size: 0.75rem; font-weight: 900;
         transition: background-color 0.8s ease;
-        animation: tagColorChange 12s infinite alternate;
+        animation: tagColorChange 24s infinite alternate;
         text-indent: 0px; color: black;
     }
 
@@ -230,12 +230,16 @@ st.markdown("""
     }
 
     @keyframes auraChange {
+        /* Cian para las primeras 3 imágenes (0% a 70%) */
         0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
+        /* Cambio a Violeta para la última imagen (75% a 100%) */
         75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
     }
 
     @keyframes tagColorChange {
+        /* Cian para las primeras 3 imágenes */
         0%, 70% { background: rgba(0, 210, 255, 1); } 
+        /* Violeta para la última imagen */
         75%, 100% { background: rgba(221, 160, 221, 1); } 
     }
 
@@ -246,10 +250,10 @@ st.markdown("""
         49%, 51% { opacity: 0.8; }
         55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
         74%, 76% { opacity: 0.8; }
+        /* La última imagen coincide con el cambio de color a violeta */
         80%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
     }
-    
-    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
+   @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
 </style>
 """, unsafe_allow_html=True)
 
