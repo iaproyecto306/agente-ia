@@ -153,6 +153,7 @@ st.markdown("""
     .info-icon:hover::after {
         content: attr(data-tooltip); position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
         background-color: #333; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px; width: 180px; z-index: 100;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
     }
 
     .video-placeholder {
@@ -171,19 +172,11 @@ st.markdown("""
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
 
     .glass-container { background: rgba(38, 39, 48, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; }
-    .stTextArea textarea { background-color: rgba(0,0,0,0.3) !important; border: 1px solid #444 !important; color: #eee !important; }
-
-    div.stButton > button[kind="primary"] { 
-        background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; 
-        border: none !important; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4) !important;
-        transition: all 0.4s ease !important; color: white !important; font-weight: 700 !important;
-    }
-    div.stButton > button[kind="primary"]:hover { transform: scale(1.05) !important; box-shadow: 0 0 30px rgba(0, 210, 255, 0.7) !important; }
-
+    
     .card-wrapper { display: flex; flex-direction: column; height: 100%; }
     .free-card, .pro-card, .agency-card { 
         height: 420px !important; display: flex; flex-direction: column; justify-content: flex-start;
-        transition: all 0.4s ease-out !important; text-align: left !important;
+        transition: all 0.4s ease-out !important; 
     }
     .free-card:hover { transform: translateY(-10px) !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; }
     .pro-card { border: 1px solid rgba(0, 210, 255, 0.3) !important; }
@@ -191,14 +184,14 @@ st.markdown("""
     .agency-card { border: 1px solid rgba(221, 160, 221, 0.3) !important; }
     .agency-card:hover { transform: translateY(-10px) !important; border-color: #DDA0DD !important; box-shadow: 0 0 40px rgba(221, 160, 221, 0.4) !important; }
 
-    /* ESTILO DE LOS PUNTOS DE VENTA */
-    .feature-list { list-style: none; padding: 0; margin: 20px 0; font-size: 0.95rem; line-height: 1.8; }
+    /* PUNTOS DE VENTAS MEJORADOS */
+    .feature-list { text-align: left; margin-top: 20px; font-size: 0.95rem; line-height: 1.8; color: #ddd; }
+    .feature-item { margin-bottom: 8px; display: flex; align-items: center; justify-content: flex-start; }
 
     [data-testid="column"] button { width: 100% !important; }
     [data-testid="column"]:nth-child(1) button { border: 1px solid #444 !important; color: #888 !important; }
     [data-testid="column"]:nth-child(2) button { border: 2px solid #00d2ff !important; color: #00d2ff !important; }
     [data-testid="column"]:nth-child(3) button { border: 2px solid #DDA0DD !important; color: #DDA0DD !important; }
-    div.stButton > button:hover { transform: translateY(-5px) !important; background: transparent !important; }
 
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; z-index: 10; }
 </style>
@@ -234,9 +227,16 @@ st.markdown("<br><br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    desc_f = f"<div class='feature-list'>{L['desc1']} <span class='info-icon' data-tooltip='{L['t1_1']}'>i</span><br>{L['desc2']} <span class='info-icon' data-tooltip='{L['t1_2']}'>i</span><br>{L['desc3']} <span class='info-icon' data-tooltip='{L['t1_3']}'>i</span></div>"
-    st.markdown(f"<div class='card-wrapper'><div class='glass-container free-card'><h3 style='text-align:center;'>{L['plan1']}</h3><h1 style='text-align:center;'>$0</h1><hr style='opacity:0.2;'>{desc_f}</div></div>", unsafe_allow_html=True)
+    content_f = f"<div class='feature-list'><div class='feature-item'>{L['desc1']} <span class='info-icon' data-tooltip='{L['t1_1']}'>i</span></div><div class='feature-item'>{L['desc2']} <span class='info-icon' data-tooltip='{L['t1_2']}'>i</span></div><div class='feature-item'>{L['desc3']} <span class='info-icon' data-tooltip='{L['t1_3']}'>i</span></div></div>"
+    st.markdown(f"<div class='card-wrapper'><div class='glass-container free-card'><h3>{L['plan1']}</h3><h1>$0</h1><hr style='opacity:0.2;'>{content_f}</div></div>", unsafe_allow_html=True)
     st.button(L['btn1'], key="f1")
 
 with col2:
-    desc_p = f"<div class='feature-list'><b>{L['desc4']}</b> <span class='info-icon' data-tooltip='{L['t2_1']}'>i</span><br>{L['desc5']} <span class='info-icon' data-tooltip='{L['t2_2']}'>i</span><br>{L['desc6']} <span class='info-icon' data-tooltip='{L['t2_3']}'>i</span><br>✨ <b>{L['desc7']}
+    content_p = f"<div class='feature-list'><div class='feature-item'><b>{L['desc4']}</b> <span class='info-icon' data-tooltip='{L['t2_1']}'>i</span></div><div class='feature-item'>{L['desc5']} <span class='info-icon' data-tooltip='{L['t2_2']}'>i</span></div><div class='feature-item'>{L['desc6']} <span class='info-icon' data-tooltip='{L['t2_3']}'>i</span></div><div class='feature-item'>✨ <b>{L['desc7']}</b> <span class='info-icon' data-tooltip='{L['t2_4']}'>i</span></div></div>"
+    st.markdown(f"<div class='card-wrapper'><div class='glass-container pro-card'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'>{content_p}</div></div>", unsafe_allow_html=True)
+    st.button(L['btn2'], key="f2")
+
+with col3:
+    content_a = f"<div class='feature-list'><div class='feature-item'>{L['desc8']} <span class='info-icon' data-tooltip='{L['t3_1']}'>i</span></div><div class='feature-item'>{L['desc9']} <span class='info-icon' data-tooltip='{L['t3_2']}'>i</span></div><div class='feature-item'>{L['desc10']} <span class='info-icon' data-tooltip='{L['t3_3']}'>i</span></div><div class='feature-item'>🔥 <b>{L['desc11']}</b> <span class='info-icon' data-tooltip='{L['t3_4']}'>i</span></div></div>"
+    st.markdown(f"<div class='card-wrapper'><div class='glass-container agency-card'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{content_a}</div></div>", unsafe_allow_html=True)
+    st.button(L['btn3'], key="f3")
