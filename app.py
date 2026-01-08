@@ -17,17 +17,17 @@ traducciones = {
         "btn_gen": "✨ GENERAR DESCRIPCIÓN", "p_destacada": "PROPIEDAD DESTACADA",
         "comunidad": "Propiedades de la Comunidad", "popular": "MÁS POPULAR",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agencia",
-        "desc1": "3 descripciones / día", "t1_1": "Límite diario de generaciones.",
-        "desc2": "Soporte Básico", "t1_2": "Ayuda técnica vía email en 48hs.",
-        "desc3": "Marca de Agua", "t1_3": "Los textos incluyen mención a nuestra web.",
-        "desc4": "Generaciones Ilimitadas", "t2_1": "Sin límites para tu negocio.",
-        "desc5": "Pack Redes Sociales", "t2_2": "Post para Instagram y Facebook con hashtags.",
-        "desc6": "Optimización SEO", "t2_3": "Textos preparados para Google.",
-        "desc7": "Banner Principal", "t2_4": "Tus fotos rotan en nuestra home.",
-        "desc8": "5 Usuarios / Cuentas", "t3_1": "Acceso para 5 miembros de tu equipo.",
-        "desc9": "Panel de Equipo", "t3_2": "Gestiona el trabajo de tus agentes.",
-        "desc10": "Acceso vía API", "t3_3": "Conexión directa con tu sistema.",
-        "desc11": "Prioridad en Banner", "t3_4": "Tus anuncios aparecen más seguido.",
+        "desc1": "✅ 3 descripciones / día", "t1_1": "Límite diario de generaciones.",
+        "desc2": "⚡ Soporte Básico", "t1_2": "Ayuda técnica vía email en 48hs.",
+        "desc3": "🏷️ Marca de Agua", "t1_3": "Los textos incluyen mención a nuestra web.",
+        "desc4": "💎 Generaciones Ilimitadas", "t2_1": "Sin límites para tu negocio.",
+        "desc5": "📱 Pack Redes Sociales", "t2_2": "Post para Instagram y Facebook con hashtags.",
+        "desc6": "🔍 Optimización SEO", "t2_3": "Textos preparados para Google.",
+        "desc7": "🌟 Banner Principal", "t2_4": "Tus fotos rotan en nuestra home.",
+        "desc8": "👥 5 Usuarios / Cuentas", "t3_1": "Acceso para 5 miembros de tu equipo.",
+        "desc9": "📊 Panel de Equipo", "t3_2": "Gestiona el trabajo de tus agentes.",
+        "desc10": "🔌 Acceso vía API", "t3_3": "Conexión directa con tu sistema.",
+        "desc11": "🔥 Prioridad en Banner", "t3_4": "Tus anuncios aparecen más seguido.",
         "btn1": "REGISTRO GRATIS", "btn2": "MEJORAR AHORA", "btn3": "CONTACTAR VENTAS"
     },
     "English": {
@@ -37,17 +37,17 @@ traducciones = {
         "btn_gen": "✨ GENERATE DESCRIPTION", "p_destacada": "FEATURED PROPERTY",
         "comunidad": "Community Properties", "popular": "MOST POPULAR",
         "plan1": "Starter", "plan2": "Agent Pro", "plan3": "Agency",
-        "desc1": "3 descriptions / day", "t1_1": "Daily generation limit.",
-        "desc2": "Basic Support", "t1_2": "Email support in 48h.",
-        "desc3": "Watermark", "t1_3": "Texts include our website mention.",
-        "desc4": "Unlimited Generations", "t2_1": "No limits for your business.",
-        "desc5": "Social Media Pack", "t2_2": "Instagram & FB posts with hashtags.",
-        "desc6": "SEO Optimization", "t2_3": "Texts ready for Google.",
-        "desc7": "Main Banner", "t2_4": "Your photos rotate on our home.",
-        "desc8": "5 Users / Accounts", "t3_1": "Access for 5 team members.",
-        "desc9": "Team Panel", "t3_2": "Manage your agents' work.",
-        "desc10": "API Access", "t3_3": "Direct connection to your system.",
-        "desc11": "Banner Priority", "t3_4": "Your ads appear more frequently.",
+        "desc1": "✅ 3 descriptions / day", "t1_1": "Daily generation limit.",
+        "desc2": "⚡ Basic Support", "t1_2": "Email support in 48h.",
+        "desc3": "🏷️ Watermark", "t1_3": "Texts include our website mention.",
+        "desc4": "💎 Unlimited Generations", "t2_1": "No limits for your business.",
+        "desc5": "📱 Social Media Pack", "t2_2": "Instagram & FB posts with hashtags.",
+        "desc6": "🔍 SEO Optimization", "t2_3": "Texts ready for Google.",
+        "desc7": "🌟 Main Banner", "t2_4": "Your photos rotate on our home.",
+        "desc8": "👥 5 Users / Accounts", "t3_1": "Access for 5 team members.",
+        "desc9": "📊 Team Panel", "t3_2": "Manage your agents' work.",
+        "desc10": "🔌 API Access", "t3_3": "Direct connection to your system.",
+        "desc11": "🔥 Banner Priority", "t3_4": "Your ads appear more frequently.",
         "btn1": "FREE SIGN UP", "btn2": "UPGRADE NOW", "btn3": "CONTACT SALES"
     },
     "Português": {
@@ -57,17 +57,17 @@ traducciones = {
         "btn_gen": "✨ GERAR DESCRIÇÃO", "p_destacada": "PROPRIEDADE EM DESTAQUE",
         "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
-        "desc1": "3 descrições / dia", "t1_1": "Limite diário de gerações.",
-        "desc2": "Suporte Básico", "t1_2": "Ajuda técnica em 48h.",
-        "desc3": "Marca d'Água", "t1_3": "Textos incluem menção ao site.",
-        "desc4": "Gerações Ilimitadas", "t2_1": "Sem limites.",
-        "desc5": "Pack Redes Sociais", "t2_2": "Posts para IG e FB.",
-        "desc6": "Otimização SEO", "t2_3": "Textos prontos para Google.",
-        "desc7": "Banner Principal", "t2_4": "Fotos rotacionam na home.",
-        "desc8": "5 Usuários / Contas", "t3_1": "Acesso para 5 membros.",
-        "desc9": "Painel de Equipe", "t3_2": "Gerencie seus corretores.",
-        "desc10": "Acesso via API", "t3_3": "Conexão com seu sistema.",
-        "desc11": "Prioridade no Banner", "t3_4": "Mais frequência na home.",
+        "desc1": "✅ 3 descrições / dia", "t1_1": "Limite diário de gerações.",
+        "desc2": "⚡ Suporte Básico", "t1_2": "Ajuda técnica em 48h.",
+        "desc3": "🏷️ Marca d'Água", "t1_3": "Textos incluem menção ao site.",
+        "desc4": "💎 Gerações Ilimitadas", "t2_1": "Sem limites.",
+        "desc5": "📱 Pack Redes Sociais", "t2_2": "Posts para IG e FB.",
+        "desc6": "🔍 Otimização SEO", "t2_3": "Textos prontos para Google.",
+        "desc7": "🌟 Banner Principal", "t2_4": "Fotos rotacionam na home.",
+        "desc8": "👥 5 Usuários / Contas", "t3_1": "Acesso para 5 membros.",
+        "desc9": "📊 Painel de Equipe", "t3_2": "Gerencie seus corretores.",
+        "desc10": "🔌 Acesso via API", "t3_3": "Conexão com seu sistema.",
+        "desc11": "🔥 Prioridade no Banner", "t3_4": "Mais frequência na home.",
         "btn1": "REGISTRO GRÁTIS", "btn2": "MELHORAR AGORA", "btn3": "CONTATO VENDAS"
     },
     "中文": {
@@ -77,17 +77,17 @@ traducciones = {
         "btn_gen": "✨ 生成描述", "p_destacada": "精选物业",
         "comunidad": "社区物业", "popular": "最受欢迎",
         "plan1": "入门版", "plan2": "专业代理", "plan3": "代理机构",
-        "desc1": "每天 3 条描述", "t1_1": "每日生成限制。",
-        "desc2": "基础支持", "t1_2": "48小时内邮件支持。",
-        "desc3": "水印", "t1_3": "文字包含我们的网站引用。",
-        "desc4": "无限生成", "t2_1": "业务无限制。",
-        "desc5": "社交媒体包", "t2_2": "带标签的 IG 和 FB 帖子。",
-        "desc6": "SEO 优化", "t2_3": "为 Google 准备的文字。",
-        "desc7": "主横幅", "t2_4": "您的照片在首页轮换。",
-        "desc8": "5 个用户 / 账户", "t3_1": "5 名团队成员的权限。",
-        "desc9": "团队面板", "t3_2": "管理代理人的工作。",
-        "desc10": "API 访问", "t3_3": "直接连接到您的系统。",
-        "desc11": "横幅优先级", "t3_4": "您的广告出现频率更高。",
+        "desc1": "✅ 每天 3 条描述", "t1_1": "每日生成限制。",
+        "desc2": "⚡ 基础支持", "t1_2": "48小时内邮件支持。",
+        "desc3": "🏷️ 水印", "t1_3": "文字包含我们的网站引用。",
+        "desc4": "💎 无限生成", "t2_1": "业务无限制。",
+        "desc5": "📱 社交媒体包", "t2_2": "带标签的 IG 和 FB 帖子。",
+        "desc6": "🔍 SEO 优化", "t2_3": "为 Google 准备的文字。",
+        "desc7": "🌟 主横幅", "t2_4": "您的照片在首页轮换。",
+        "desc8": "👥 5 个用户 / 账户", "t3_1": "5 名团队成员的权限。",
+        "desc9": "📊 团队面板", "t3_2": "管理代理人的工作。",
+        "desc10": "🔌 API 访问", "t3_3": "直接连接到您的系统。",
+        "desc11": "🔥 横幅优先级", "t3_4": "您的广告出现频率更高。",
         "btn1": "免费注册", "btn2": "立即升级", "btn3": "联系销售"
     },
     "Français": {
@@ -97,17 +97,17 @@ traducciones = {
         "btn_gen": "✨ GÉNÉRER LA DESCRIPTION", "p_destacada": "PROPRIÉTÉ EN VEDETTE",
         "comunidad": "Propriétés de la Communauté", "popular": "PLUS POPULAIRE",
         "plan1": "Initial", "plan2": "Agent Pro", "plan3": "Agence",
-        "desc1": "3 descriptions / jour", "t1_1": "Limite de génération.",
-        "desc2": "Support de base", "t1_2": "Support par email en 48h.",
-        "desc3": "Filigrane", "t1_3": "Les textes incluent notre site.",
-        "desc4": "Générations Illimitées", "t2_1": "Aucune limite.",
-        "desc5": "Pack Réseaux Sociaux", "t2_2": "Posts IG et FB avec hashtags.",
-        "desc6": "Optimisation SEO", "t2_3": "Prêt pour Google.",
-        "desc7": "Bannière Principale", "t2_4": "Vos photos tournent sur l'accueil.",
-        "desc8": "5 Utilisateurs / Comptes", "t3_1": "Accès pour 5 membres.",
-        "desc9": "Tableau de Bord", "t3_2": "Gérez vos agents.",
-        "desc10": "Accès API", "t3_3": "Connexion directe.",
-        "desc11": "Priorité Bannière", "t3_4": "Plus de fréquence sur l'accueil.",
+        "desc1": "✅ 3 descriptions / jour", "t1_1": "Limite de génération.",
+        "desc2": "⚡ Support de base", "t1_2": "Support par email en 48h.",
+        "desc3": "🏷️ Filigrane", "t1_3": "Les textes incluent notre site.",
+        "desc4": "💎 Générations Illimitées", "t2_1": "Aucune limite.",
+        "desc5": "📱 Pack Réseaux Sociaux", "t2_2": "Posts IG et FB avec hashtags.",
+        "desc6": "🔍 Optimisation SEO", "t2_3": "Prêt pour Google.",
+        "desc7": "🌟 Bannière Principale", "t2_4": "Vos photos tournent sur l'accueil.",
+        "desc8": "👥 5 Utilisateurs / Comptes", "t3_1": "Accès pour 5 membres.",
+        "desc9": "📊 Tableau de Bord", "t3_2": "Gérez vos agents.",
+        "desc10": "🔌 Accès API", "t3_3": "Connexion directe.",
+        "desc11": "🔥 Priorité Bannière", "t3_4": "Plus de fréquence sur l'accueil.",
         "btn1": "INSCRIPTION GRATUITE", "btn2": "AMÉLIORER", "btn3": "CONTACTER VENTES"
     },
     "Deutsch": {
@@ -117,22 +117,22 @@ traducciones = {
         "btn_gen": "✨ BESCHREIBUNG GENERIEREN", "p_destacada": "TOP-IMMOBILIE",
         "comunidad": "Community-Immobilien", "popular": "AM BELIEBTESTEN",
         "plan1": "Basis", "plan2": "Agent Pro", "plan3": "Agentur",
-        "desc1": "3 Beschreibungen / Tag", "t1_1": "Tägliches Limit.",
-        "desc2": "Basis-Support", "t1_2": "E-Mail-Support in 48h.",
-        "desc3": "Wasserzeichen", "t1_3": "Texte enthalten Web-Link.",
-        "desc4": "Unbegrenzte KI-Texte", "t2_1": "Keine Grenzen.",
-        "desc5": "Social Media Paket", "t2_2": "IG & FB Posts mit Hashtags.",
-        "desc6": "SEO-Optimierung", "t2_3": "Bereit für Google.",
-        "desc7": "Hauptbanner", "t2_4": "Ihre Fotos auf der Startseite.",
-        "desc8": "5 Benutzer / Konten", "t3_1": "Zugang für 5 Mitglieder.",
-        "desc9": "Team-Panel", "t3_2": "Verwalten Sie Ihre Makler.",
-        "desc10": "API-Zugang", "t3_3": "Direkte Anbindung.",
-        "desc11": "Banner-Priorität", "t3_4": "Höhere Frequenz auf Home.",
+        "desc1": "✅ 3 Beschreibungen / Tag", "t1_1": "Tägliches Limit.",
+        "desc2": "⚡ Basis-Support", "t1_2": "E-Mail-Support in 48h.",
+        "desc3": "🏷️ Wasserzeichen", "t1_3": "Texte enthalten Web-Link.",
+        "desc4": "💎 Unbegrenzte KI-Texte", "t2_1": "Keine Grenzen.",
+        "desc5": "📱 Social Media Paket", "t2_2": "IG & FB Posts mit Hashtags.",
+        "desc6": "🔍 SEO-Optimierung", "t2_3": "Bereit für Google.",
+        "desc7": "🌟 Hauptbanner", "t2_4": "Ihre Fotos auf der Startseite.",
+        "desc8": "👥 5 Benutzer / Konten", "t3_1": "Zugang für 5 Mitglieder.",
+        "desc9": "📊 Team-Panel", "t3_2": "Verwalten Sie Ihre Makler.",
+        "desc10": "🔌 API-Zugang", "t3_3": "Direkte Anbindung.",
+        "desc11": "🔥 Banner-Priorität", "t3_4": "Höhere Frequenz auf Home.",
         "btn1": "ANMELDEN", "btn2": "JETZT UPGRADEN", "btn3": "KONTAKT"
     }
 }
 
-# --- 3. ESTILOS CSS (RESTAURANDO ANIMACIONES Y AURA) ---
+# --- 3. ESTILOS CSS ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -155,7 +155,6 @@ st.markdown("""
         background-color: #333; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px; width: 180px; z-index: 100;
     }
 
-    /* CARRUSEL ANIMADO */
     .video-placeholder {
         border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 12px; height: 220px;
         display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
@@ -181,17 +180,19 @@ st.markdown("""
     }
     div.stButton > button[kind="primary"]:hover { transform: scale(1.05) !important; box-shadow: 0 0 30px rgba(0, 210, 255, 0.7) !important; }
 
-    /* SIMETRÍA DEFINITIVA */
     .card-wrapper { display: flex; flex-direction: column; height: 100%; }
     .free-card, .pro-card, .agency-card { 
         height: 420px !important; display: flex; flex-direction: column; justify-content: flex-start;
-        transition: all 0.4s ease-out !important; 
+        transition: all 0.4s ease-out !important; text-align: left !important;
     }
     .free-card:hover { transform: translateY(-10px) !important; border: 1px solid rgba(255, 255, 255, 0.4) !important; }
     .pro-card { border: 1px solid rgba(0, 210, 255, 0.3) !important; }
     .pro-card:hover { transform: translateY(-10px) !important; border-color: #00d2ff !important; box-shadow: 0 0 40px rgba(0, 210, 255, 0.4) !important; }
     .agency-card { border: 1px solid rgba(221, 160, 221, 0.3) !important; }
     .agency-card:hover { transform: translateY(-10px) !important; border-color: #DDA0DD !important; box-shadow: 0 0 40px rgba(221, 160, 221, 0.4) !important; }
+
+    /* ESTILO DE LOS PUNTOS DE VENTA */
+    .feature-list { list-style: none; padding: 0; margin: 20px 0; font-size: 0.95rem; line-height: 1.8; }
 
     [data-testid="column"] button { width: 100% !important; }
     [data-testid="column"]:nth-child(1) button { border: 1px solid #444 !important; color: #888 !important; }
@@ -211,7 +212,7 @@ col_logo, _, col_lang = st.columns([2, 4, 1.5])
 with col_logo:
     st.markdown('<div class="header-logo">🏢 IA REALTY PRO</div>', unsafe_allow_html=True)
 with col_lang:
-    idioma_selec = st.selectbox("", list(traducciones.keys()), label_visibility="collapsed")
+    idioma_selec = st.selectbox("", list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma), label_visibility="collapsed")
     st.session_state.idioma = idioma_selec
 
 L = traducciones[st.session_state.idioma]
@@ -233,16 +234,9 @@ st.markdown("<br><br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    desc_f = f"{L['desc1']} <span class='info-icon' data-tooltip='{L['t1_1']}'>i</span><br>{L['desc2']} <span class='info-icon' data-tooltip='{L['t1_2']}'>i</span><br>{L['desc3']} <span class='info-icon' data-tooltip='{L['t1_3']}'>i</span>"
-    st.markdown(f"<div class='card-wrapper'><div class='glass-container free-card'><h3>{L['plan1']}</h3><h1>$0</h1><hr style='opacity:0.2;'><p>{desc_f}</p></div></div>", unsafe_allow_html=True)
+    desc_f = f"<div class='feature-list'>{L['desc1']} <span class='info-icon' data-tooltip='{L['t1_1']}'>i</span><br>{L['desc2']} <span class='info-icon' data-tooltip='{L['t1_2']}'>i</span><br>{L['desc3']} <span class='info-icon' data-tooltip='{L['t1_3']}'>i</span></div>"
+    st.markdown(f"<div class='card-wrapper'><div class='glass-container free-card'><h3 style='text-align:center;'>{L['plan1']}</h3><h1 style='text-align:center;'>$0</h1><hr style='opacity:0.2;'>{desc_f}</div></div>", unsafe_allow_html=True)
     st.button(L['btn1'], key="f1")
 
 with col2:
-    desc_p = f"<b>{L['desc4']}</b> <span class='info-icon' data-tooltip='{L['t2_1']}'>i</span><br>{L['desc5']} <span class='info-icon' data-tooltip='{L['t2_2']}'>i</span><br>{L['desc6']} <span class='info-icon' data-tooltip='{L['t2_3']}'>i</span><br>✨ <b>{L['desc7']}</b> <span class='info-icon' data-tooltip='{L['t2_4']}'>i</span>"
-    st.markdown(f"<div class='card-wrapper'><div class='glass-container pro-card'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'><p>{desc_p}</p></div></div>", unsafe_allow_html=True)
-    st.button(L['btn2'], key="f2")
-
-with col3:
-    desc_a = f"{L['desc8']} <span class='info-icon' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']} <span class='info-icon' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']} <span class='info-icon' data-tooltip='{L['t3_3']}'>i</span><br>🔥 <b>{L['desc11']}</b> <span class='info-icon' data-tooltip='{L['t3_4']}'>i</span>"
-    st.markdown(f"<div class='card-wrapper'><div class='glass-container agency-card'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'><p>{desc_a}</p></div></div>", unsafe_allow_html=True)
-    st.button(L['btn3'], key="f3")
+    desc_p = f"<div class='feature-list'><b>{L['desc4']}</b> <span class='info-icon' data-tooltip='{L['t2_1']}'>i</span><br>{L['desc5']} <span class='info-icon' data-tooltip='{L['t2_2']}'>i</span><br>{L['desc6']} <span class='info-icon' data-tooltip='{L['t2_3']}'>i</span><br>✨ <b>{L['desc7']}
