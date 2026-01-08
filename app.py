@@ -1,21 +1,15 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 
-# --- 1. CONFIGURACIÓN DE IA (Corregida para estabilidad) ---
-# RECUERDA: Si esta clave sigue dando error, reemplázala por la nueva que generes en AI Studio
-API_KEY = "AIzaSyBjitYtu7A03WgAfccYzBbn5PhJNnNEgzs"
+# --- 1. CONFIGURACIÓN DE IA (Actualizada según tu guía oficial) ---
+# RECUERDA: Si la clave de tu cuenta actual falla, pega aquí la de un Gmail secundario.
+API_KEY = "AIzaSyD9fd0DenZgs67N_vKC-WhXG4XQoctjEio"
 
-genai.configure(api_key=API_KEY)
-
-# Usamos una función para llamar al modelo y evitar errores de sesión
-def generar_texto(prompt):
-    try:
-        # Forzamos la selección del modelo flash que es el que permite el plan gratuito
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(prompt)
-        return response.text
-    except Exception as e:
-        return f"ERROR_TECNICO: {str(e)}"
+try:
+    # Usamos el cliente nuevo de la guía oficial
+    client = genai.Client(api_key=API_KEY)
+except Exception as e:
+    st.error(f"Error al inicializar la IA: {e}")
 
 # --- 2. CONFIGURACIÓN INICIAL ---
 st.set_page_config(
@@ -97,7 +91,7 @@ traducciones = {
         "desc1": "每天 3 条描述", "t1_1": "新用户的每日生成限制。",
         "desc2": "基础支持", "t1_2": "通过电子邮件提供技术帮助，48小时内回复。",
         "desc3": "水印", "t1_3": "生成的文本包含对我们平台的简短提及。",
-        "desc4": "无限生成", "t2_1": "根据需要创建任意数量的描述，无任何限制。",
+        "desc4": "无限生成", "t2_1": "根据需要创建任意数量 farm 的描述，无任何限制。",
         "desc5": "社交媒体包", "t2_2": "自动为 Instagram、Facebook 和 TikTok 生成带标签的帖子。",
         "desc6": "SEO 优化", "t2_3": "结构化文本，旨在搜索引擎中排名第一。",
         "desc7": "主页横幅", "t2_4": "您的精选房产将在我们的主页上轮播展示。",
@@ -143,7 +137,7 @@ traducciones = {
         "desc7": "Haupt-Banner", "t2_4": "Ihre Top-Immobilien rotieren auf unserer Startseite.",
         "desc8": "5 Benutzer / Konten", "t3_1": "Einzelzugriff für bis zu 5 Mitglieder Ihres Immobilienteams.",
         "desc9": "Team-Panel", "t3_2": "Überwachen und verwalten Sie die von Ihren Maklern erstellten Beschreibungen.",
-        "desc10": "API-Zugang", "t3_3": "Verbinden Sie unsere KI direkt mit Ihrer eigenen Software oder Ihrem CRM.",
+        "desc10": "API-Zugang", "t3_3": "Verbinden Sie unsere KI direkt con Ihrer eigenen Software oder Ihrem CRM.",
         "desc11": "Banner-Priorität", "t3_4": "Ihre Anzeigen erscheinen doppelt so häufig auf der Startseite.",
         "btn1": "GRATIS REGISTRIEREN", "btn2": "JETZT UPGRADEN", "btn3": "VERTRIEB KONTAKTIEREN"
     }
@@ -175,74 +169,25 @@ st.markdown("""
     .card-wrapper:hover { transform: translateY(-15px); }
     .glass-container { background: rgba(38, 39, 48, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; height: 100%; }
     
-    .free-card { box-shadow: 0 0 20px rgba(255, 255, 255, 0.03); }
-    .free-card:hover { box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1); }
-    .pro-card { border: 1px solid rgba(0, 210, 255, 0.4) !important; box-shadow: 0 0 25px rgba(0, 210, 255, 0.15); }
-    .pro-card:hover { box-shadow: 0 15px 60px rgba(0, 210, 255, 0.5); }
-    .agency-card { border: 1px solid rgba(221, 160, 221, 0.4) !important; box-shadow: 0 0 25px rgba(221, 160, 221, 0.15); }
-    .agency-card:hover { box-shadow: 0 15px 60px rgba(221, 160, 221, 0.5); }
-
-    /* TOOLTIPS */
-    .info-icon { display: inline-block; width: 16px; height: 16px; border-radius: 50%; text-align: center; font-size: 11px; line-height: 16px; margin-left: 8px; cursor: help; position: relative; font-weight: bold; }
-    .i-free { background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
-    .i-pro { background-color: rgba(0, 210, 255, 0.15); color: #00d2ff; border: 1px solid rgba(0, 210, 255, 0.5); }
-    .i-agency { background-color: rgba(221, 160, 221, 0.15); color: #DDA0DD; border: 1px solid rgba(221, 160, 221, 0.5); }
-    
-    .info-icon:hover::after {
-        content: attr(data-tooltip); position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-        background-color: #1a1c23; color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 12px; width: 230px; z-index: 999;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); line-height: 1.5; text-align: left; font-weight: normal;
-    }
-
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
     /* VIDEO CARRUSEL MEJORADO */
     .video-placeholder {
-        border-radius: 12px; 
-        height: 230px; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: flex-end;
-        margin-bottom: 25px; 
-        position: relative; 
-        overflow: hidden; 
-        background-size: cover; 
-        background-position: center;
-        transition: all 0.8s ease-in-out;
-        animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
+        border-radius: 12px; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+        margin-bottom: 25px; position: relative; overflow: hidden; background-size: cover; background-position: center;
+        transition: all 0.8s ease-in-out; animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
         border: 1px solid rgba(255,255,255,0.1);
     }
+    .dynamic-tag { position: absolute; top: 15px; left: 15px; color: black; padding: 5px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; animation: tagColorChange 24s infinite alternate; }
 
-    .dynamic-tag {
-        position: absolute; top: 15px; left: 15px; 
-        color: black; padding: 5px 14px; border-radius: 4px; 
-        font-size: 0.75rem; font-weight: 900;
-        transition: background-color 0.8s ease;
-        animation: tagColorChange 24s infinite alternate;
+    @keyframes auraChange { 0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } }
+    @keyframes adCarousel { 
+        0%, 20% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); }
+        30%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); }
+        55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); }
+        80%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); }
     }
-
-    @keyframes auraChange {
-        0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
-        75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
-    }
-
-    @keyframes tagColorChange {
-        0%, 70% { background: rgba(0, 210, 255, 1); } 
-        75%, 100% { background: rgba(221, 160, 221, 1); } 
-    }
-
-    @keyframes adCarousel {
-        0%, 20% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        24%, 26% { opacity: 0.8; }
-        30%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        49%, 51% { opacity: 0.8; }
-        55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        74%, 76% { opacity: 0.8; }
-        80%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-    }
-    
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
 </style>
 """, unsafe_allow_html=True)
@@ -274,17 +219,17 @@ with c2:
     if st.button(L['btn_gen'], key="main_gen", type="primary"):
         if user_input:
             with st.spinner("Generando..."):
-                # Configuración del prompt profesional
-                prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
-                resultado = generar_texto(prompt)
-                
-                if "ERROR_TECNICO" in resultado:
-                    st.error("Hubo un problema de conexión. Por favor, verifica tu API Key en la configuración.")
-                else:
-                    st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
+                try:
+                    # USAMOS EL CLIENTE NUEVO (Gemini 2.0 Flash)
+                    response = client.models.generate_content(
+                        model="gemini-2.0-flash",
+                        contents=f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} para: {user_input}"
+                    )
+                    st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; color:white;'>{response.text}</div>", unsafe_allow_html=True)
+                except Exception as e:
+                    st.error("Hubo un problema de conexión. Por favor, verifica tu API Key.")
         else:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
-    
     st.markdown('</div>', unsafe_allow_html=True)
 
 # --- 7. PLANES ---
@@ -292,16 +237,16 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    desc_f = f"<div class='feature-list'>{L['desc1']}<span class='info-icon i-free' data-tooltip='{L['t1_1']}'>i</span><br>{L['desc2']}<span class='info-icon i-free' data-tooltip='{L['t1_2']}'>i</span><br>{L['desc3']}<span class='info-icon i-free' data-tooltip='{L['t1_3']}'>i</span></div>"
-    st.markdown(f"<div class='card-wrapper free-card'><div class='glass-container'><h3>{L['plan1']}</h3><h1>$0</h1><hr style='opacity:0.2;'>{desc_f}</div></div>", unsafe_allow_html=True)
+    desc_f = f"<div class='feature-list'>{L['desc1']}<br>{L['desc2']}<br>{L['desc3']}</div>"
+    st.markdown(f"<div class='card-wrapper'><div class='glass-container'><h3>{L['plan1']}</h3><h1>$0</h1><hr style='opacity:0.2;'>{desc_f}</div></div>", unsafe_allow_html=True)
     st.button(L['btn1'], key="btn_f")
 
 with col2:
-    desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_1']}'>i</span><br>{L['desc5']}<span class='info-icon i-pro' data-tooltip='{L['t2_2']}'>i</span><br>{L['desc6']}<span class='info-icon i-pro' data-tooltip='{L['t2_3']}'>i</span><br><b>{L['desc7']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_4']}'>i</span></div>"
+    desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><br>{L['desc5']}<br>{L['desc6']}<br><b>{L['desc7']}</b></div>"
     st.markdown(f"<div class='card-wrapper pro-card'><div class='glass-container'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'>{desc_p}</div></div>", unsafe_allow_html=True)
     st.button(L['btn2'], key="btn_p")
 
 with col3:
-    desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
-    st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
+    desc_a = f"<div class='feature-list'>{L['desc8']}<br>{L['desc9']}<br>{L['desc10']}<br><b>{L['desc11']}</b></div>"
+    st.markdown(f"<div class='card-wrapper'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
     st.button(L['btn3'], key="btn_a")
