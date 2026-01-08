@@ -282,27 +282,27 @@ with c2:
   # ... (Caja de texto user_input)
     user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
-    # --- CSS PARA CENTRADO ABSOLUTO Y SIMÉTRICO ---
+   # --- CSS PARA BOTÓN CORTO Y CENTRADO ---
     st.markdown("""
         <style>
-        /* Seleccionamos el contenedor del botón dentro de esta sección */
+        /* Buscamos el contenedor del botón para centrarlo */
         [data-testid="stVerticalBlock"] > div:has(div.stButton) {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
+            display: flex !important;
+            justify-content: center !important;
+            width: 100% !important;
         }
-        /* Ajustamos el ancho del botón para que no intente ocupar todo el espacio */
+        
+        /* Acortamos el botón: le damos un ancho del 50% del contenedor */
         div.stButton > button {
-            width: auto !important;
-            min-width: 300px; /* Ancho mínimo para que se vea importante */
-            margin: 0 auto;
+            width: 50% !important; /* Aquí controlas qué tan corto es */
+            min-width: 250px !important; 
+            margin: 0 auto !important;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # El botón ahora aparecerá en el centro exacto
-    ejecutar = st.button(L['btn_gen'], key="main_gen_final", type="primary")
+    # Botón con nueva key para evitar errores
+    ejecutar = st.button(L['btn_gen'], key="main_gen_corto", type="primary")
 
     if ejecutar:
         if user_input:
@@ -316,7 +316,6 @@ with c2:
                     st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
         else:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
-            
     st.markdown('</div>', unsafe_allow_html=True)
     # --- AGREGADO: ESTADÍSTICAS (Impacto) ---
 st.markdown("<br>", unsafe_allow_html=True)
