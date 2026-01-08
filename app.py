@@ -268,6 +268,20 @@ L = traducciones[st.session_state.idioma]
 st.markdown(f"<h1 class='neon-title'>{L['title1']} <br><span class='neon-highlight'>{L['title2']}</span></h1>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
+st.markdown("""
+    <style>
+    /* 1. Elimina el espacio extra entre bloques de Streamlit */
+    [data-testid="stVerticalBlock"] {
+        gap: 0rem !important;
+    }
+    
+    /* 2. Ajusta el margen superior del contenedor de la IA */
+    .glass-container {
+        margin-top: -20px !important; /* Mueve el cuadro hacia arriba */
+        padding-top: 10px !important; /* Achica el espacio interno */
+    }
+    </style>
+""", unsafe_allow_html=True)
 # --- 6. SECCIÓN CENTRAL ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
