@@ -2,15 +2,12 @@ import streamlit as st
 import google.generativeai as genai
 
 # --- 1. CONFIGURACIÓN DE IA (Corregida para estabilidad) ---
-# RECUERDA: Si esta clave sigue dando error, reemplázala por la nueva que generes en AI Studio
 API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 
 genai.configure(api_key=API_KEY)
 
-# Usamos una función para llamar al modelo y evitar errores de sesión
 def generar_texto(prompt):
     try:
-        # Forzamos la selección del modelo flash que es el que permite el plan gratuito
         model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(prompt)
         return response.text
@@ -25,7 +22,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 3. DICCIONARIO MAESTRO (Traducciones Completas) ---
+# --- 3. DICCIONARIO MAESTRO (Traducciones Completas y Corregidas) ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
@@ -74,12 +71,12 @@ traducciones = {
         "btn_gen": "✨ GERAR DESCRIÇÃO", "p_destacada": "IMÓVEL EM DESTAQUE",
         "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
-        "desc1": "3 descrições / día", "t1_1": "Limite diário de gerações para nuevos usuários.",
-        "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail con resposta em menos de 48 horas.",
+        "desc1": "3 descrições / dia", "t1_1": "Limite diário de gerações para novos usuários.",
+        "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail com resposta em menos de 48 horas.",
         "desc3": "Marca d'Água", "t1_3": "Os textos incluem uma pequena menção à nossa plataforma.",
         "desc4": "Gerações Ilimitadas", "t2_1": "Crie quantas descrições precisar, sem restrições.",
         "desc5": "Pack Redes Sociais", "t2_2": "Gere automaticamente posts para Instagram, Facebook e TikTok com hashtags.",
-        "desc6": "Optimización SEO", "t2_3": "Textos estruturados para aparecer primeiro nos motores de busca.",
+        "desc6": "Otimização SEO", "t2_3": "Textos estruturados para aparecer primeiro nos motores de busca.",
         "desc7": "Banner Principal", "t2_4": "Seus imóveis de destaque rodarão em nossa página inicial.",
         "desc8": "5 Usuários / Contas", "t3_1": "Acesso individual para até 5 membros da sua equipe imobiliária.",
         "desc9": "Painel de Equipe", "t3_2": "Supervisione e gerencie as descrições criadas por seus agentes.",
@@ -110,20 +107,20 @@ traducciones = {
     "Français": {
         "title1": "Transformez vos Annonces en", "title2": "Aimants à Ventes",
         "sub": "L'outil IA secret des agents immobiliers les plus performants.",
-        "placeholder": "🏠 Collez le lien de la propiedad ou décrivez brièvement...",
+        "placeholder": "🏠 Collez le lien de la propriété ou décrivez brièvement...",
         "btn_gen": "✨ GÉNÉRER LA DESCRIPTION", "p_destacada": "PROPRIÉTÉ À LA UNE",
         "comunidad": "Propriétés de la Communauté", "popular": "PLUS POPULAIRE",
         "plan1": "Initial", "plan2": "Agent Pro", "plan3": "Agence",
         "desc1": "3 descriptions / jour", "t1_1": "Limite quotidienne de générations pour les nouveaux utilisateurs.",
-        "desc2": "Support de Base", "t1_2": "Aide technique par e-mail con réponse en moins de 48 heures.",
+        "desc2": "Support de Base", "t1_2": "Aide technique par e-mail avec réponse en moins de 48 heures.",
         "desc3": "Filigrane", "t1_3": "Les textes incluent une petite mention de notre plateforme.",
         "desc4": "Générations Illimitées", "t2_1": "Créez autant de descriptions que nécessaire sans restrictions.",
         "desc5": "Pack Réseaux Sociaux", "t2_2": "Générez automatiquement des posts pour Instagram, Facebook et TikTok avec hashtags.",
-        "desc6": "Optimisation SEO", "t2_3": "Textos structurés pour apparaître en premier dans les moteurs de recherche.",
+        "desc6": "Optimisation SEO", "t2_3": "Textes structurés pour apparaître en premier dans les moteurs de recherche.",
         "desc7": "Bannière Principale", "t2_4": "Vos propriétés à la une tourneront sur notre page d'accueil.",
         "desc8": "5 Utilisateurs / Comptes", "t3_1": "Accès individuel pour jusqu'à 5 membres de votre équipe immobilière.",
         "desc9": "Tableau de Bord Équipe", "t3_2": "Supervisez et gérez les descriptions créées par vos agents.",
-        "desc10": "Accès via API", "t3_3": "Connectez notre IA directamente à votre propre logiciel ou CRM.",
+        "desc10": "Accès via API", "t3_3": "Connectez notre IA directement à votre propre logiciel ou CRM.",
         "desc11": "Priorité Bannière", "t3_4": "Vos annonces apparaîtront deux fois plus souvent sur la page d'accueil.",
         "btn1": "INSCRIPTION GRATUITE", "btn2": "AMÉLIORER MAINTENANT", "btn3": "CONTACTER VENTES"
     },
@@ -138,7 +135,7 @@ traducciones = {
         "desc2": "Basis-Support", "t1_2": "Technische Hilfe per E-Mail mit Antwort in weniger als 48 Stunden.",
         "desc3": "Wasserzeichen", "t1_3": "Die Texte enthalten einen kleinen Hinweis auf unsere Plattform.",
         "desc4": "Unbegrenzte Generierungen", "t2_1": "Erstellen Sie so viele Beschreibungen wie nötig ohne Einschränkungen.",
-        "desc5": "Social Media Paket", "t2_2": "Erstellen Sie automatisch Posts für Instagram, Facebook und TikTok mit Hashtags.",
+        "desc5": "Social Media Paket", "t2_2": "Erstellen Sie automáticamente Posts für Instagram, Facebook und TikTok mit Hashtags.",
         "desc6": "SEO-Optimierung", "t2_3": "Strukturierte Texte, um in Suchmaschinen ganz oben zu stehen.",
         "desc7": "Haupt-Banner", "t2_4": "Ihre Top-Immobilien rotieren auf unserer Startseite.",
         "desc8": "5 Benutzer / Konten", "t3_1": "Einzelzugriff für bis zu 5 Mitglieder Ihres Immobilienteams.",
@@ -197,7 +194,7 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-    /* VIDEO CARRUSEL MEJORADO (Ajustado para ocultar texto de carga) */
+    /* VIDEO CARRUSEL (Timing Ajustado a 12s) */
     .video-placeholder {
         border-radius: 12px; 
         height: 230px; 
@@ -211,10 +208,10 @@ st.markdown("""
         background-size: cover; 
         background-position: center;
         transition: all 0.8s ease-in-out;
-        animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
+        animation: float 5s ease-in-out infinite, adCarousel 12s infinite alternate, auraChange 12s infinite alternate;
         border: 1px solid rgba(255,255,255,0.1);
-        color: transparent; /* Oculta cualquier texto residual de la URL */
-        text-indent: -9999px; /* Asegura que el texto no se vea */
+        color: transparent;
+        text-indent: -9999px;
     }
 
     .dynamic-tag {
@@ -222,14 +219,14 @@ st.markdown("""
         color: black; padding: 5px 14px; border-radius: 4px; 
         font-size: 0.75rem; font-weight: 900;
         transition: background-color 0.8s ease;
-        animation: tagColorChange 24s infinite alternate;
-        text-indent: 0px; color: black; /* Restaura visibilidad para el tag */
+        animation: tagColorChange 12s infinite alternate;
+        text-indent: 0px; color: black;
     }
 
     .carousel-label {
         background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); 
         width: 100%; padding: 20px; text-align: center; color: white;
-        text-indent: 0px; /* Restaura visibilidad para el label */
+        text-indent: 0px;
     }
 
     @keyframes auraChange {
