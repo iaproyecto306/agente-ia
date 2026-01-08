@@ -1,22 +1,28 @@
 import streamlit as st
-from google import genai
+import google.generativeai as genai
 
-# --- 1. CONFIGURACIÓN DE IA (Actualizada a la guía oficial 2.0) ---
-# He colocado tu nueva clave aquí. 
+# --- 1. CONFIGURACIÓN DE IA ---
 API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 
-def generar_texto(prompt, idioma):
+# Configuramos la clave al inicio
+try:
+    genai.configure(api_key=API_KEY)
+except Exception as e:
+    st.error(f"Error al configurar la API: {e}")
+
+def generar_texto(prompt):
     try:
-        # Usamos el cliente de la nueva librería que pegaste anteriormente
-        client = genai.Client(api_key=API_KEY)
-        # Forzamos el uso del modelo 2.0 Flash (más rápido y estable para el plan gratuito)
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
-        )
-        return response.text
+        # Usamos 1.5-flash que es el que tienes activo en tu panel gratuito
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = model.generate_content(prompt)
+        
+        if response and response.text:
+            return response.text
+        else:
+            return "La IA no devolvió texto. Revisa la descripción."
     except Exception as e:
-        return f"ERROR_TECNICO: {str(e)}"
+        # Esto nos dirá el error REAL (ej: 403 Forbidden o 429 Limit)
+        return f"ERROR_TECNICO_DETALLADO: {str(e)}"
 
 # --- 2. CONFIGURACIÓN INICIAL ---
 st.set_page_config(
