@@ -8,14 +8,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. DICCIONARIO MAESTRO ---
+# --- 2. DICCIONARIO MAESTRO (6 IDIOMAS) ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
         "sub": "La herramienta IA secreta de los agentes top productores.",
         "placeholder": "🏠 Pega el link de la propiedad o describe brevemente...",
-        "btn_gen": "✨ GENERAR DESCRIPCIÓN", "p_destacada": "PROPIEDAD DESTACADA PRO",
-        "comunidad": "Propiedades de nuestra Red de Agencias", "popular": "MÁS POPULAR",
+        "btn_gen": "✨ GENERAR DESCRIPCIÓN", "p_destacada": "PROPIEDAD DESTACADA",
+        "comunidad": "Propiedades de la Comunidad", "popular": "MÁS POPULAR",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agencia",
         "desc1": "3 descripciones / día", "t1_1": "Límite diario de generaciones para nuevos usuarios.",
         "desc2": "Soporte Básico", "t1_2": "Ayuda técnica vía email con respuesta en menos de 48hs.",
@@ -30,11 +30,11 @@ traducciones = {
         "desc11": "Prioridad en Banner", "t3_4": "Tus anuncios aparecerán con el doble de frecuencia en la home.",
         "btn1": "REGISTRO GRATIS", "btn2": "MEJORAR AHORA", "btn3": "CONTACTAR VENTAS"
     },
-    "English": { "title1": "Turn Boring Listings into", "title2": "Sales Magnets", "sub": "The secret AI tool used by top producers.", "placeholder": "🏠 Paste the property link or briefly describe...", "btn_gen": "✨ GENERATE DESCRIPTION", "p_destacada": "PRO FEATURED LISTING", "comunidad": "Properties from our Agency Network", "popular": "MOST POPULAR", "plan1": "Starter", "plan2": "Agent Pro", "plan3": "Agency", "desc1": "3 descriptions / day", "t1_1": "Daily limit.", "desc2": "Basic Support", "t1_2": "Email help.", "desc3": "Watermark", "t1_3": "Mention.", "desc4": "Unlimited", "t2_1": "No limits.", "desc5": "Social Pack", "t2_2": "Auto posts.", "desc6": "SEO", "t2_3": "Rank higher.", "desc7": "Main Banner", "t2_4": "Home rotation.", "desc8": "5 Accounts", "t3_1": "5 members.", "desc9": "Team Panel", "t3_2": "Manage agents.", "desc10": "API Access", "t3_3": "CRM link.", "desc11": "Priority", "t3_4": "Double visibility.", "btn1": "FREE SIGN UP", "btn2": "UPGRADE NOW", "btn3": "CONTACT SALES" },
-    "Português": { "title1": "Anúncios em", "title2": "Ímãs de Vendas", "sub": "Ferramenta secreta.", "placeholder": "🏠 Cole o link...", "btn_gen": "✨ GERAR", "p_destacada": "DESTAQUE PRO", "comunidad": "Rede de Agências Parceiras", "popular": "POPULAR", "plan1": "Inicial", "plan2": "Pro", "plan3": "Agência", "desc1": "3 p/ dia", "t1_1": "Limite.", "desc2": "Suporte", "t1_2": "48h.", "desc3": "Marca", "t1_3": "Menção.", "desc4": "Ilimitado", "t2_1": "Sem limite.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Banner", "t2_4": "Home.", "desc8": "5 Contas", "t3_1": "5 membros.", "desc9": "Painel", "t3_2": "Gestão.", "desc10": "API", "t3_3": "CRM.", "desc11": "Prioridade", "t3_4": "Dobra.", "btn1": "GRÁTIS", "btn2": "UPGRADE", "btn3": "VENDAS" },
-    "中文": { "title1": "房产广告", "title2": "销售磁铁", "sub": "AI 工具。", "placeholder": "🏠 粘贴...", "btn_gen": "✨ 生成", "p_destacada": "PRO 精选房源", "comunidad": "代理商网络房源", "popular": "最受欢迎", "plan1": "入门", "plan2": "专业", "plan3": "机构", "desc1": "3条/天", "t1_1": "限制。", "desc2": "支持", "t1_2": "48小时。", "desc3": "水印", "t1_3": "引用。", "desc4": "无限", "t2_1": "无限制。", "desc5": "社交", "t2_2": "帖子。", "desc6": "SEO", "t2_3": "优化。", "desc7": "横幅", "t2_4": "首页。", "desc8": "5用户", "t3_1": "5成员。", "desc9": "面板", "t3_2": "管理。", "desc10": "API", "t3_3": "CRM。", "desc11": "优先级", "t3_4": "双倍。", "btn1": "免费", "btn2": "升级", "btn3": "联系" },
-    "Français": { "title1": "Annonces", "title2": "Aimants à Ventes", "sub": "Outil secret.", "placeholder": "🏠 Collez...", "btn_gen": "✨ GÉNÉRER", "p_destacada": "ANNONCE VEDETTE PRO", "comunidad": "Réseau d'Agences Partenaires", "popular": "POPULAIRE", "plan1": "Initial", "plan2": "Pro", "plan3": "Agence", "desc1": "3 / jour", "t1_1": "Limite.", "desc2": "Support", "t1_2": "48h.", "desc3": "Filigrane", "t1_3": "Mention.", "desc4": "Illimité", "t2_1": "Sans limite.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Bannière", "t2_4": "Home.", "desc8": "5 Comptes", "t3_1": "5 membres.", "desc9": "Dashboard", "t3_2": "Gestion.", "desc10": "API", "t3_3": "CRM.", "desc11": "Priorité", "t3_4": "Fréquence.", "btn1": "GRATUIT", "btn2": "AMÉLIORER", "btn3": "VENTES" },
-    "Deutsch": { "title1": "Anzeigen in", "title2": "Verkaufsmagnete", "sub": "KI-Tool.", "placeholder": "🏠 Link...", "btn_gen": "✨ GENERIEREN", "p_destacada": "TOP PRO-IMMOBILIE", "comunidad": "Netzwerk der Partneragenturen", "popular": "BELIEBT", "plan1": "Basis", "plan2": "Pro", "plan3": "Agentur", "desc1": "3 / Tag", "t1_1": "Limit.", "desc2": "Support", "t1_2": "48h.", "desc3": "Wasserzeichen", "t1_3": "Link.", "desc4": "Unbegrenzt", "t2_1": "Keine Limits.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Banner", "t2_4": "Home.", "desc8": "5 Benutzer", "t3_1": "5 Mitglieder.", "desc9": "Panel", "t3_2": "Verwalten.", "desc10": "API", "t3_3": "CRM.", "desc11": "Priorität", "t3_4": "Häufigkeit.", "btn1": "ANMELDEN", "btn2": "UPGRADE", "btn3": "KONTAKT" }
+    "English": { "title1": "Turn Boring Listings into", "title2": "Sales Magnets", "sub": "The secret AI tool used by top producers.", "placeholder": "🏠 Paste the property link or briefly describe...", "btn_gen": "✨ GENERATE DESCRIPTION", "p_destacada": "FEATURED PROPERTY", "comunidad": "Community Properties", "popular": "MOST POPULAR", "plan1": "Starter", "plan2": "Agent Pro", "plan3": "Agency", "desc1": "3 descriptions / day", "t1_1": "Daily limit.", "desc2": "Basic Support", "t1_2": "Email support.", "desc3": "Watermark", "t1_3": "Mention.", "desc4": "Unlimited", "t2_1": "No limits.", "desc5": "Social Pack", "t2_2": "Auto posts.", "desc6": "SEO", "t2_3": "Rank higher.", "desc7": "Main Banner", "t2_4": "Home rotation.", "desc8": "5 Accounts", "t3_1": "5 members.", "desc9": "Team Panel", "t3_2": "Manage agents.", "desc10": "API Access", "t3_3": "Connect CRM.", "desc11": "Priority", "t3_4": "Double visibility.", "btn1": "FREE SIGN UP", "btn2": "UPGRADE NOW", "btn3": "CONTACT SALES" },
+    "Português": { "title1": "Anúncios em", "title2": "Ímãs de Vendas", "sub": "Ferramenta secreta.", "placeholder": "🏠 Cole o link...", "btn_gen": "✨ GERAR", "p_destacada": "DESTAQUE", "comunidad": "Comunidade", "popular": "POPULAR", "plan1": "Inicial", "plan2": "Pro", "plan3": "Agência", "desc1": "3 p/ dia", "t1_1": "Limite.", "desc2": "Suporte", "t1_2": "48h.", "desc3": "Marca", "t1_3": "Menção.", "desc4": "Ilimitado", "t2_1": "Sem limite.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Banner", "t2_4": "Home.", "desc8": "5 Contas", "t3_1": "5 membros.", "desc9": "Painel", "t3_2": "Gestão.", "desc10": "API", "t3_3": "CRM.", "desc11": "Prioridade", "t3_4": "Dobra.", "btn1": "GRÁTIS", "btn2": "UPGRADE", "btn3": "VENDAS" },
+    "中文": { "title1": "房产广告", "title2": "销售磁铁", "sub": "AI 工具。", "placeholder": "🏠 粘贴...", "btn_gen": "✨ 生成", "p_destacada": "精选", "comunidad": "社区", "popular": "最受欢迎", "plan1": "入门", "plan2": "专业", "plan3": "机构", "desc1": "3条/天", "t1_1": "限制。", "desc2": "支持", "t1_2": "48小时。", "desc3": "水印", "t1_3": "引用。", "desc4": "无限", "t2_1": "无限制。", "desc5": "社交", "t2_2": "帖子。", "desc6": "SEO", "t2_3": "优化。", "desc7": "横幅", "t2_4": "首页。", "desc8": "5用户", "t3_1": "5成员。", "desc9": "面板", "t3_2": "管理。", "desc10": "API", "t3_3": "CRM。", "desc11": "优先级", "t3_4": "双倍。", "btn1": "免费", "btn2": "升级", "btn3": "联系" },
+    "Français": { "title1": "Annonces", "title2": "Aimants à Ventes", "sub": "Outil secret.", "placeholder": "🏠 Collez...", "btn_gen": "✨ GÉNÉRER", "p_destacada": "VEDETTE", "comunidad": "Communauté", "popular": "POPULAIRE", "plan1": "Initial", "plan2": "Pro", "plan3": "Agence", "desc1": "3 / jour", "t1_1": "Limite.", "desc2": "Support", "t1_2": "48h.", "desc3": "Filigrane", "t1_3": "Mention.", "desc4": "Illimité", "t2_1": "Sans limite.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Bannière", "t2_4": "Home.", "desc8": "5 Comptes", "t3_1": "5 membres.", "desc9": "Dashboard", "t3_2": "Gestion.", "desc10": "API", "t3_3": "CRM.", "desc11": "Priorité", "t3_4": "Fréquence.", "btn1": "GRATUIT", "btn2": "AMÉLIORER", "btn3": "VENTES" },
+    "Deutsch": { "title1": "Anzeigen in", "title2": "Verkaufsmagnete", "sub": "KI-Tool.", "placeholder": "🏠 Link...", "btn_gen": "✨ GENERIEREN", "p_destacada": "TOP", "comunidad": "Community", "popular": "BELIEBT", "plan1": "Basis", "plan2": "Pro", "plan3": "Agentur", "desc1": "3 / Tag", "t1_1": "Limit.", "desc2": "Support", "t1_2": "48h.", "desc3": "Wasserzeichen", "t1_3": "Link.", "desc4": "Unbegrenzt", "t2_1": "Keine Limits.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Banner", "t2_4": "Home.", "desc8": "5 Benutzer", "t3_1": "5 Mitglieder.", "desc9": "Panel", "t3_2": "Verwalten.", "desc10": "API", "t3_3": "CRM.", "desc11": "Priorität", "t3_4": "Häufigkeit.", "btn1": "ANMELDEN", "btn2": "UPGRADE", "btn3": "KONTAKT" }
 }
 
 # --- 3. ESTILOS CSS ---
@@ -58,46 +58,49 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
-    /* PLANES Y AURA */
+    /* PLANES: ANIMACIÓN SINCRONIZADA */
     .card-wrapper { 
         transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); 
         border-radius: 12px; height: 480px; 
     }
     .card-wrapper:hover { transform: translateY(-15px); }
+
     .glass-container { background: rgba(38, 39, 48, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; height: 100%; }
     
     .free-card { box-shadow: 0 0 20px rgba(255, 255, 255, 0.03); }
     .free-card:hover { box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1); }
+    
     .pro-card { border: 1px solid rgba(0, 210, 255, 0.4) !important; box-shadow: 0 0 25px rgba(0, 210, 255, 0.15); }
     .pro-card:hover { box-shadow: 0 15px 60px rgba(0, 210, 255, 0.5); }
+    
     .agency-card { border: 1px solid rgba(221, 160, 221, 0.4) !important; box-shadow: 0 0 25px rgba(221, 160, 221, 0.15); }
     .agency-card:hover { box-shadow: 0 15px 60px rgba(221, 160, 221, 0.5); }
 
-    .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
-    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
-
-    /* TOOLTIPS CON COLOR RESTAURADO */
+    /* TOOLTIPS CON COLOR */
     .info-icon { display: inline-block; width: 16px; height: 16px; border-radius: 50%; text-align: center; font-size: 11px; line-height: 16px; margin-left: 8px; cursor: help; position: relative; font-weight: bold; }
     .i-free { background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
     .i-pro { background-color: rgba(0, 210, 255, 0.15); color: #00d2ff; border: 1px solid rgba(0, 210, 255, 0.5); }
     .i-agency { background-color: rgba(221, 160, 221, 0.15); color: #DDA0DD; border: 1px solid rgba(221, 160, 221, 0.5); }
-    
+
     .info-icon:hover::after {
         content: attr(data-tooltip); position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
         background-color: #1a1c23; color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 12px; width: 230px; z-index: 999;
         box-shadow: 0 10px 40px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); line-height: 1.5; text-align: left; font-weight: normal;
     }
 
-    /* VIDEO CARRUSEL */
+    .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
+    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
+
+    /* VIDEO CARRUSEL (RESTAURADO) */
     .video-placeholder {
         border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 12px; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
         margin-bottom: 25px; position: relative; overflow: hidden; background-size: cover; background-position: center;
         animation: float 5s ease-in-out infinite, adCarousel 18s infinite;
     }
     @keyframes adCarousel {
-        0%, 33% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); }
-        34%, 66% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); }
-        67%, 100% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); }
+        0%, 30% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); }
+        33%, 63% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); }
+        66%, 100% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); }
     }
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
 </style>
@@ -118,7 +121,7 @@ st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 # --- 5. SECCIÓN CENTRAL ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
-    st.markdown(f'<div class="video-placeholder"><div style="position: absolute; top: 15px; left: 15px; background: #00d2ff; color: black; padding: 5px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; box-shadow: 0 0 15px rgba(0,210,255,0.6);">{L["p_destacada"]}</div><div style="background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%); width: 100%; padding: 25px; text-align: center; font-weight: 600; font-size: 0.9rem; color: #00d2ff;">{L["comunidad"]}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="video-placeholder"><div style="position: absolute; top: 15px; left: 15px; background: rgba(0, 210, 255, 1); color: black; padding: 5px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; box-shadow: 0 0 10px rgba(0,210,255,0.5);">{L["p_destacada"]}</div><div style="background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); width: 100%; padding: 20px; text-align: center;">{L["comunidad"]}</div></div>', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     st.text_area("", placeholder=L['placeholder'], label_visibility="collapsed")
     st.button(L['btn_gen'], key="main_gen", type="primary")
