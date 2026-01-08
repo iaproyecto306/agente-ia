@@ -33,7 +33,7 @@ traducciones = {
     "English": { "title1": "Turn Boring Listings into", "title2": "Sales Magnets", "sub": "The secret AI tool used by top producers.", "placeholder": "🏠 Paste link...", "btn_gen": "✨ GENERATE", "p_destacada": "FEATURED", "comunidad": "Community", "popular": "MOST POPULAR", "plan1": "Starter", "plan2": "Pro", "plan3": "Agency", "desc1": "3/day", "t1_1": "Limit.", "desc2": "Basic", "t1_2": "48h response.", "desc3": "Watermark", "t1_3": "Site mention.", "desc4": "Unlimited", "t2_1": "No limits.", "desc5": "Social Pack", "t2_2": "Auto posts.", "desc6": "SEO", "t2_3": "Rank higher.", "desc7": "Banner", "t2_4": "Home rotation.", "desc8": "5 Users", "t3_1": "5 members.", "desc9": "Team Panel", "t3_2": "Manage agents.", "desc10": "API", "t3_3": "CRM link.", "desc11": "Priority", "t3_4": "Double visibility.", "btn1": "SIGN UP", "btn2": "UPGRADE", "btn3": "CONTACT" },
     "Português": { "title1": "Anúncios em", "title2": "Ímãs de Vendas", "sub": "Ferramenta secreta.", "placeholder": "🏠 Cole o link...", "btn_gen": "✨ GERAR", "p_destacada": "DESTAQUE", "comunidad": "Comunidade", "popular": "POPULAR", "plan1": "Inicial", "plan2": "Pro", "plan3": "Agência", "desc1": "3 p/ dia", "t1_1": "Limite.", "desc2": "Suporte", "t1_2": "48h.", "desc3": "Marca", "t1_3": "Menção.", "desc4": "Ilimitado", "t2_1": "Sem limite.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Banner", "t2_4": "Home.", "desc8": "5 Contas", "t3_1": "5 membros.", "desc9": "Painel", "t3_2": "Gestão.", "desc10": "API", "t3_3": "CRM.", "desc11": "Prioridade", "t3_4": "Dobra.", "btn1": "GRÁTIS", "btn2": "UPGRADE", "btn3": "VENDAS" },
     "中文": { "title1": "房产广告", "title2": "销售磁铁", "sub": "AI 工具。", "placeholder": "🏠 粘贴...", "btn_gen": "✨ 生成", "p_destacada": "精选", "comunidad": "社区", "popular": "最受欢迎", "plan1": "入门", "plan2": "专业", "plan3": "机构", "desc1": "3条/天", "t1_1": "限制。", "desc2": "支持", "t1_2": "48小时。", "desc3": "水印", "t1_3": "引用。", "desc4": "无限", "t2_1": "无限制。", "desc5": "社交", "t2_2": "帖子。", "desc6": "SEO", "t2_3": "优化。", "desc7": "横幅", "t2_4": "首页。", "desc8": "5用户", "t3_1": "5成员。", "desc9": "面板", "t3_2": "管理。", "desc10": "API", "t3_3": "CRM。", "desc11": "优先级", "t3_4": "双倍。", "btn1": "免费", "btn2": "升级", "btn3": "联系" },
-    "Français": { "title1": "Annonces", "title2": "Aimants à Ventes", "sub": "Outil secret.", "placeholder": "🏠 Collez...", "btn_gen": "✨ GÉNÉRER", "p_destacada": "VEDETTE", "communauté": "Communauté", "popular": "POPULAIRE", "plan1": "Initial", "plan2": "Pro", "plan3": "Agence", "desc1": "3 / jour", "t1_1": "Limite.", "desc2": "Support", "t1_2": "48h.", "desc3": "Filigrane", "t1_3": "Mention.", "desc4": "Illimité", "t2_1": "Sans limite.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Bannière", "t2_4": "Home.", "desc8": "5 Comptes", "t3_1": "5 membres.", "desc9": "Dashboard", "t3_2": "Gestion.", "desc10": "API", "t3_3": "CRM.", "desc11": "Priorité", "t3_4": "Fréquence.", "btn1": "GRATUIT", "btn2": "AMÉLIORER", "btn3": "VENTES" },
+    "Français": { "title1": "Annonces", "title2": "Aimants à Ventes", "sub": "Outil secret.", "placeholder": "🏠 Collez...", "btn_gen": "✨ GÉNÉRER", "p_destacada": "VEDETTE", "comunidad": "Communauté", "popular": "POPULAIRE", "plan1": "Initial", "plan2": "Pro", "plan3": "Agence", "desc1": "3 / jour", "t1_1": "Limite.", "desc2": "Support", "t1_2": "48h.", "desc3": "Filigrane", "t1_3": "Mention.", "desc4": "Illimité", "t2_1": "Sans limite.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Bannière", "t2_4": "Home.", "desc8": "5 Comptes", "t3_1": "5 membres.", "desc9": "Dashboard", "t3_2": "Gestion.", "desc10": "API", "t3_3": "CRM.", "desc11": "Priorité", "t3_4": "Fréquence.", "btn1": "GRATUIT", "btn2": "AMÉLIORER", "btn3": "VENTES" },
     "Deutsch": { "title1": "Anzeigen in", "title2": "Verkaufsmagnete", "sub": "KI-Tool.", "placeholder": "🏠 Link...", "btn_gen": "✨ GENERIEREN", "p_destacada": "TOP", "comunidad": "Community", "popular": "BELIEBT", "plan1": "Basis", "plan2": "Pro", "plan3": "Agentur", "desc1": "3 / Tag", "t1_1": "Limit.", "desc2": "Support", "t1_2": "48h.", "desc3": "Wasserzeichen", "t1_3": "Link.", "desc4": "Unbegrenzt", "t2_1": "Keine Limits.", "desc5": "Social", "t2_2": "Posts.", "desc6": "SEO", "t2_3": "Ranking.", "desc7": "Banner", "t2_4": "Home.", "desc8": "5 Benutzer", "t3_1": "5 Mitglieder.", "desc9": "Panel", "t3_2": "Verwalten.", "desc10": "API", "t3_3": "CRM.", "desc11": "Priorität", "t3_4": "Häufigkeit.", "btn1": "ANMELDEN", "btn2": "UPGRADE", "btn3": "KONTAKT" }
 }
 
@@ -85,7 +85,7 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-    /* VIDEO CARRUSEL MEJORADO (SUAVIDAD Y SINCRONÍA) */
+    /* VIDEO CARRUSEL SINCRONIZADO Y SUAVE */
     .video-placeholder {
         border-radius: 12px; 
         height: 230px; 
@@ -98,9 +98,8 @@ st.markdown("""
         overflow: hidden; 
         background-size: cover; 
         background-position: center;
-        /* Suavizamos la transición general */
-        transition: all 0.8s ease-in-out;
-        animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
+        /* Animaciones sin alternate para evitar reversos bruscos */
+        animation: float 5s ease-in-out infinite, adCarousel 24s infinite, auraChange 24s infinite;
         border: 1px solid rgba(255,255,255,0.1);
     }
 
@@ -108,30 +107,37 @@ st.markdown("""
         position: absolute; top: 15px; left: 15px; 
         color: black; padding: 5px 14px; border-radius: 4px; 
         font-size: 0.75rem; font-weight: 900;
-        transition: background-color 0.8s ease;
-        animation: tagColorChange 24s infinite alternate;
+        animation: tagColorChange 24s infinite;
     }
 
-    /* SINCRONÍA DE COLORES Y SUAVIZADO (FADE) */
+    /* COLORES SINCRONIZADOS: 75% Pro (Cian), 25% Agencia (Violeta) */
     @keyframes auraChange {
-        0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
-        75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
+        0%, 74% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.6); border-color: rgba(0, 210, 255, 0.5); } 
+        75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.6); border-color: rgba(221, 160, 221, 0.5); } 
     }
 
     @keyframes tagColorChange {
-        0%, 70% { background: rgba(0, 210, 255, 1); } 
+        0%, 74% { background: rgba(0, 210, 255, 1); } 
         75%, 100% { background: rgba(221, 160, 221, 1); } 
     }
 
-    /* CARRUSEL CON FADE SUAVE EN LOS PUNTOS DE CAMBIO */
+    /* CARRUSEL CON FADE EN TODOS LOS CAMBIOS (Cian a Cian y Cian a Violeta) */
     @keyframes adCarousel {
+        /* Foto 1 - Pro */
         0%, 20% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        24%, 26% { opacity: 0.8; } /* Pequeño fade para suavizar transición */
-        30%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        49%, 51% { opacity: 0.8; }
-        55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        74%, 76% { opacity: 0.8; }
-        80%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        24%, 25% { opacity: 0.3; } /* Fundido a negro/transparencia */
+        
+        /* Foto 2 - Pro */
+        26%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        49%, 50% { opacity: 0.3; }
+        
+        /* Foto 3 - Pro */
+        51%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        74%, 75% { opacity: 0.3; }
+        
+        /* Foto 4 - Agencia */
+        76%, 95% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        99%, 100% { opacity: 0.3; }
     }
     
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
