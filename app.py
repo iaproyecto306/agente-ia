@@ -1,12 +1,11 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- 1. CONFIGURACIÓN DE IA (SOLO ESTO SE AGREGA) ---
-# Usamos tu clave de Gemini
+# --- 1. CONFIGURACIÓN DE IA (Ajustada para corregir el error NotFound) ---
 genai.configure(api_key="AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA")
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('models/gemini-1.5-flash')
 
-# --- 1. CONFIGURACIÓN INICIAL ---
+# --- 2. CONFIGURACIÓN INICIAL ---
 st.set_page_config(
     page_title="IA Realty Pro",
     page_icon="🏢",
@@ -14,7 +13,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. DICCIONARIO MAESTRO (Traducciones Completas) ---
+# --- 3. DICCIONARIO MAESTRO (Traducciones Completas) ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
@@ -59,16 +58,16 @@ traducciones = {
     "Português": {
         "title1": "Transforme Anúncios Tediosos em", "title2": "Ímãs de Vendas",
         "sub": "A ferramenta de IA secreta dos agentes de alto desempenho.",
-        "placeholder": "🏠 Cole o link do imóvel o descreva brevemente...",
+        "placeholder": "🏠 Cole o link do imóvel ou descreva brevemente...",
         "btn_gen": "✨ GERAR DESCRIÇÃO", "p_destacada": "IMÓVEL EM DESTAQUE",
         "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
-        "desc1": "3 descrições / día", "t1_1": "Limite diário de gerações para novos usuários.",
+        "desc1": "3 descrições / día", "t1_1": "Limite diário de gerações para nuevos usuários.",
         "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail com resposta em menos de 48 horas.",
         "desc3": "Marca d'Água", "t1_3": "Os textos incluem uma pequena menção à nossa plataforma.",
         "desc4": "Gerações Ilimitadas", "t2_1": "Crie quantas descrições precisar, sem restrições.",
         "desc5": "Pack Redes Sociais", "t2_2": "Gere automaticamente posts para Instagram, Facebook e TikTok com hashtags.",
-        "desc6": "Otimización SEO", "t2_3": "Textos estruturados para aparecer primeiro nos motores de busca.",
+        "desc6": "Optimización SEO", "t2_3": "Textos estruturados para aparecer primeiro nos motores de busca.",
         "desc7": "Banner Principal", "t2_4": "Seus imóveis de destaque rodarão em nossa página inicial.",
         "desc8": "5 Usuários / Contas", "t3_1": "Acesso individual para até 5 membros da sua equipe imobiliária.",
         "desc9": "Painel de Equipe", "t3_2": "Supervisione e gerencie as descrições criadas por seus agentes.",
@@ -108,11 +107,11 @@ traducciones = {
         "desc3": "Filigrane", "t1_3": "Les textes incluent une petite mention de notre plateforme.",
         "desc4": "Générations Illimitées", "t2_1": "Créez autant de descriptions que nécessaire sans restrictions.",
         "desc5": "Pack Réseaux Sociaux", "t2_2": "Générez automatiquement des posts pour Instagram, Facebook et TikTok avec hashtags.",
-        "desc6": "Optimisation SEO", "t2_3": "Textos estruturés pour apparaître en premier dans les moteurs de recherche.",
+        "desc6": "Optimisation SEO", "t2_3": "Textes structurés pour apparaître en premier dans les moteurs de recherche.",
         "desc7": "Bannière Principale", "t2_4": "Vos propriétés à la une tourneront sur notre page d'accueil.",
         "desc8": "5 Utilisateurs / Comptes", "t3_1": "Accès individuel pour jusqu'à 5 membres de votre équipe immobilière.",
         "desc9": "Tableau de Bord Équipe", "t3_2": "Supervisez et gérez les descriptions créées par vos agents.",
-        "desc10": "Accès via API", "t3_3": "Connectez notre IA directement à votre propre logiciel ou CRM.",
+        "desc10": "Accès via API", "t3_3": "Connectez notre IA directamente à votre propre logiciel ou CRM.",
         "desc11": "Priorité Bannière", "t3_4": "Vos annonces apparaîtront deux fois plus souvent sur la page d'accueil.",
         "btn1": "INSCRIPTION GRATUITE", "btn2": "AMÉLIORER MAINTENANT", "btn3": "CONTACTER VENTES"
     },
@@ -138,7 +137,7 @@ traducciones = {
     }
 }
 
-# --- 3. ESTILOS CSS ---
+# --- 4. ESTILOS CSS ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -236,7 +235,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 4. INTERFAZ ---
+# --- 5. INTERFAZ ---
 if "idioma" not in st.session_state: st.session_state.idioma = "Español"
 col_logo, _, col_lang = st.columns([2.5, 4, 1.5])
 with col_logo: st.markdown('<div style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-top:10px; letter-spacing: 1px;">🏢 IA REALTY PRO</div>', unsafe_allow_html=True)
@@ -248,7 +247,7 @@ L = traducciones[st.session_state.idioma]
 st.markdown(f"<h1 class='neon-title'>{L['title1']} <br><span class='neon-highlight'>{L['title2']}</span></h1>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
-# --- 5. SECCIÓN CENTRAL ---
+# --- 6. SECCIÓN CENTRAL ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
     st.markdown(f'''
@@ -258,20 +257,24 @@ with c2:
         </div>
     ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
-    user_input = st.text_area("", placeholder=L['placeholder'], label_visibility="collapsed")
+    user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
     if st.button(L['btn_gen'], key="main_gen", type="primary"):
         if user_input:
             with st.spinner("Generando..."):
-                prompt = f"Actúa como un experto inmobiliario. Escribe un anuncio AIDA en {st.session_state.idioma} para: {user_input}"
-                response = model.generate_content(prompt)
-                st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px;'>{response.text}</div>", unsafe_allow_html=True)
+                try:
+                    # Configuración del prompt profesional
+                    prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
+                    response = model.generate_content(prompt)
+                    st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{response.text}</div>", unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Error de conexión con la IA. Verifica tu API Key.")
         else:
-            st.warning("Escribe algo sobre la propiedad.")
+            st.warning("Por favor, ingresa los detalles de la propiedad.")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 6. PLANES ---
+# --- 7. PLANES ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
