@@ -1,41 +1,52 @@
 import streamlit as st
-import google.generativeai as genai
+import requests
+import json
 
 # --- CONFIGURACIÓN ---
 API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 
-# Configuración básica
-genai.configure(api_key=API_KEY)
-
-def generar_texto(prompt, idioma):
+def generar_texto_directo(prompt):
+    # Forzamos la URL a la versión estable v1 manualmente
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+    
+    headers = {'Content-Type': 'application/json'}
+    
+    data = {
+        "contents": [{
+            "parts": [{"text": f"Actúa como experto inmobiliario. Genera un anuncio para: {prompt}"}]
+        }]
+    }
+    
     try:
-        # Usamos el nombre de modelo más estable
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        res_json = response.json()
         
-        # Respuesta simple
-        response = model.generate_content(
-            f"Actúa como experto inmobiliario. Escribe en {idioma}: {prompt}"
-        )
-        
-        if response and response.text:
-            return response.text
+        # Extraemos el texto del formato JSON de Google
+        if 'candidates' in res_json:
+            texto = res_json['candidates'][0]['content']['parts'][0]['text']
+            return texto
         else:
-            return "ERROR: El modelo no devolvió texto."
+            return f"ERROR_API: {json.dumps(res_json)}"
             
     except Exception as e:
-        return f"ERROR_TECNICO: {str(e)}"
+        return f"ERROR_CONEXION: {str(e)}"
 
 # --- INTERFAZ ---
-st.title("🏢 IA Realty Pro")
+st.set_page_config(page_title="IA Realty Pro")
+st.title("🏢 IA Realty Pro (Conexión Directa)")
+
 user_input = st.text_area("Describe la propiedad:")
 
 if st.button("✨ GENERAR ANUNCIO"):
     if user_input:
-        with st.spinner("Conectando con Google AI..."):
-            resultado = generar_texto(user_input, "Español")
-            if "ERROR" in resultado:
-                st.error("Error en la conexión")
+        with st.spinner("Llamando directamente a Google v1..."):
+            resultado = generar_texto_directo(user_input)
+            
+            if "ERROR_" in resultado:
+                st.error("Error en la respuesta de Google")
                 st.code(resultado)
             else:
-                st.success("¡Anuncio generado!")
+                st.success("¡Logrado!")
                 st.write(resultado)
+    else:
+        st.warning("Escribe una descripción.")
