@@ -9,12 +9,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CSS MAESTRO (VIDEO + TEXTOS V2 + BOTONES) ---
+# --- CSS MAESTRO (VIDEO + TEXTOS VENTA + BOTONES) ---
 st.markdown("""
 <style>
-    /* 1. ESTILO DE LA APP (TRANSPARENTE PARA QUE SE VEA EL VIDEO) */
+    /* 1. FONDO TRANSPARENTE PARA EL VIDEO */
     .stApp {
-        background: rgba(0,0,0,0.7); /* Oscuridad sobre el video para leer bien */
+        background: rgba(0,0,0,0.75); /* Un poco más oscuro para leer bien los textos largos */
         font-family: 'Helvetica Neue', sans-serif;
     }
     
@@ -33,7 +33,7 @@ st.markdown("""
         z-index: -1;
     }
 
-    /* 3. TÍTULOS (ESTILO VERSIÓN 2 QUE TE GUSTABA) */
+    /* 3. TÍTULOS NEÓN (ESTÉTICA V2) */
     .neon-title {
         font-size: 4rem;
         font-weight: 900;
@@ -51,6 +51,7 @@ st.markdown("""
         font-size: 1.4rem;
         color: #d1d5db;
         margin-top: -10px;
+        margin-bottom: 30px;
     }
 
     /* 4. CONTENEDORES GLASS */
@@ -61,54 +62,65 @@ st.markdown("""
         border-radius: 15px;
         padding: 30px;
         box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        height: 100%; /* Para que todas las cajas tengan la misma altura */
     }
 
-    /* 5. INPUTS MÁS PROLIJOS */
+    /* LISTAS DE BENEFICIOS */
+    .benefit-list {
+        text-align: left;
+        margin-top: 20px;
+        font-size: 0.95rem;
+        color: #e0e0e0;
+        line-height: 1.8;
+    }
+    .benefit-list b {
+        color: white;
+    }
+
+    /* 5. INPUTS */
     .stTextInput > div > div > input, .stTextArea > div > div > textarea {
-        background-color: rgba(0, 0, 0, 0.5) !important;
+        background-color: rgba(0, 0, 0, 0.6) !important;
         color: white !important;
-        border: 1px solid #444 !important;
-        font-size: 1.1rem;
+        border: 1px solid #555 !important;
     }
 
-    /* 6. BOTONES PERSONALIZADOS POR COLUMNA (HACK DE CSS) */
-    
-    /* Botón Genérico (El de generar y el gratis) */
+    /* 6. BOTONES PERSONALIZADOS POR COLUMNA */
     div.stButton > button {
         background: transparent;
         border: 1px solid white;
         color: white;
         transition: all 0.3s;
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     div.stButton > button:hover {
         background: rgba(255,255,255,0.1);
         transform: scale(1.02);
     }
 
-    /* OBJETIVO: EL BOTÓN DEL PLAN DEL MEDIO (PRO) - COLUMNA 2 */
-    /* Usamos nth-of-type para encontrar el botón dentro de la columna del medio */
+    /* PRO PLAN BUTTON (COLUMNA 2) */
     [data-testid="column"]:nth-of-type(2) div.stButton > button {
         background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
         border: none;
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
-        color: black; /* Texto negro para contraste */
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+        color: black;
     }
     [data-testid="column"]:nth-of-type(2) div.stButton > button:hover {
-        box-shadow: 0 0 30px rgba(0, 210, 255, 0.9);
+        box-shadow: 0 0 40px rgba(0, 210, 255, 0.8);
         transform: scale(1.05);
     }
 
-    /* OBJETIVO: EL BOTÓN DE AGENCIA - COLUMNA 3 */
+    /* AGENCY PLAN BUTTON (COLUMNA 3) */
     [data-testid="column"]:nth-of-type(3) div.stButton > button {
          border: 1px solid #DDA0DD;
          color: #DDA0DD;
-         box-shadow: 0 0 10px rgba(221, 160, 221, 0.2);
     }
     [data-testid="column"]:nth-of-type(3) div.stButton > button:hover {
-         box-shadow: 0 0 20px rgba(221, 160, 221, 0.6);
+         box-shadow: 0 0 20px rgba(221, 160, 221, 0.4);
+         background: rgba(221, 160, 221, 0.1);
     }
 
 </style>
@@ -123,35 +135,33 @@ if 'generated' not in st.session_state: st.session_state.generated = False
 
 # --- HERO SECTION ---
 st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown(f"<h1 class='neon-title'>Convierte Anuncios en <span class='neon-highlight'>IMANES DE VENTAS</span></h1>", unsafe_allow_html=True)
-st.markdown(f"<p class='subtitle'>La IA secreta que usan los Top Producers para vender más rápido.</p>", unsafe_allow_html=True)
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown(f"<h1 class='neon-title'>IA REALTY <span class='neon-highlight'>PRO</span></h1>", unsafe_allow_html=True)
+st.markdown(f"<p class='subtitle'>Escribe descripciones que venden propiedades en segundos.</p>", unsafe_allow_html=True)
 
-# --- INPUT AREA (CENTRAL) ---
+# --- INPUT AREA ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
     st.markdown('<div class="glass-container">', unsafe_allow_html=True)
-    user_input = st.text_area("Datos de la propiedad:", height=120, placeholder="Ej: 3 habs, 2 baños, cocina renovada, vista al lago...")
+    user_input = st.text_area("Pegá el link de Zillow o poné los detalles:", height=100, placeholder="Ej: Casa moderna, 3 habitaciones, cocina de mármol, jardín amplio...")
     st.markdown("<br>", unsafe_allow_html=True)
-    # Botón Principal (Le ponemos un estilo inline para que destaque también)
-    gen_btn = st.button("✨ GENERAR DESCRIPCIÓN MÁGICA", type="primary")
+    gen_btn = st.button("✨ Generar Descripción v4.0")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- RESULTADO ---
+# --- RESULTADO MOCK ---
 if gen_btn and user_input:
     with c2:
-        with st.spinner("Conectando neuronas inmobiliarias..."):
+        with st.spinner("La IA está analizando el mercado..."):
             time.sleep(1.5)
             st.session_state.generated = True
             mock_res = f"""
-            🚀 **¡TU PRÓXIMO BEST-SELLER!**
+            🏡 **TU REFUGIO PERFECTO TE ESPERA**
             
-            Bienvenido a la definición de exclusividad.
+            Imagina despertar cada mañana en esta obra maestra de diseño moderno.
             
-            ✅ **Espacios:** {user_input[:20]}... diseñados para impresionar.
-            ✅ **Estilo:** Acabados de lujo y luz natural.
+            ✨ **Cocina Gourmet:** {user_input[:15]}... ideal para tus mejores cenas.
+            ✨ **Espacios Vivos:** Luz natural que inunda cada rincón.
             
-            *Agenda tu visita hoy.* #RealEstate #Luxury
+            *No dejes pasar esta oportunidad única.*
             """
 
 if st.session_state.generated:
@@ -160,59 +170,69 @@ if st.session_state.generated:
     with col_r2:
         st.markdown(f'<div class="glass-container" style="border-color: #00d2ff;">{mock_res}</div>', unsafe_allow_html=True)
 
-# --- PRUEBA SOCIAL ---
-st.markdown("<br><br>", unsafe_allow_html=True)
-col_s1, col_s2, col_s3, col_s4 = st.columns(4)
-with col_s1: st.markdown("<h3 style='text-align:center; color:#666;'>RE/MAX</h3>", unsafe_allow_html=True)
-with col_s2: st.markdown("<h3 style='text-align:center; color:#666;'>KELLER</h3>", unsafe_allow_html=True)
-with col_s3: st.markdown("<h3 style='text-align:center; color:#666;'>CENTURY</h3>", unsafe_allow_html=True)
-with col_s4: st.markdown("<h3 style='text-align:center; color:#666;'>SOTHEBY'S</h3>", unsafe_allow_html=True)
-
-# --- PLANES DE PRECIOS ---
-st.markdown("<br><br><h2 style='text-align: center; color: white; font-weight:800;'>PLANES FLEXIBLES</h2><br>", unsafe_allow_html=True)
-
-# Definimos las columnas
+# --- PLANES DE PRECIOS (CON ARGUMENTOS DE VENTA) ---
+st.markdown("<br><br><br>", unsafe_allow_html=True)
 p1, p2, p3 = st.columns([1, 1, 1])
 
 # COLUMNA 1: GRATIS
 with p1:
     st.markdown("""
-    <div class='glass-container' style='text-align: center; height: 350px;'>
-        <h3 style='color: #ccc;'>Starter</h3>
+    <div class='glass-container' style='text-align: center;'>
+        <h3 style='color: #ccc;'>Principiante</h3>
         <h1>$0</h1>
-        <p style='color: #888;'>Para probar</p>
-        <hr style='border-color: #444;'>
-        <p>3 Generaciones / día</p>
-        <br>
+        <p style='color: #888; font-size: 0.9em;'>Para agentes curiosos</p>
+        <hr style='border-color: #444; opacity: 0.5;'>
+        
+        <div class='benefit-list'>
+            ✅ 3 Descripciones al día<br>
+            ✅ Tono Estándar<br>
+            ❌ Sin Optimización SEO<br>
+            ❌ Sin Textos para Redes<br>
+            ❌ Marca de agua<br>
+        </div>
+        <br><br>
     </div>
     """, unsafe_allow_html=True)
-    st.button("EMPEZAR GRATIS") # Botón fuera del HTML para que funcione en Python
+    st.button("PROBAR GRATIS")
 
-# COLUMNA 2: PRO (EL QUE BRILLA)
+# COLUMNA 2: PRO (EL FOCO DE VENTA)
 with p2:
     st.markdown("""
-    <div class='glass-container' style='text-align: center; border: 1px solid #00d2ff; box-shadow: 0 0 20px rgba(0, 210, 255, 0.2); transform: scale(1.05); height: 350px;'>
-        <h3 style='color: #00d2ff;'>AGENTE PRO 🚀</h3>
-        <h1>$49<small>/mes</small></h1>
-        <p style='color: #888;'>Top Producers</p>
-        <hr style='border-color: #444;'>
-        <p><b>Ilimitado</b></p>
-        <p>Textos para Instagram</p>
+    <div class='glass-container' style='text-align: center; border: 1px solid #00d2ff; background: rgba(0, 210, 255, 0.05); transform: scale(1.03);'>
+        <span style='background: #00d2ff; color: black; padding: 4px 12px; border-radius: 20px; font-size: 0.7em; font-weight: bold; text-transform: uppercase;'>Más Vendido</span>
+        <h3 style='color: #00d2ff; margin-top: 10px;'>AGENTE PRO 🚀</h3>
+        <h1 style='color: white;'>$49<small style='font-size:0.4em'>/mes</small></h1>
+        <p style='color: #ccc; font-size: 0.9em;'>Para cerrar ventas rápido</p>
+        <hr style='border-color: #00d2ff; opacity: 0.5;'>
+        
+        <div class='benefit-list'>
+            ✅ <b>Generaciones ILIMITADAS</b><br>
+            ✅ <b>Pack Redes Sociales</b> (IG/FB)<br>
+            ✅ <b>Optimización SEO</b> (Google)<br>
+            ✅ 3 Tonos: Lujo, Urgencia, Pro<br>
+            ✅ Emails de Seguimiento<br>
+        </div>
         <br>
     </div>
     """, unsafe_allow_html=True)
-    st.button("MEJORAR AHORA") # Este botón será atacado por el CSS para ser NEÓN
+    st.button("QUIERO VENDER MÁS")
 
 # COLUMNA 3: AGENCIA
 with p3:
     st.markdown("""
-    <div class='glass-container' style='text-align: center; height: 350px;'>
+    <div class='glass-container' style='text-align: center;'>
         <h3 style='color: #DDA0DD;'>Agencia</h3>
-        <h1>$199<small>/mes</small></h1>
-        <p style='color: #888;'>Equipos</p>
-        <hr style='border-color: #444;'>
-        <p>5 Usuarios</p>
-        <p>API Access</p>
+        <h1>$199<small style='font-size:0.4em'>/mes</small></h1>
+        <p style='color: #888; font-size: 0.9em;'>Para equipos y brokers</p>
+        <hr style='border-color: #444; opacity: 0.5;'>
+        
+        <div class='benefit-list'>
+            ✅ <b>Todo lo del plan PRO</b><br>
+            ✅ <b>Hasta 5 Usuarios</b><br>
+            ✅ Panel de Control de Equipo<br>
+            ✅ Integración API / CRM<br>
+            ✅ Soporte Prioritario 24/7<br>
+        </div>
         <br>
     </div>
     """, unsafe_allow_html=True)
