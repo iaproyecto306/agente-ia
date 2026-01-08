@@ -2,50 +2,50 @@ import streamlit as st
 import google.generativeai as genai
 
 # --- CONFIGURACIÓN ---
-# Asegúrate de que esta clave sea de AI Studio
 API_KEY = "AIzaSyBuTXGDypKhTM1V1I6k6Qc6tdkNcrOu0dA"
 
+# Configuramos la API de forma directa
 genai.configure(api_key=API_KEY)
 
 def generar_texto(prompt, idioma):
     try:
-        # Usamos el modelo más básico y compatible
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Usamos el nombre 'gemini-1.5-flash-latest' que es el más robusto actualmente
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
         
+        # Agregamos una instrucción de sistema explícita
         response = model.generate_content(
-            f"Como experto inmobiliario, escribe en {idioma} un anuncio para: {prompt}"
+            f"Como experto inmobiliario, escribe exclusivamente en {idioma}: {prompt}"
         )
         
-        if response.text:
+        if response and response.text:
             return response.text
         else:
-            return "La IA no devolvió texto."
+            return "ERROR_INTERNO: La IA no generó texto."
+            
     except Exception as e:
-        # Si falla el nombre corto, intentamos con el nombre técnico completo
-        try:
-            model_alt = genai.GenerativeModel('models/gemini-1.5-flash')
-            response_alt = model_alt.generate_content(f"Escribe en {idioma}: {prompt}")
-            return response_alt.text
-        except Exception as e_alt:
-            return f"ERROR_FINAL: {str(e_alt)}"
+        error_str = str(e)
+        # Si falla por el 404, intentamos con el modelo Pro (que a veces tiene rutas distintas)
+        if "404" in error_str:
+            try:
+                model_pro = genai.GenerativeModel('gemini-1.5-pro')
+                res_pro = model_pro.generate_content(f"Escribe en {idioma}: {prompt}")
+                return res_pro.text
+            except:
+                return f"ERROR_TECNICO: {error_str}"
+        return f"ERROR_TECNICO: {error_str}"
 
 # --- INTERFAZ ---
-st.set_page_config(page_title="IA Realty Pro", page_icon="🏢")
 st.title("🏢 IA Realty Pro")
-
-user_input = st.text_area("Describe la propiedad (ej: Casa con piscina en Carrasco):")
+user_input = st.text_area("Describe la propiedad:")
 
 if st.button("✨ GENERAR ANUNCIO"):
     if user_input:
-        with st.spinner("Generando..."):
+        with st.spinner("Conectando con Google..."):
             resultado = generar_texto(user_input, "Español")
-            
-            if "ERROR_FINAL" in resultado:
-                st.error("Error de conexión con Google")
-                st.info("Detalle técnico:")
+            if "ERROR" in resultado:
+                st.error("Sigue habiendo un problema con la API")
+                st.info("Esto puede deberse a que la API Key necesita ser regenerada en AI Studio.")
                 st.code(resultado)
             else:
-                st.success("¡Anuncio listo!")
+                st.success("¡Anuncio generado!")
                 st.write(resultado)
-    else:
-        st.warning("Por favor, escribe una descripción.")
