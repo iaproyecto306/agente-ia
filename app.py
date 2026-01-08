@@ -45,6 +45,9 @@ st.markdown("""
     .neon-highlight { color: #00d2ff; text-shadow: 0 0 40px rgba(0, 210, 255, 0.8); }
     .subtitle { text-align: center; font-size: 1.2rem; color: #aaa; margin-bottom: 40px; }
 
+    /* BOTONES DE PLANES Y ANCHORS */
+    [data-testid="stHeaderActionElements"] { display: none; }
+
     /* BOTÓN GENERAR */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; border: none !important; 
@@ -58,7 +61,7 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
-    /* PLANES CON AURA RESTAURADA */
+    /* PLANES */
     .card-wrapper { transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); border-radius: 12px; height: 480px; }
     .card-wrapper:hover { transform: translateY(-15px); }
     .glass-container { background: rgba(38, 39, 48, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; height: 100%; }
@@ -85,9 +88,8 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-    /* VIDEO CARRUSEL: ANIMACIÓN FLOAT Y BREVE AURA AGREGADA */
+    /* VIDEO CARRUSEL CON AURA Y ETIQUETA DINÁMICA */
     .video-placeholder {
-        border: 1px solid rgba(0, 210, 255, 0.2); 
         border-radius: 12px; 
         height: 230px; 
         display: flex; 
@@ -99,10 +101,32 @@ st.markdown("""
         overflow: hidden; 
         background-size: cover; 
         background-position: center;
-        animation: float 5s ease-in-out infinite, adCarousel 18s infinite;
-        /* BREVE AURA: Suave y sin parpadeo brusco */
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.15); 
+        /* Sincronizamos animaciones: float, cambio de fotos y CAMBIO DE AURA */
+        animation: float 5s ease-in-out infinite, adCarousel 18s infinite, auraChange 18s infinite;
+        border: 1px solid rgba(255,255,255,0.1);
     }
+
+    .dynamic-tag {
+        position: absolute; top: 15px; left: 15px; 
+        color: black; padding: 5px 14px; border-radius: 4px; 
+        font-size: 0.75rem; font-weight: 900;
+        animation: tagColorChange 18s infinite;
+    }
+
+    /* ANIMACIÓN DEL COLOR DEL AURA */
+    @keyframes auraChange {
+        0%, 30% { box-shadow: 0 0 35px rgba(0, 210, 255, 0.4); border-color: rgba(0, 210, 255, 0.3); } /* Color PRO */
+        33%, 63% { box-shadow: 0 0 35px rgba(221, 160, 221, 0.4); border-color: rgba(221, 160, 221, 0.3); } /* Color AGENCIA */
+        66%, 100% { box-shadow: 0 0 35px rgba(0, 210, 255, 0.4); border-color: rgba(0, 210, 255, 0.3); } /* Color PRO */
+    }
+
+    /* ANIMACIÓN DEL COLOR DE LA ETIQUETA */
+    @keyframes tagColorChange {
+        0%, 30% { background: rgba(0, 210, 255, 1); } 
+        33%, 63% { background: rgba(221, 160, 221, 1); } 
+        66%, 100% { background: rgba(0, 210, 255, 1); }
+    }
+
     @keyframes adCarousel {
         0%, 30% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); }
         33%, 63% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); }
@@ -127,7 +151,12 @@ st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 # --- 5. SECCIÓN CENTRAL ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
-    st.markdown(f'<div class="video-placeholder"><div style="position: absolute; top: 15px; left: 15px; background: rgba(0, 210, 255, 1); color: black; padding: 5px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 900;">{L["p_destacada"]}</div><div style="background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); width: 100%; padding: 20px; text-align: center; color: white;">{L["comunidad"]}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'''
+        <div class="video-placeholder">
+            <div class="dynamic-tag">{L["p_destacada"]}</div>
+            <div style="background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); width: 100%; padding: 20px; text-align: center; color: white;">{L["comunidad"]}</div>
+        </div>
+    ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     st.text_area("", placeholder=L['placeholder'], label_visibility="collapsed")
     st.button(L['btn_gen'], key="main_gen", type="primary")
