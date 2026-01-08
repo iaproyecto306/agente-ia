@@ -85,9 +85,9 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-    /* VIDEO CARRUSEL: ANIMACIÓN FLOAT RESTAURADA, SIN AURA */
+    /* VIDEO CARRUSEL: ANIMACIÓN FLOAT Y BREVE AURA AGREGADA */
     .video-placeholder {
-        border: 1px solid rgba(255, 255, 255, 0.1); /* Borde simple sin brillo */
+        border: 1px solid rgba(0, 210, 255, 0.2); 
         border-radius: 12px; 
         height: 230px; 
         display: flex; 
@@ -100,7 +100,8 @@ st.markdown("""
         background-size: cover; 
         background-position: center;
         animation: float 5s ease-in-out infinite, adCarousel 18s infinite;
-        box-shadow: none !important; /* SACAMOS EL AURA */
+        /* BREVE AURA: Suave y sin parpadeo brusco */
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.15); 
     }
     @keyframes adCarousel {
         0%, 30% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); }
@@ -126,7 +127,7 @@ st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 # --- 5. SECCIÓN CENTRAL ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
-    st.markdown(f'<div class="video-placeholder"><div style="position: absolute; top: 15px; left: 15px; background: rgba(0, 210, 255, 1); color: black; padding: 5px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 900;">{L["p_destacada"]}</div><div style="background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); width: 100%; padding: 20px; text-align: center;">{L["comunidad"]}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="video-placeholder"><div style="position: absolute; top: 15px; left: 15px; background: rgba(0, 210, 255, 1); color: black; padding: 5px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 900;">{L["p_destacada"]}</div><div style="background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); width: 100%; padding: 20px; text-align: center; color: white;">{L["comunidad"]}</div></div>', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     st.text_area("", placeholder=L['placeholder'], label_visibility="collapsed")
     st.button(L['btn_gen'], key="main_gen", type="primary")
