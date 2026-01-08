@@ -1,2 +1,2 @@
 streamlit
-pip install -q -U google-genai 
+google-genai 
