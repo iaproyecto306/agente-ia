@@ -282,21 +282,20 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-# --- 6. SECCIÓN CENTRAL ---
+# --- 6. SECCIÓN CENTRAL CORREGIDA ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
-    # Empezamos directamente con el contenedor de la IA, sin el placeholder de video
+    # Abrimos el contenedor una sola vez (esto elimina el espacio muerto del video)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     
-    user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
+    # Una sola caja de texto
+    user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia_limpia", label_visibility="collapsed")
     
-    # Aquí iría el botón que ya centramos antes...
-    # (El resto del código de ejecución)
-   
-    st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
-    user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
+    # Espacio estético antes del botón
+    st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
     
-    if st.button(L['btn_gen'], key="main_gen", type="primary"):
+    # El botón de generar (le puse una key única para evitar conflictos)
+    if st.button(L['btn_gen'], key="main_gen_final", type="primary"):
         if user_input:
             with st.spinner("Generando..."):
                 prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
@@ -305,11 +304,14 @@ with c2:
                 if "ERROR_TECNICO" in resultado:
                     st.error("Hubo un problema de conexión. Por favor, verifica tu API Key en la configuración.")
                 else:
+                    # Caja de resultado
                     st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
         else:
             st.warning("Por favor, ingresa los detalles de la propiedad.")
     
+    # Cerramos el contenedor una sola vez
     st.markdown('</div>', unsafe_allow_html=True)
+
 # --- NUEVA SECCIÓN: CÓMO FUNCIONA ---
 st.markdown("<br><br><h2 style='text-align:center; color:white;'>¿Cómo funciona IA Realty Pro?</h2>", unsafe_allow_html=True)
 c1, c2, c3 = st.columns(3)
