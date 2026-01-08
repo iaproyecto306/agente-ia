@@ -282,27 +282,28 @@ with c2:
   # ... (Caja de texto user_input)
     user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
-   # --- CSS PARA BOTÓN CORTO Y CENTRADO ---
+  # --- CSS AGRESIVO PARA BOTÓN CORTO Y CENTRADO ---
     st.markdown("""
         <style>
-        /* Buscamos el contenedor del botón para centrarlo */
-        [data-testid="stVerticalBlock"] > div:has(div.stButton) {
+        /* 1. Forzamos al contenedor a no dejar que el botón se estire */
+        div.stButton {
             display: flex !important;
             justify-content: center !important;
             width: 100% !important;
         }
         
-        /* Acortamos el botón: le damos un ancho del 50% del contenedor */
+        /* 2. Forzamos al botón físico a medir solo el 50% y centrarse */
         div.stButton > button {
-            width: 50% !important; /* Aquí controlas qué tan corto es */
-            min-width: 250px !important; 
+            width: 50% !important; 
+            max-width: 50% !important; /* Añadimos max-width para asegurar */
+            display: block !important;
             margin: 0 auto !important;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # Botón con nueva key para evitar errores
-    ejecutar = st.button(L['btn_gen'], key="main_gen_corto", type="primary")
+    # Cambiamos la key a v5 para refrescar el elemento por completo
+    ejecutar = st.button(L['btn_gen'], key="main_gen_v5", type="primary")
 
     if ejecutar:
         if user_input:
