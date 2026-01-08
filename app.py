@@ -154,17 +154,6 @@ st.markdown("""
     .neon-highlight { color: #00d2ff; text-shadow: 0 0 40px rgba(0, 210, 255, 0.8); }
     .subtitle { text-align: center; font-size: 1.2rem; color: #aaa; margin-bottom: 40px; }
 
-    /* 1. ANIMACIÓN DE APARICIÓN SUAVE (NUEVA) */
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Aplicación de la animación de entrada a las secciones principales */
-    .stColumn, .card-wrapper, .glass-container {
-        animation: fadeInUp 0.8s ease-out forwards;
-    }
-
     /* BOTÓN GENERAR */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; border: none !important; 
@@ -178,33 +167,17 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
-    /* 2. RESPLANDOR EN CUADRO DE TEXTO (NUEVO) */
-    textarea:focus {
-        border-color: #00d2ff !important;
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.3) !important;
-        background: rgba(255, 255, 255, 0.07) !important;
-        transition: all 0.3s ease;
-    }
-
-    /* PLANES (CON ANIMACIONES DEVUELTAS) */
+    /* PLANES */
     .card-wrapper { transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); border-radius: 12px; height: 480px; }
     .card-wrapper:hover { transform: translateY(-15px); }
     .glass-container { background: rgba(38, 39, 48, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; height: 100%; }
     
     .free-card { box-shadow: 0 0 20px rgba(255, 255, 255, 0.03); }
     .free-card:hover { box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1); }
-    
     .pro-card { border: 1px solid rgba(0, 210, 255, 0.4) !important; box-shadow: 0 0 25px rgba(0, 210, 255, 0.15); }
-    .pro-card:hover { 
-        box-shadow: 0 15px 60px rgba(0, 210, 255, 0.5); 
-        border: 1px solid rgba(0, 210, 255, 0.8) !important; /* Brillo devuelto */
-    }
-    
+    .pro-card:hover { box-shadow: 0 15px 60px rgba(0, 210, 255, 0.5); }
     .agency-card { border: 1px solid rgba(221, 160, 221, 0.4) !important; box-shadow: 0 0 25px rgba(221, 160, 221, 0.15); }
-    .agency-card:hover { 
-        box-shadow: 0 15px 60px rgba(221, 160, 221, 0.5); 
-        border: 1px solid rgba(221, 160, 221, 0.8) !important; /* Brillo devuelto */
-    }
+    .agency-card:hover { box-shadow: 0 15px 60px rgba(221, 160, 221, 0.5); }
 
     /* TOOLTIPS */
     .info-icon { display: inline-block; width: 16px; height: 16px; border-radius: 50%; text-align: center; font-size: 11px; line-height: 16px; margin-left: 8px; cursor: help; position: relative; font-weight: bold; }
@@ -221,31 +194,23 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-    /* VIDEO CARRUSEL */
+  /* VIDEO CARRUSEL MEJORADO */
     .video-placeholder {
         border-radius: 12px; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
         margin-bottom: 25px; position: relative; overflow: hidden; background-size: cover; background-position: center;
-        transition: all 0.8s ease-in-out; 
-        animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
+        transition: all 0.8s ease-in-out; animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate;
         border: 1px solid rgba(255,255,255,0.1);
     }
     .dynamic-tag { position: absolute; top: 15px; left: 15px; color: black; padding: 5px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; transition: background-color 0.8s ease; animation: tagColorChange 24s infinite alternate; }
 
-    @keyframes auraChange { 
-        0%, 74% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
-        75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
-    }
-    @keyframes tagColorChange { 
-        0%, 74% { background: rgba(0, 210, 255, 1); } 
-        75%, 100% { background: rgba(221, 160, 221, 1); } 
-    }
+    @keyframes auraChange { 0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } }
+    @keyframes tagColorChange { 0%, 70% { background: rgba(0, 210, 255, 1); } 75%, 100% { background: rgba(221, 160, 221, 1); } }
     @keyframes adCarousel { 
         0%, 20% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        25%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        50%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
-        75%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        30%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
+        80%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; }
     }
-    
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
 </style>
 """, unsafe_allow_html=True)
