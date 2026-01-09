@@ -225,7 +225,6 @@ with c2:
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
         if st.button("COMENZAR GRATIS / START FREE", type="primary"):
             if email_input and "@" in email_input:
-                # --- INICIO BLOQUE SEGURO ---
                 df_actual = obtener_datos_db()
                 user_match = df_actual[df_actual['email'] == email_input]
                 
@@ -243,7 +242,6 @@ with c2:
                 
                 st.session_state.email_usuario = email_input
                 st.rerun()
-                # --- FIN BLOQUE SEGURO ---
             else:
                 st.error("Por favor ingresa un email válido.")
     
