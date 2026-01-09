@@ -227,7 +227,7 @@ st.markdown("""
 # --- 5. INTERFAZ ---
 if "idioma" not in st.session_state: st.session_state.idioma = "Español"
 col_logo, _, col_lang = st.columns([2.5, 4, 1.5])
-with col_logo: st.markdown('<div style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-top:10px; letter-spacing: 1px;">🏢 IA REALTY PRO</div>', unsafe_allow_html=True)
+with col_logo: st.markdown('<div style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-top:10px; letter-spacing: 1px;">🏢 AI REALTY PRO</div>', unsafe_allow_html=True)
 with col_lang:
     idioma_selec = st.selectbox("", list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma), label_visibility="collapsed")
     st.session_state.idioma = idioma_selec
