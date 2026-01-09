@@ -479,43 +479,58 @@ with col_stat1: st.markdown(f'<div style="text-align:center; padding:20px; borde
 with col_stat2: st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">-80%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat2"]}</p></div>', unsafe_allow_html=True)
 with col_stat3: st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+45%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p></div>', unsafe_allow_html=True)
 
-# --- 7. PLANES INTEGRADOS CON PAYPAL ---
+# --- 7. PLANES INTEGRADOS CON PAYPAL (AUTOMATIZADOS) ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
+# PLAN GRATIS
 with col1:
     desc_f = f"<div class='feature-list'>{L['desc1']}<span class='info-icon i-free' data-tooltip='{L['t1_1']}'>i</span><br>{L['desc2']}<span class='info-icon i-free' data-tooltip='{L['t1_2']}'>i</span><br>{L['desc3']}<span class='info-icon i-free' data-tooltip='{L['t1_3']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper free-card'><div class='glass-container'><h3>{L['plan1']}</h3><h1>$0</h1><hr style='opacity:0.2;'>{desc_f}</div></div>", unsafe_allow_html=True)
     st.button(L['btn1'], key="btn_f")
 
+# PLAN PRO ($49) - Con rastreo de email
 with col2:
     desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_1']}'>i</span><br>{L['desc5']}<span class='info-icon i-pro' data-tooltip='{L['t2_2']}'>i</span><br>{L['desc6']}<span class='info-icon i-pro' data-tooltip='{L['t2_3']}'>i</span><br><b>{L['desc7']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_4']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper pro-card'><div class='glass-container'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'>{desc_p}</div></div>", unsafe_allow_html=True)
     
-    paypal_html_49 = """
+    # Botón Pro con custom_id
+    paypal_html_49 = f"""
     <div id="paypal-button-container-P-3P2657040E401734NNFQQ5TY"></div>
     <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
     <script>
-      paypal.Buttons({
-          style: { shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' },
-          createSubscription: function(data, actions) { return actions.subscription.create({ 'plan_id': 'P-3P2657040E401734NNFQQ5TY' }); }
-      }).render('#paypal-button-container-P-3P2657040E401734NNFQQ5TY');
+      paypal.Buttons({{
+          style: {{ shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' }},
+          createSubscription: function(data, actions) {{
+            return actions.subscription.create({{
+              'plan_id': 'P-3P2657040E401734NNFQQ5TY',
+              'custom_id': '{st.session_state.email_usuario}'
+            }});
+          }}
+      }}).render('#paypal-button-container-P-3P2657040E401734NNFQQ5TY');
     </script>
     """
     components.html(paypal_html_49, height=150)
 
+# PLAN AGENCIA ($199) - Con rastreo de email
 with col3:
     desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
     
-    paypal_html_199 = """
+    # Botón Agencia con custom_id
+    paypal_html_199 = f"""
     <div id="paypal-button-container-P-0S451470G5041550ENFQRB4I"></div>
     <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
     <script>
-      paypal.Buttons({
-          style: { shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' },
-          createSubscription: function(data, actions) { return actions.subscription.create({ 'plan_id': 'P-0S451470G5041550ENFQRB4I' }); }
-      }).render('#paypal-button-container-P-0S451470G5041550ENFQRB4I');
+      paypal.Buttons({{
+          style: {{ shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' }},
+          createSubscription: function(data, actions) {{
+            return actions.subscription.create({{
+              'plan_id': 'P-0S451470G5041550ENFQRB4I',
+              'custom_id': '{st.session_state.email_usuario}'
+            }});
+          }}
+      }}).render('#paypal-button-container-P-0S451470G5041550ENFQRB4I');
     </script>
     """
     components.html(paypal_html_199, height=150)
