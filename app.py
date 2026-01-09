@@ -445,15 +445,20 @@ with c2:
             st.error(L["limit_msg"])
             st.markdown(f"#### {L['upgrade_msg']}")
             
-            # Botón de PayPal directo para Agente Pro ($49) en el centro
-            paypal_bloqueo = """
+           # Botón de PayPal INTELIGENTE (Envía el email del usuario para la automatización)
+            paypal_bloqueo = f"""
             <div id="paypal-bloqueo-container"></div>
             <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
             <script>
-              paypal.Buttons({
-                  style: { shape: 'pill', color: 'blue', layout: 'horizontal', label: 'subscribe' },
-                  createSubscription: function(data, actions) { return actions.subscription.create({ 'plan_id': 'P-3P2657040E401734NNFQQ5TY' }); }
-              }).render('#paypal-bloqueo-container');
+              paypal.Buttons({{
+                  style: {{ shape: 'pill', color: 'blue', layout: 'horizontal', label: 'subscribe' }},
+                  createSubscription: function(data, actions) {{
+                    return actions.subscription.create({{
+                      'plan_id': 'P-3P2657040E401734NNFQQ5TY',
+                      'custom_id': '{st.session_state.email_usuario}' // <--- ESTO ES LA CLAVE DE LA AUTOMATIZACIÓN
+                    }});
+                  }}
+              }}).render('#paypal-bloqueo-container');
             </script>
             """
             components.html(paypal_bloqueo, height=100)
