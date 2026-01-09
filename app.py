@@ -1,4 +1,4 @@
-    import streamlit as st
+import streamlit as st
 from openai import OpenAI
 import streamlit.components.v1 as components
 from streamlit_gsheets import GSheetsConnection
