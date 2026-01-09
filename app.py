@@ -1,8 +1,8 @@
 import streamlit as st
 from openai import OpenAI
+import streamlit.components.v1 as components
 
 # --- 1. CONFIGURACIÓN DE IA SEGURA ---
-# Intentamos obtener la clave de los secretos de Streamlit
 try:
     api_key = st.secrets["OPENAI_API_KEY"]
     client = OpenAI(api_key=api_key)
@@ -32,16 +32,20 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 3. DICCIONARIO MAESTRO (Traducciones Completas) ---
+# --- LÓGICA DE CONTROL DE USOS (PAYWALL) ---
+if "usos" not in st.session_state:
+    st.session_state.usos = 0
+if "email_usuario" not in st.session_state:
+    st.session_state.email_usuario = ""
+
+# --- 3. DICCIONARIO MAESTRO ---
 traducciones = {
     "Español": {
-        # Hero & General
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
         "sub": "La herramienta IA secreta de los agentes top productores.",
         "placeholder": "🏠 Pega el link de la propiedad o describe brevemente...",
         "btn_gen": "✨ GENERAR DESCRIPCIÓN", "p_destacada": "PROPIEDAD DESTACADA",
         "comunidad": "Propiedades de la Comunidad", "popular": "MÁS POPULAR",
-        # Planes
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agencia",
         "desc1": "3 descripciones / día", "t1_1": "Límite diario de generaciones para nuevos usuarios.",
         "desc2": "Soporte Básico", "t1_2": "Ayuda técnica vía email con respuesta en menos de 48hs.",
@@ -55,19 +59,15 @@ traducciones = {
         "desc10": "Acceso vía API", "t3_3": "Conecta nuestra IA directamente con tu propio software o CRM.",
         "desc11": "Prioridad en Banner", "t3_4": "Tus anuncios aparecerán con el doble de frecuencia en la home.",
         "btn1": "REGISTRO GRATIS", "btn2": "MEJORAR AHORA", "btn3": "CONTACTAR VENTAS",
-        # Cómo Funciona
         "how_title": "¿Cómo funciona IA Realty Pro?",
         "step1_t": "Pega el Link", "step1_d": "O escribe una descripción breve.",
         "step2_t": "IA Analiza", "step2_d": "Optimizamos para SEO y ventas.",
         "step3_t": "Publica", "step3_d": "Copia el texto y atrae clientes.",
-        # Estadísticas
         "stat1": "Anuncios Optimizados", "stat2": "Tiempo Ahorrado", "stat3": "Más Consultas",
-        # Testimonios
         "test_title": "Lo que dicen los Expertos",
         "test1_txt": "Mis ventas en Instagram subieron un 50% desde que uso la IA para los copies.", "test1_au": "Carlos R. (RE/MAX)",
         "test2_txt": "Increíble cómo resume las características de los links de portales. Ahorro horas.", "test2_au": "Ana M. (Century 21)",
         "test3_txt": "La mejor inversión para mi agencia este año. El plan Pro vale cada centavo.", "test3_au": "Luis P. (Independiente)",
-        # Footer
         "foot_desc": "Herramientas de Inteligencia Artificial para Inmuebles.",
         "foot_links": "Términos de Servicio | Política de Privacidad | Soporte"
     },
@@ -90,7 +90,6 @@ traducciones = {
         "desc10": "API Access", "t3_3": "Connect our AI directly with your own software or CRM.",
         "desc11": "Banner Priority", "t3_4": "Your listings will appear twice as often on the home screen.",
         "btn1": "FREE SIGNUP", "btn2": "UPGRADE NOW", "btn3": "CONTACT SALES",
-        # New Translations
         "how_title": "How does AI Realty Pro work?",
         "step1_t": "Paste the Link", "step1_d": "Or write a brief description.",
         "step2_t": "AI Analyzes", "step2_d": "We optimize for SEO and sales.",
@@ -112,7 +111,7 @@ traducciones = {
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
         "desc1": "3 descrições / dia", "t1_1": "Limite diário de gerações para novos usuários.",
         "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail com resposta em menos de 48 horas.",
-        "desc3": "Marca d'Água", "t1_3": "Os textos incluem uma pequena menção à nossa plataforma.",
+        "desc3": "Marca d'Água", "t1_3": "Os textos incluyen uma pequena menção à nossa plataforma.",
         "desc4": "Gerações Ilimitadas", "t2_1": "Crie quantas descrições precisar, sem restrições.",
         "desc5": "Pack Redes Sociais", "t2_2": "Gere automaticamente posts para Instagram, Facebook e TikTok com hashtags.",
         "desc6": "Otimização SEO", "t2_3": "Textos estruturados para aparecer primeiro nos motores de busca.",
@@ -122,7 +121,6 @@ traducciones = {
         "desc10": "Acesso via API", "t3_3": "Conecte nossa IA diretamente com seu próprio software ou CRM.",
         "desc11": "Prioridade no Banner", "t3_4": "Seus anúncios aparecerão com o dobro de frequência na home.",
         "btn1": "REGISTRO GRÁTIS", "btn2": "MELHORAR AGORA", "btn3": "CONTATO VENDAS",
-        # New Translations
         "how_title": "Como funciona o AI Realty Pro?",
         "step1_t": "Cole o Link", "step1_d": "Ou escreva uma breve descrição.",
         "step2_t": "IA Analisa", "step2_d": "Otimizamos para SEO e vendas.",
@@ -132,7 +130,7 @@ traducciones = {
         "test1_txt": "Minhas vendas no Instagram subiram 50% desde que uso a IA para legendas.", "test1_au": "Carlos R. (RE/MAX)",
         "test2_txt": "Incrível como resume os links dos portais. Economizo horas.", "test2_au": "Ana M. (Century 21)",
         "test3_txt": "Melhor investimento para minha agência este ano. O plano Pro vale cada centavo.", "test3_au": "Luis P. (Independente)",
-        "foot_desc": "Ferramentas de Inteligência Artificial para Imóveis.",
+        "foot_desc": "Ferramentas de Inteligencia Artificial para Imóveis.",
         "foot_links": "Termos de Serviço | Política de Privacidade | Suporte"
     },
     "中文": {
@@ -154,7 +152,6 @@ traducciones = {
         "desc10": "API 访问", "t3_3": "将我们的人工智能直接与您自己的软件或 CRM 连接。",
         "desc11": "横幅优先级", "t3_4": "您的广告在主页上出现的频率将增加一倍。",
         "btn1": "免费注册", "btn2": "立即升级", "btn3": "联系销售",
-        # New Translations
         "how_title": "AI Realty Pro 如何运作？",
         "step1_t": "粘贴链接", "step1_d": "或写简短描述。",
         "step2_t": "AI 分析", "step2_d": "我们针对 SEO 和销售进行优化。",
@@ -186,7 +183,6 @@ traducciones = {
         "desc10": "Accès via API", "t3_3": "Connectez notre IA directement à votre propre logiciel ou CRM.",
         "desc11": "Priorité Bannière", "t3_4": "Vos annonces apparaîtront deux fois plus souvent sur la page d'accueil.",
         "btn1": "INSCRIPTION GRATUITE", "btn2": "AMÉLIORER MAINTENANT", "btn3": "CONTACTER VENTES",
-        # New Translations
         "how_title": "Comment fonctionne AI Realty Pro ?",
         "step1_t": "Collez le lien", "step1_d": "Ou écrivez une brève description.",
         "step2_t": "IA Analyse", "step2_d": "Nous optimisons pour le SEO et la vente.",
@@ -218,7 +214,6 @@ traducciones = {
         "desc10": "API-Zugang", "t3_3": "Verbinden Sie unsere KI direkt mit Ihrer eigenen Software oder Ihrem CRM.",
         "desc11": "Banner-Priorität", "t3_4": "Ihre Anzeigen erscheinen doppelt so häufig auf der Startseite.",
         "btn1": "GRATIS REGISTRIEREN", "btn2": "JETZT UPGRADEN", "btn3": "VERTRIEB KONTAKTIEREN",
-        # New Translations
         "how_title": "Wie funktioniert AI Realty Pro?",
         "step1_t": "Link einfügen", "step1_d": "Oder kurze Beschreibung schreiben.",
         "step2_t": "KI Analysiert", "step2_d": "Wir optimieren für SEO und Verkauf.",
@@ -255,7 +250,7 @@ st.markdown("""
     }
 
     /* PLANES */
-    .card-wrapper { transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); border-radius: 12px; height: 480px; }
+    .card-wrapper { transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); border-radius: 12px; height: 520px; margin-bottom: 20px;}
     .card-wrapper:hover { transform: translateY(-15px); }
     .glass-container { background: rgba(38, 39, 48, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; height: 100%; }
     
@@ -281,7 +276,6 @@ st.markdown("""
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
 
-  /* VIDEO CARRUSEL MEJORADO */
     .video-placeholder {
         border-radius: 12px; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
         margin-bottom: 25px; position: relative; overflow: hidden; background-size: cover; background-position: center;
@@ -314,7 +308,7 @@ L = traducciones[st.session_state.idioma]
 st.markdown(f"<h1 class='neon-title'>{L['title1']} <br><span class='neon-highlight'>{L['title2']}</span></h1>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
-# --- 6. SECCIÓN CENTRAL ---
+# --- 6. SECCIÓN CENTRAL (BLOQUEO DE USOS) ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
     st.markdown(f'''
@@ -324,20 +318,32 @@ with c2:
         </div>
     ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
-    user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
     
-    if st.button(L['btn_gen'], key="main_gen", type="primary"):
-        if user_input:
-            with st.spinner("Generando..."):
-                prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
-                resultado = generar_texto(prompt)
-                
-                if "ERROR_TECNICO" in resultado:
-                    st.error("Hubo un problema de conexión. Por favor, verifica tu API Key en la configuración.")
+    # --- CAPTURA DE EMAIL ---
+    if not st.session_state.email_usuario:
+        st.session_state.email_usuario = st.text_input("📧 Ingresa tu Email para comenzar / Enter Email to start", key="user_email")
+    
+    if st.session_state.email_usuario:
+        # Lógica de Paywall: Solo permite generar si usos < 3
+        if st.session_state.usos < 3:
+            user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
+            if st.button(L['btn_gen'], key="main_gen", type="primary"):
+                if user_input:
+                    with st.spinner("Generando..."):
+                        prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
+                        resultado = generar_texto(prompt)
+                        if "ERROR_TECNICO" not in resultado:
+                            st.session_state.usos += 1
+                            st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
+                            st.info(f"Usos gratuitos restantes: {3 - st.session_state.usos}")
+                        else:
+                            st.error("Error de conexión.")
                 else:
-                    st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
+                    st.warning("Por favor, ingresa los detalles.")
         else:
-            st.warning("Por favor, ingresa los detalles de la propiedad.")
+            # BLOQUEO Y BOTONES DE PAYPAL
+            st.error("🚫 Has agotado tus 3 usos gratuitos. ¡Mejora tu plan para seguir vendiendo!")
+            st.markdown("### Selecciona un plan para continuar:")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -351,35 +357,17 @@ with c2:
 with c3:
     st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>{L['step3_t']}</b><br>{L['step3_d']}</p></div>", unsafe_allow_html=True)
 
-# --- AGREGADO: ESTADÍSTICAS (Impacto) ---
+# --- ESTADÍSTICAS ---
 st.markdown("<br>", unsafe_allow_html=True)
 col_stat1, col_stat2, col_stat3 = st.columns(3)
-
 with col_stat1:
-    st.markdown(f"""
-        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
-            <h2 style="color:#00d2ff; margin:0;">+10k</h2>
-            <p style="color:#aaa; font-size:0.9rem;">{L['stat1']}</p>
-        </div>
-    """, unsafe_allow_html=True)
-
+    st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+10k</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat1"]}</p></div>', unsafe_allow_html=True)
 with col_stat2:
-    st.markdown(f"""
-        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
-            <h2 style="color:#00d2ff; margin:0;">-80%</h2>
-            <p style="color:#aaa; font-size:0.9rem;">{L['stat2']}</p>
-        </div>
-    """, unsafe_allow_html=True)
-
+    st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">-80%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat2"]}</p></div>', unsafe_allow_html=True)
 with col_stat3:
-    st.markdown(f"""
-        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
-            <h2 style="color:#00d2ff; margin:0;">+45%</h2>
-            <p style="color:#aaa; font-size:0.9rem;">{L['stat3']}</p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+45%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p></div>', unsafe_allow_html=True)
 
-# --- 7. PLANES ---
+# --- 7. PLANES INTEGRADOS CON PAYPAL ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
@@ -391,42 +379,43 @@ with col1:
 with col2:
     desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_1']}'>i</span><br>{L['desc5']}<span class='info-icon i-pro' data-tooltip='{L['t2_2']}'>i</span><br>{L['desc6']}<span class='info-icon i-pro' data-tooltip='{L['t2_3']}'>i</span><br><b>{L['desc7']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_4']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper pro-card'><div class='glass-container'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'>{desc_p}</div></div>", unsafe_allow_html=True)
-    st.button(L['btn2'], key="btn_p")
+    
+    # CÓDIGO PAYPAL PLAN PRO 49
+    paypal_html_49 = """
+    <div id="paypal-button-container-P-3P2657040E401734NNFQQ5TY"></div>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+    <script>
+      paypal.Buttons({
+          style: { shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' },
+          createSubscription: function(data, actions) { return actions.subscription.create({ 'plan_id': 'P-3P2657040E401734NNFQQ5TY' }); }
+      }).render('#paypal-button-container-P-3P2657040E401734NNFQQ5TY');
+    </script>
+    """
+    components.html(paypal_html_49, height=150)
 
 with col3:
     desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
-    st.button(L['btn3'], key="btn_a")
+    
+    # CÓDIGO PAYPAL PLAN AGENCIA 199
+    paypal_html_199 = """
+    <div id="paypal-button-container-P-0S451470G5041550ENFQRB4I"></div>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+    <script>
+      paypal.Buttons({
+          style: { shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' },
+          createSubscription: function(data, actions) { return actions.subscription.create({ 'plan_id': 'P-0S451470G5041550ENFQRB4I' }); }
+      }).render('#paypal-button-container-P-0S451470G5041550ENFQRB4I');
+    </script>
+    """
+    components.html(paypal_html_199, height=150)
 
-# --- AGREGADO: TESTIMONIOS (Glassmorphism) ---
+# --- TESTIMONIOS Y FOOTER ---
 st.markdown(f"<br><br><h2 style='text-align:center; color:white;'>{L['test_title']}</h2>", unsafe_allow_html=True)
 ct1, ct2, ct3 = st.columns(3)
+testimonio_style = '<div style="padding:20px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); height:180px;"><p style="font-style:italic; color:#ddd; font-size:0.9rem;">"{texto}"</p><p style="color:#00d2ff; font-weight:bold; margin-top:15px;">- {autor}</p></div>'
+with ct1: st.markdown(testimonio_style.format(texto=L['test1_txt'], autor=L['test1_au']), unsafe_allow_html=True)
+with ct2: st.markdown(testimonio_style.format(texto=L['test2_txt'], autor=L['test2_au']), unsafe_allow_html=True)
+with ct3: st.markdown(testimonio_style.format(texto=L['test3_txt'], autor=L['test3_au']), unsafe_allow_html=True)
 
-testimonio_style = """
-    <div style="padding:20px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); height:180px; transition: 0.3s;">
-        <p style="font-style:italic; color:#ddd; font-size:0.9rem;">"{texto}"</p>
-        <p style="color:#00d2ff; font-weight:bold; margin-top:15px;">- {autor}</p>
-    </div>
-"""
-
-with ct1:
-    st.markdown(testimonio_style.format(texto=L['test1_txt'], autor=L['test1_au']), unsafe_allow_html=True)
-with ct2:
-    st.markdown(testimonio_style.format(texto=L['test2_txt'], autor=L['test2_au']), unsafe_allow_html=True)
-with ct3:
-    st.markdown(testimonio_style.format(texto=L['test3_txt'], autor=L['test3_au']), unsafe_allow_html=True)
-
-# --- AGREGADO: FOOTER ---
-st.markdown(f"""
-    <br><br><br>
-    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;">
-        <div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 AI REALTY PRO</div>
-        <p style="color:#666; font-size:0.8rem;">
-            © 2026 IA Realty Pro - {L['foot_desc']}<br>
-            {L['foot_links']}
-        </p>
-        <div style="margin-top:15px; color:#00d2ff; font-size:1.2rem;">
-            🌐 📸 🐦 💼
-        </div>
-    </div>
-""", unsafe_allow_html=True)
+st.markdown(f'<div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;"><div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 AI REALTY PRO</div><p style="color:#666; font-size:0.8rem;">© 2026 IA Realty Pro - {L["foot_desc"]}<br>{L["foot_links"]}</p></div>', unsafe_allow_html=True)
