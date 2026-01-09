@@ -1,6 +1,8 @@
 import streamlit as st
 from openai import OpenAI
 import streamlit.components.v1 as components
+from streamlit_gsheets import GSheetsConnection
+import pandas as pd
 
 # --- 1. CONFIGURACIÓN DE IA SEGURA ---
 try:
@@ -9,6 +11,24 @@ try:
 except Exception:
     st.warning("⚠️ Configuración pendiente: Por favor, añade la API Key en los Secrets de Streamlit.")
     st.stop()
+
+# --- CONEXIÓN A BASE DE DATOS (Agregado para persistencia de usos) ---
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+def obtener_datos_db():
+    try:
+        return conn.read(worksheet="Sheet1", ttl=0)
+    except:
+        return pd.DataFrame(columns=['email', 'usos'])
+
+def actualizar_usos_db(email, nuevos_usos):
+    df = obtener_datos_db()
+    if email in df['email'].values:
+        df.loc[df['email'] == email, 'usos'] = nuevos_usos
+    else:
+        nueva_fila = pd.DataFrame({"email": [email], "usos": [nuevos_usos]})
+        df = pd.concat([df, nueva_fila], ignore_index=True)
+    conn.update(worksheet="Sheet1", data=df)
 
 def generar_texto(prompt):
     try:
@@ -133,7 +153,7 @@ traducciones = {
         "test2_txt": "Incrível como resume os links dos portais. Economizo horas.", "test2_au": "Ana M. (Century 21)",
         "test3_txt": "Melhor investimento para minha agência este ano. O plano Pro vale cada centavo.", "test3_au": "Luis P. (Independente)",
         "foot_desc": "Ferramentas de Inteligencia Artificial para Imóveis.",
-        "foot_links": "Termos de Serviço | Política de Privacidade | Suporte",
+        "foot_links": "Termos de Servicio | Política de Privacidade | Suporte",
         "mail_label": "📧 Insira seu e-mail para começar", "limit_msg": "🚫 Limite grátis atingido.", "upgrade_msg": "Atualize para PRO para continuar vendendo."
     },
     "中文": {
@@ -180,7 +200,7 @@ traducciones = {
         "desc3": "Filigrane", "t1_3": "Les textes incluent une petite mention de notre plateforme.",
         "desc4": "Générations Illimitées", "t2_1": "Créez autant de descriptions que nécessaire sans restrictions.",
         "desc5": "Pack Réseaux Sociaux", "t2_2": "Générez automatiquement des posts pour Instagram, Facebook et TikTok avec hashtags.",
-        "desc6": "Optimisation SEO", "t2_3": "Textes structurés pour apparaître en premier dans les moteurs de recherche.",
+        "desc6": "Optimización SEO", "t2_3": "Textos estructurados pour apparaître en premier dans les moteurs de recherche.",
         "desc7": "Bannière Principale", "t2_4": "Vos propriétés à la une tourneront sur notre page d'accueil.",
         "desc8": "5 Utilisateurs / Comptes", "t3_1": "Accès individuel pour jusqu'à 5 membres de votre équipe immobilière.",
         "desc9": "Tableau de Bord Équipe", "t3_2": "Supervisez et gérez les descriptions créées par vos agents.",
@@ -223,7 +243,7 @@ traducciones = {
         "step1_t": "Link einfügen", "step1_d": "Oder kurze Beschreibung schreiben.",
         "step2_t": "KI Analysiert", "step2_d": "Wir optimieren für SEO und Verkauf.",
         "step3_t": "Veröffentlichen", "step3_d": "Text kopieren und Kunden gewinnen.",
-        "stat1": "Optimierte Anzeigen", "stat2": "Zeit Gespart", "stat3": "Mehr Anfragen",
+        "stat1": "Optimierte Anzeigen", "stat2": "Zeit Gespart", "stat3": "More Inquiries",
         "test_title": "Was Experten sagen",
         "test1_txt": "Meine Instagram-Verkäufe stiegen um 50%, seit ich KI für Captions nutze.", "test1_au": "Carlos R. (RE/MAX)",
         "test2_txt": "Unglaublich, wie es Portal-Links zusammenfasst. Ich spare Stunden.", "test2_au": "Ana M. (Century 21)",
@@ -330,6 +350,11 @@ with c2:
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
         if st.button("COMENZAR GRATIS / START FREE", type="primary"):
             if email_input and "@" in email_input:
+                df_actual = obtener_datos_db()
+                if email_input in df_actual['email'].values:
+                    st.session_state.usos = int(df_actual[df_actual['email'] == email_input]['usos'].values[0])
+                else:
+                    st.session_state.usos = 0
                 st.session_state.email_usuario = email_input
                 st.rerun()
             else:
@@ -346,6 +371,7 @@ with c2:
                         resultado = generar_texto(prompt)
                         if "ERROR_TECNICO" not in resultado:
                             st.session_state.usos += 1
+                            actualizar_usos_db(st.session_state.email_usuario, st.session_state.usos)
                             st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
                             st.info(f"Usos restantes: {3 - st.session_state.usos}")
                         else:
