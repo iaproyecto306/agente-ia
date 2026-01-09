@@ -17,7 +17,6 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 
 def obtener_datos_db():
     try:
-        # Ahora incluimos la columna 'plan'
         return conn.read(worksheet="Sheet1", ttl=0)
     except:
         return pd.DataFrame(columns=['email', 'usos', 'plan'])
@@ -26,7 +25,6 @@ def actualizar_usos_db(email, nuevos_usos, plan="Gratis"):
     df = obtener_datos_db()
     if email in df['email'].values:
         df.loc[df['email'] == email, 'usos'] = nuevos_usos
-        # No sobreescribimos el plan si ya es Pro o Agencia
         if df.loc[df['email'] == email, 'plan'].values[0] not in ["Pro", "Agencia"]:
             df.loc[df['email'] == email, 'plan'] = plan
     else:
@@ -75,7 +73,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- LÓGICA DE CONTROL DE SESIÓN ---
 if "usos" not in st.session_state: st.session_state.usos = 0
 if "email_usuario" not in st.session_state: st.session_state.email_usuario = ""
 if "plan" not in st.session_state: st.session_state.plan = "Gratis"
@@ -155,8 +152,6 @@ st.markdown("""
     .neon-title { font-size: 3.5rem; font-weight: 800; text-align: center; margin-top: 20px; color: white; text-shadow: 0 0 25px rgba(0, 210, 255, 0.5); }
     .neon-highlight { color: #00d2ff; text-shadow: 0 0 40px rgba(0, 210, 255, 0.8); }
     .subtitle { text-align: center; font-size: 1.2rem; color: #aaa; margin-bottom: 40px; }
-
-    /* BOTÓN GENERAR */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; border: none !important; 
         box-shadow: 0 0 20px rgba(0, 210, 255, 0.4) !important; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important; 
@@ -168,31 +163,22 @@ st.markdown("""
         box-shadow: 0 0 50px rgba(0, 210, 255, 1), 0 0 20px rgba(0, 210, 255, 0.6) !important; 
         border: 2px solid #00d2ff !important;
     }
-
-    /* PLANES */
     .card-wrapper { transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); border-radius: 12px; height: 520px; margin-bottom: 20px;}
     .card-wrapper:hover { transform: translateY(-15px); }
     .glass-container { background: rgba(38, 39, 48, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; height: 100%; }
-    
-    .free-card { box-shadow: 0 0 20px rgba(255, 255, 255, 0.03); }
     .pro-card { border: 1px solid rgba(0, 210, 255, 0.4) !important; box-shadow: 0 0 25px rgba(0, 210, 255, 0.15); }
     .agency-card { border: 1px solid rgba(221, 160, 221, 0.4) !important; box-shadow: 0 0 25px rgba(221, 160, 221, 0.15); }
-
-    /* TOOLTIPS */
     .info-icon { display: inline-block; width: 16px; height: 16px; border-radius: 50%; text-align: center; font-size: 11px; line-height: 16px; margin-left: 8px; cursor: help; position: relative; font-weight: bold; }
     .i-free { background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
     .i-pro { background-color: rgba(0, 210, 255, 0.15); color: #00d2ff; border: 1px solid rgba(0, 210, 255, 0.5); }
     .i-agency { background-color: rgba(221, 160, 221, 0.15); color: #DDA0DD; border: 1px solid rgba(221, 160, 221, 0.5); }
-    
     .info-icon:hover::after {
         content: attr(data-tooltip); position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
         background-color: #1a1c23; color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 12px; width: 230px; z-index: 999;
         box-shadow: 0 10px 40px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); line-height: 1.5; text-align: left; font-weight: normal;
     }
-
     .feature-list { text-align: left; margin: 25px auto; display: inline-block; font-size: 0.95rem; color: #ddd; line-height: 2.2; }
     .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #00d2ff; color: black; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; z-index: 10; box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
-
     .video-placeholder {
         border-radius: 12px; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
         margin-bottom: 25px; position: relative; overflow: hidden; background-size: cover; background-position: center;
@@ -200,7 +186,6 @@ st.markdown("""
         border: 1px solid rgba(255,255,255,0.1);
     }
     .dynamic-tag { position: absolute; top: 15px; left: 15px; color: black; padding: 5px 14px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; transition: background-color 0.8s ease; animation: tagColorChange 24s infinite alternate; }
-
     @keyframes auraChange { 0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } }
     @keyframes tagColorChange { 0%, 70% { background: rgba(0, 210, 255, 1); } 75%, 100% { background: rgba(221, 160, 221, 1); } }
     @keyframes adCarousel { 
@@ -236,46 +221,45 @@ with c2:
     ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     
-  if not st.session_state.email_usuario:
+    if not st.session_state.email_usuario:
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
         if st.button("COMENZAR GRATIS / START FREE", type="primary"):
             if email_input and "@" in email_input:
+                # --- INICIO BLOQUE SEGURO ---
                 df_actual = obtener_datos_db()
-                user_row = df_actual[df_actual['email'] == email_input]
-                if not user_row.empty:
+                user_match = df_actual[df_actual['email'] == email_input]
+                
+                if not user_match.empty:
                     try:
-                        raw_usos = user_row['usos'].values[0]
-                        st.session_state.usos = int(pd.to_numeric(raw_usos, errors='coerce')) if pd.notnull(raw_usos) else 0
-                        st.session_state.plan = str(user_row['plan'].values[0])
+                        raw_val = user_match['usos'].values[0]
+                        st.session_state.usos = int(pd.to_numeric(raw_val, errors='coerce')) if pd.notnull(raw_val) else 0
+                        st.session_state.plan = str(user_match['plan'].values[0])
                     except:
                         st.session_state.usos = 0
                         st.session_state.plan = "Gratis"
                 else:
                     st.session_state.usos = 0
                     st.session_state.plan = "Gratis"
+                
                 st.session_state.email_usuario = email_input
                 st.rerun()
+                # --- FIN BLOQUE SEGURO ---
             else:
                 st.error("Por favor ingresa un email válido.")
     
     elif st.session_state.email_usuario:
-        # Lógica de permiso según Plan o Usos
         if st.session_state.usos < 3 or st.session_state.plan in ["Pro", "Agencia"]:
             user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
             if st.button(L['btn_gen'], key="main_gen", type="primary"):
                 if user_input:
                     with st.spinner("Diseñando tu estrategia de lujo..."):
                         resultado = generar_contenido_ia(user_input, st.session_state.plan, st.session_state.idioma)
-                        
                         if "ERROR_TECNICO" not in resultado:
                             st.session_state.usos += 1
                             actualizar_usos_db(st.session_state.email_usuario, st.session_state.usos, st.session_state.plan)
-                            
-                            # INTERFAZ DE RESULTADOS POR PESTAÑAS (Solo para Pro/Agencia)
                             if st.session_state.plan != "Gratis":
                                 t1, t2, t3 = st.tabs(["🏠 Descripción", "📱 Pack Redes", "🎯 SEO & Venta"])
-                                with t1:
-                                    st.markdown(f"<div style='color:white;'>{resultado.split('SECCION 2')[0]}</div>", unsafe_allow_html=True)
+                                with t1: st.markdown(f"<div style='color:white;'>{resultado.split('SECCION 2')[0]}</div>", unsafe_allow_html=True)
                                 with t2:
                                     if "SECCION 2" in resultado:
                                         redes = resultado.split("SECCION 2")[1].split("SECCION 3")[0]
@@ -285,17 +269,13 @@ with c2:
                                         seo = resultado.split("SECCION 3")[1]
                                         st.success(seo)
                             else:
-                                # Resultado simple para Gratis
                                 st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
                                 st.warning("Pásate a PRO para desbloquear el Pack de Redes Sociales.")
                         else:
                             st.error("Error de conexión.")
-                else:
-                    st.warning("Por favor, ingresa los detalles.")
         else:
             st.error(L["limit_msg"])
             st.markdown(f"#### {L['upgrade_msg']}")
-            
             paypal_bloqueo = """
             <div id="paypal-bloqueo-container"></div>
             <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
