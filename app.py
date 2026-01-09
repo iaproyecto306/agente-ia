@@ -23,6 +23,7 @@ def generar_texto(prompt):
         return response.choices[0].message.content
     except Exception as e:
         return f"ERROR_TECNICO: {str(e)}"
+
 # --- 2. CONFIGURACIÓN INICIAL ---
 st.set_page_config(
     page_title="AI Realty Pro",
@@ -31,14 +32,16 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 3. DICCIONARIO MAESTRO (Traducciones Completas y Corregidas) ---
+# --- 3. DICCIONARIO MAESTRO (Traducciones Completas) ---
 traducciones = {
     "Español": {
+        # Hero & General
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
         "sub": "La herramienta IA secreta de los agentes top productores.",
         "placeholder": "🏠 Pega el link de la propiedad o describe brevemente...",
         "btn_gen": "✨ GENERAR DESCRIPCIÓN", "p_destacada": "PROPIEDAD DESTACADA",
         "comunidad": "Propiedades de la Comunidad", "popular": "MÁS POPULAR",
+        # Planes
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agencia",
         "desc1": "3 descripciones / día", "t1_1": "Límite diario de generaciones para nuevos usuarios.",
         "desc2": "Soporte Básico", "t1_2": "Ayuda técnica vía email con respuesta en menos de 48hs.",
@@ -51,7 +54,22 @@ traducciones = {
         "desc9": "Panel de Equipo", "t3_2": "Supervisa y gestiona las descripciones creadas por tus agentes.",
         "desc10": "Acceso vía API", "t3_3": "Conecta nuestra IA directamente con tu propio software o CRM.",
         "desc11": "Prioridad en Banner", "t3_4": "Tus anuncios aparecerán con el doble de frecuencia en la home.",
-        "btn1": "REGISTRO GRATIS", "btn2": "MEJORAR AHORA", "btn3": "CONTACTAR VENTAS"
+        "btn1": "REGISTRO GRATIS", "btn2": "MEJORAR AHORA", "btn3": "CONTACTAR VENTAS",
+        # Cómo Funciona
+        "how_title": "¿Cómo funciona IA Realty Pro?",
+        "step1_t": "Pega el Link", "step1_d": "O escribe una descripción breve.",
+        "step2_t": "IA Analiza", "step2_d": "Optimizamos para SEO y ventas.",
+        "step3_t": "Publica", "step3_d": "Copia el texto y atrae clientes.",
+        # Estadísticas
+        "stat1": "Anuncios Optimizados", "stat2": "Tiempo Ahorrado", "stat3": "Más Consultas",
+        # Testimonios
+        "test_title": "Lo que dicen los Expertos",
+        "test1_txt": "Mis ventas en Instagram subieron un 50% desde que uso la IA para los copies.", "test1_au": "Carlos R. (RE/MAX)",
+        "test2_txt": "Increíble cómo resume las características de los links de portales. Ahorro horas.", "test2_au": "Ana M. (Century 21)",
+        "test3_txt": "La mejor inversión para mi agencia este año. El plan Pro vale cada centavo.", "test3_au": "Luis P. (Independiente)",
+        # Footer
+        "foot_desc": "Herramientas de Inteligencia Artificial para Inmuebles.",
+        "foot_links": "Términos de Servicio | Política de Privacidad | Soporte"
     },
     "English": {
         "title1": "Turn Boring Listings into", "title2": "Sales Magnets",
@@ -71,7 +89,19 @@ traducciones = {
         "desc9": "Team Dashboard", "t3_2": "Monitor and manage the descriptions created by your agents.",
         "desc10": "API Access", "t3_3": "Connect our AI directly with your own software or CRM.",
         "desc11": "Banner Priority", "t3_4": "Your listings will appear twice as often on the home screen.",
-        "btn1": "FREE SIGNUP", "btn2": "UPGRADE NOW", "btn3": "CONTACT SALES"
+        "btn1": "FREE SIGNUP", "btn2": "UPGRADE NOW", "btn3": "CONTACT SALES",
+        # New Translations
+        "how_title": "How does AI Realty Pro work?",
+        "step1_t": "Paste the Link", "step1_d": "Or write a brief description.",
+        "step2_t": "AI Analyzes", "step2_d": "We optimize for SEO and sales.",
+        "step3_t": "Publish", "step3_d": "Copy text and attract clients.",
+        "stat1": "Optimized Listings", "stat2": "Time Saved", "stat3": "More Inquiries",
+        "test_title": "What Experts Say",
+        "test1_txt": "My Instagram sales went up 50% since using AI for captions.", "test1_au": "Carlos R. (RE/MAX)",
+        "test2_txt": "Incredible how it summarizes portal links. I save hours.", "test2_au": "Ana M. (Century 21)",
+        "test3_txt": "Best investment for my agency this year. Pro plan is worth every penny.", "test3_au": "Luis P. (Independent)",
+        "foot_desc": "Artificial Intelligence Tools for Real Estate.",
+        "foot_links": "Terms of Service | Privacy Policy | Support"
     },
     "Português": {
         "title1": "Transforme Anúncios Tediosos em", "title2": "Ímãs de Vendas",
@@ -91,7 +121,19 @@ traducciones = {
         "desc9": "Painel de Equipe", "t3_2": "Supervisione e gerencie as descrições criadas por seus agentes.",
         "desc10": "Acesso via API", "t3_3": "Conecte nossa IA diretamente com seu próprio software ou CRM.",
         "desc11": "Prioridade no Banner", "t3_4": "Seus anúncios aparecerão com o dobro de frequência na home.",
-        "btn1": "REGISTRO GRÁTIS", "btn2": "MELHORAR AGORA", "btn3": "CONTATO VENDAS"
+        "btn1": "REGISTRO GRÁTIS", "btn2": "MELHORAR AGORA", "btn3": "CONTATO VENDAS",
+        # New Translations
+        "how_title": "Como funciona o AI Realty Pro?",
+        "step1_t": "Cole o Link", "step1_d": "Ou escreva uma breve descrição.",
+        "step2_t": "IA Analisa", "step2_d": "Otimizamos para SEO e vendas.",
+        "step3_t": "Publique", "step3_d": "Copie o texto e atraia clientes.",
+        "stat1": "Anúncios Otimizados", "stat2": "Tempo Economizado", "stat3": "Mais Consultas",
+        "test_title": "O que dizem os Especialistas",
+        "test1_txt": "Minhas vendas no Instagram subiram 50% desde que uso a IA para legendas.", "test1_au": "Carlos R. (RE/MAX)",
+        "test2_txt": "Incrível como resume os links dos portais. Economizo horas.", "test2_au": "Ana M. (Century 21)",
+        "test3_txt": "Melhor investimento para minha agência este ano. O plano Pro vale cada centavo.", "test3_au": "Luis P. (Independente)",
+        "foot_desc": "Ferramentas de Inteligência Artificial para Imóveis.",
+        "foot_links": "Termos de Serviço | Política de Privacidade | Suporte"
     },
     "中文": {
         "title1": "将枯燥的广告转化为", "title2": "销售磁铁",
@@ -111,7 +153,19 @@ traducciones = {
         "desc9": "团队面板", "t3_2": "监控并管理您的经纪人创建的描述。",
         "desc10": "API 访问", "t3_3": "将我们的人工智能直接与您自己的软件或 CRM 连接。",
         "desc11": "横幅优先级", "t3_4": "您的广告在主页上出现的频率将增加一倍。",
-        "btn1": "免费注册", "btn2": "立即升级", "btn3": "联系销售"
+        "btn1": "免费注册", "btn2": "立即升级", "btn3": "联系销售",
+        # New Translations
+        "how_title": "AI Realty Pro 如何运作？",
+        "step1_t": "粘贴链接", "step1_d": "或写简短描述。",
+        "step2_t": "AI 分析", "step2_d": "我们针对 SEO 和销售进行优化。",
+        "step3_t": "发布", "step3_d": "复制文本并吸引客户。",
+        "stat1": "已优化广告", "stat2": "节省时间", "stat3": "更多咨询",
+        "test_title": "专家怎么说",
+        "test1_txt": "自从使用 AI 撰写文案以来，我的 Instagram 销售额增长了 50%。", "test1_au": "Carlos R. (RE/MAX)",
+        "test2_txt": "令人难以置信的是它如何总结门户网站链接。我节省了几个小时。", "test2_au": "Ana M. (Century 21)",
+        "test3_txt": "今年我代理机构的最佳投资。专业版物超所值。", "test3_au": "Luis P. (独立)",
+        "foot_desc": "房地产人工智能工具。",
+        "foot_links": "服务条款 | 隐私政策 | 支持"
     },
     "Français": {
         "title1": "Transformez vos Annonces en", "title2": "Aimants à Ventes",
@@ -131,7 +185,19 @@ traducciones = {
         "desc9": "Tableau de Bord Équipe", "t3_2": "Supervisez et gérez les descriptions créées par vos agents.",
         "desc10": "Accès via API", "t3_3": "Connectez notre IA directement à votre propre logiciel ou CRM.",
         "desc11": "Priorité Bannière", "t3_4": "Vos annonces apparaîtront deux fois plus souvent sur la page d'accueil.",
-        "btn1": "INSCRIPTION GRATUITE", "btn2": "AMÉLIORER MAINTENANT", "btn3": "CONTACTER VENTES"
+        "btn1": "INSCRIPTION GRATUITE", "btn2": "AMÉLIORER MAINTENANT", "btn3": "CONTACTER VENTES",
+        # New Translations
+        "how_title": "Comment fonctionne AI Realty Pro ?",
+        "step1_t": "Collez le lien", "step1_d": "Ou écrivez une brève description.",
+        "step2_t": "IA Analyse", "step2_d": "Nous optimisons pour le SEO et la vente.",
+        "step3_t": "Publiez", "step3_d": "Copiez le texte et attirez des clients.",
+        "stat1": "Annonces Optimisées", "stat2": "Temps Gagné", "stat3": "Plus de Demandes",
+        "test_title": "Ce que disent les Experts",
+        "test1_txt": "Mes ventes sur Instagram ont augmenté de 50% depuis que j'utilise l'IA.", "test1_au": "Carlos R. (RE/MAX)",
+        "test2_txt": "Incroyable comment il résume les liens des portails. Je gagne des heures.", "test2_au": "Ana M. (Century 21)",
+        "test3_txt": "Le meilleur investissement pour mon agence cette année. Le plan Pro vaut chaque centime.", "test3_au": "Luis P. (Indépendant)",
+        "foot_desc": "Outils d'Intelligence Artificielle pour l'Immobilier.",
+        "foot_links": "Conditions d'Utilisation | Politique de Confidentialité | Support"
     },
     "Deutsch": {
         "title1": "Verwandeln Sie Anzeigen in", "title2": "Verkaufsmagnete",
@@ -151,7 +217,19 @@ traducciones = {
         "desc9": "Team-Panel", "t3_2": "Überwachen und verwalten Sie die von Ihren Maklern erstellten Beschreibungen.",
         "desc10": "API-Zugang", "t3_3": "Verbinden Sie unsere KI direkt mit Ihrer eigenen Software oder Ihrem CRM.",
         "desc11": "Banner-Priorität", "t3_4": "Ihre Anzeigen erscheinen doppelt so häufig auf der Startseite.",
-        "btn1": "GRATIS REGISTRIEREN", "btn2": "JETZT UPGRADEN", "btn3": "VERTRIEB KONTAKTIEREN"
+        "btn1": "GRATIS REGISTRIEREN", "btn2": "JETZT UPGRADEN", "btn3": "VERTRIEB KONTAKTIEREN",
+        # New Translations
+        "how_title": "Wie funktioniert AI Realty Pro?",
+        "step1_t": "Link einfügen", "step1_d": "Oder kurze Beschreibung schreiben.",
+        "step2_t": "KI Analysiert", "step2_d": "Wir optimieren für SEO und Verkauf.",
+        "step3_t": "Veröffentlichen", "step3_d": "Text kopieren und Kunden gewinnen.",
+        "stat1": "Optimierte Anzeigen", "stat2": "Zeit Gespart", "stat3": "Mehr Anfragen",
+        "test_title": "Was Experten sagen",
+        "test1_txt": "Meine Instagram-Verkäufe stiegen um 50%, seit ich KI für Captions nutze.", "test1_au": "Carlos R. (RE/MAX)",
+        "test2_txt": "Unglaublich, wie es Portal-Links zusammenfasst. Ich spare Stunden.", "test2_au": "Ana M. (Century 21)",
+        "test3_txt": "Die beste Investition für meine Agentur dieses Jahr. Pro-Plan ist jeden Cent wert.", "test3_au": "Luis P. (Unabhängig)",
+        "foot_desc": "Künstliche Intelligenz Tools für Immobilien.",
+        "foot_links": "Nutzungsbedingungen | Datenschutzrichtlinie | Support"
     }
 }
 
@@ -264,40 +342,40 @@ with c2:
     st.markdown('</div>', unsafe_allow_html=True)
 
 # --- NUEVA SECCIÓN: CÓMO FUNCIONA ---
-st.markdown("<br><br><h2 style='text-align:center; color:white;'>¿Cómo funciona IA Realty Pro?</h2>", unsafe_allow_html=True)
+st.markdown(f"<br><br><h2 style='text-align:center; color:white;'>{L['how_title']}</h2>", unsafe_allow_html=True)
 c1, c2, c3 = st.columns(3)
 with c1:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>Pega el Link</b><br>O escribe una descripción breve.</p></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>{L['step1_t']}</b><br>{L['step1_d']}</p></div>", unsafe_allow_html=True)
 with c2:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>IA Analiza</b><br>Optimizamos para SEO y ventas.</p></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>{L['step2_t']}</b><br>{L['step2_d']}</p></div>", unsafe_allow_html=True)
 with c3:
-    st.markdown("<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>Publica</b><br>Copia el texto y atrae clientes.</p></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>{L['step3_t']}</b><br>{L['step3_d']}</p></div>", unsafe_allow_html=True)
 
 # --- AGREGADO: ESTADÍSTICAS (Impacto) ---
 st.markdown("<br>", unsafe_allow_html=True)
 col_stat1, col_stat2, col_stat3 = st.columns(3)
 
 with col_stat1:
-    st.markdown("""
+    st.markdown(f"""
         <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
             <h2 style="color:#00d2ff; margin:0;">+10k</h2>
-            <p style="color:#aaa; font-size:0.9rem;">Anuncios Optimizados</p>
+            <p style="color:#aaa; font-size:0.9rem;">{L['stat1']}</p>
         </div>
     """, unsafe_allow_html=True)
 
 with col_stat2:
-    st.markdown("""
+    st.markdown(f"""
         <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
             <h2 style="color:#00d2ff; margin:0;">-80%</h2>
-            <p style="color:#aaa; font-size:0.9rem;">Tiempo Ahorrado</p>
+            <p style="color:#aaa; font-size:0.9rem;">{L['stat2']}</p>
         </div>
     """, unsafe_allow_html=True)
 
 with col_stat3:
-    st.markdown("""
+    st.markdown(f"""
         <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
             <h2 style="color:#00d2ff; margin:0;">+45%</h2>
-            <p style="color:#aaa; font-size:0.9rem;">Más Consultas</p>
+            <p style="color:#aaa; font-size:0.9rem;">{L['stat3']}</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -321,7 +399,7 @@ with col3:
     st.button(L['btn3'], key="btn_a")
 
 # --- AGREGADO: TESTIMONIOS (Glassmorphism) ---
-st.markdown("<br><br><h2 style='text-align:center; color:white;'>Lo que dicen los Expertos</h2>", unsafe_allow_html=True)
+st.markdown(f"<br><br><h2 style='text-align:center; color:white;'>{L['test_title']}</h2>", unsafe_allow_html=True)
 ct1, ct2, ct3 = st.columns(3)
 
 testimonio_style = """
@@ -332,20 +410,20 @@ testimonio_style = """
 """
 
 with ct1:
-    st.markdown(testimonio_style.format(texto="Mis ventas en Instagram subieron un 50% desde que uso la IA para los copies.", autor="Carlos R. (RE/MAX)"), unsafe_allow_html=True)
+    st.markdown(testimonio_style.format(texto=L['test1_txt'], autor=L['test1_au']), unsafe_allow_html=True)
 with ct2:
-    st.markdown(testimonio_style.format(texto="Increíble cómo resume las características de los links de portales. Ahorro horas.", autor="Ana M. (Century 21)"), unsafe_allow_html=True)
+    st.markdown(testimonio_style.format(texto=L['test2_txt'], autor=L['test2_au']), unsafe_allow_html=True)
 with ct3:
-    st.markdown(testimonio_style.format(texto="La mejor inversión para mi agencia este año. El plan Pro vale cada centavo.", autor="Luis P. (Independiente)"), unsafe_allow_html=True)
+    st.markdown(testimonio_style.format(texto=L['test3_txt'], autor=L['test3_au']), unsafe_allow_html=True)
 
 # --- AGREGADO: FOOTER ---
-st.markdown("""
+st.markdown(f"""
     <br><br><br>
     <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;">
-        <div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 IA REALTY PRO</div>
+        <div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 AI REALTY PRO</div>
         <p style="color:#666; font-size:0.8rem;">
-            © 2026 IA Realty Pro - Herramientas de Inteligencia Artificial para Inmuebles.<br>
-            Términos de Servicio | Política de Privacidad | Soporte
+            © 2026 IA Realty Pro - {L['foot_desc']}<br>
+            {L['foot_links']}
         </p>
         <div style="margin-top:15px; color:#00d2ff; font-size:1.2rem;">
             🌐 📸 🐦 💼
