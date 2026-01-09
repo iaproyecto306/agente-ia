@@ -25,7 +25,7 @@ def generar_texto(prompt):
         return f"ERROR_TECNICO: {str(e)}"
 # --- 2. CONFIGURACIÓN INICIAL ---
 st.set_page_config(
-    page_title="IA Realty Pro",
+    page_title="AI Realty Pro",
     page_icon="🏢",
     layout="wide",
     initial_sidebar_state="collapsed"
