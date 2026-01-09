@@ -3,6 +3,28 @@ from openai import OpenAI
 import streamlit.components.v1 as components
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
+import requests                      # <--- Nuevo
+from bs4 import BeautifulSoup        # <--- Nuevo
+
+# FUNCIÓN DE SCRAPING (El "Cerebro" que lee links)
+def extraer_datos_inmueble(url):
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+        response = requests.get(url, headers=headers, timeout=10)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            # Limpiamos el código basura
+            for element in soup(['script', 'style', 'header', 'footer', 'nav']):
+                element.decompose()
+            # Extraemos el texto relevante
+            texto = soup.get_text(separator=' ', strip=True)
+            return texto[:3500] # Enviamos los primeros 3500 caracteres a la IA
+        else:
+            return "Error: No se pudo acceder a la página."
+    except Exception as e:
+        return f"Error al leer el link: {str(e)}"
 
 # --- 1. CONFIGURACIÓN DE IA SEGURA ---
 try:
