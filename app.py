@@ -3,8 +3,8 @@ from openai import OpenAI
 import streamlit.components.v1 as components
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
-import requests                      # <--- Nuevo
-from bs4 import BeautifulSoup        # <--- Nuevo
+import requests
+from bs4 import BeautifulSoup
 
 # FUNCIÓN DE SCRAPING (El "Cerebro" que lee links)
 def extraer_datos_inmueble(url):
@@ -94,7 +94,7 @@ traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
         "sub": "La herramienta IA secreta de los agentes top productores.",
-        "placeholder": "🏠 Pega el link de la propiedad o describe brevemente...",
+        "placeholder": "🏠 Describe la propiedad o escribe instrucciones extra...",
         "btn_gen": "✨ GENERAR DESCRIPCIÓN", "p_destacada": "PROPIEDAD DESTACADA",
         "comunidad": "Propiedades de la Comunidad", "popular": "MÁS POPULAR",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agencia",
@@ -127,7 +127,7 @@ traducciones = {
     "English": {
         "title1": "Turn Boring Listings into", "title2": "Sales Magnets",
         "sub": "The secret AI tool used by top producing agents.",
-        "placeholder": "🏠 Paste the property link or describe briefly...",
+        "placeholder": "🏠 Describe the property or add extra instructions...",
         "btn_gen": "✨ GENERATE DESCRIPTION", "p_destacada": "FEATURED PROPERTY",
         "comunidad": "Community Properties", "popular": "MOST POPULAR",
         "plan1": "Starter", "plan2": "Pro Agent", "plan3": "Agency",
@@ -160,7 +160,7 @@ traducciones = {
     "Português": {
         "title1": "Transforme Anúncios Tediosos em", "title2": "Ímãs de Vendas",
         "sub": "A ferramenta de IA secreta dos agentes de alto desempenho.",
-        "placeholder": "🏠 Cole o link do imóvel ou descreva brevemente...",
+        "placeholder": "🏠 Descreva o imóvel ou adicione instruções...",
         "btn_gen": "✨ GERAR DESCRIÇÃO", "p_destacada": "IMÓVEL EM DESTAQUE",
         "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
@@ -193,7 +193,7 @@ traducciones = {
     "中文": {
         "title1": "将枯燥的广告转化为", "title2": "销售磁铁",
         "sub": "顶级房产经纪人的秘密人工智能工具。",
-        "placeholder": "🏠 粘贴房产链接或简要描述...",
+        "placeholder": "🏠 描述房产或添加说明...",
         "btn_gen": "✨ 生成描述", "p_destacada": "精选房产",
         "comunidad": "社区房产", "popular": "最受欢迎",
         "plan1": "基础版", "plan2": "专业经纪人", "plan3": "机构版",
@@ -226,7 +226,7 @@ traducciones = {
     "Français": {
         "title1": "Transformez vos Annonces en", "title2": "Aimants à Ventes",
         "sub": "L'outil IA secret des agents immobiliers les plus performants.",
-        "placeholder": "🏠 Collez le lien de la propriété ou décrivez brièvement...",
+        "placeholder": "🏠 Décrivez la propriété ou ajoutez des instructions...",
         "btn_gen": "✨ GÉNÉRER LA DESCRIPTION", "p_destacada": "PROPRIÉTÉ À LA UNE",
         "comunidad": "Propriétés de la Communauté", "popular": "PLUS POPULAIRE",
         "plan1": "Initial", "plan2": "Agent Pro", "plan3": "Agence",
@@ -259,7 +259,7 @@ traducciones = {
     "Deutsch": {
         "title1": "Verwandeln Sie Anzeigen in", "title2": "Verkaufsmagnete",
         "sub": "Das geheime KI-Tool der Top-Immobilienmakler.",
-        "placeholder": "🏠 Link einfügen oder kurz beschreiben...",
+        "placeholder": "🏠 Beschreiben Sie die Immobilie oder fügen Sie Anweisungen hinzu...",
         "btn_gen": "✨ BESCHREIBUNG GENERIEREN", "p_destacada": "TOP-IMMOBILIE",
         "comunidad": "Community-Immobilien", "popular": "AM BELIEBTESTEN",
         "plan1": "Basis", "plan2": "Pro Makler", "plan3": "Agentur",
@@ -417,11 +417,21 @@ with c2:
             with col_t2:
                 idioma_salida = st.selectbox(L.get("lbl_lang_out", "Idioma Salida:"), list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
 
+            # --- MODIFICACIÓN: CAMPO PARA LINK ---
+            url_input = st.text_input("", placeholder="🔗 Pega aquí el link de la propiedad (InfoCasas, MercadoLibre, Zillow...)", label_visibility="collapsed")
+
             user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
             
             if st.button(L['btn_gen'], key="main_gen", type="primary"):
-                if user_input:
+                # Verificamos si hay link O texto escrito
+                if user_input or url_input: 
                     with st.spinner("Analizando mercado y redactando..."):
+                        
+                        # 1. EJECUTAR SCRAPING SI HAY LINK
+                        datos_web = ""
+                        if url_input:
+                            datos_web = extraer_datos_inmueble(url_input)
+
                         # Construcción del Prompt con Optimización SEO (Cumple promesa SEO)
                         prompt_base = f"""
                         Actúa como un experto inmobiliario de lujo.
@@ -429,7 +439,12 @@ with c2:
                         Idioma de salida: {idioma_salida}.
                         Tono: {tono}.
                         Objetivo: Optimización SEO para portales inmobiliarios.
-                        Datos de la propiedad: {user_input}
+                        
+                        DATOS EXTRAÍDOS DEL LINK:
+                        {datos_web}
+                        
+                        INSTRUCCIONES O DATOS MANUALES: 
+                        {user_input}
                         """
                         
                         resultado = generar_texto(prompt_base)
@@ -461,7 +476,7 @@ with c2:
                         else:
                             st.error("Error de conexión.")
                 else:
-                    st.warning("Por favor, ingresa los detalles.")
+                    st.warning("Por favor, ingresa un link o escribe detalles.")
         else:
             # --- PASO 3: BLOQUEO (PAYWALL) ---
             st.error(L["limit_msg"])
