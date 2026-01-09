@@ -1,4 +1,4 @@
-import streamlit as st
+    import streamlit as st
 from openai import OpenAI
 import streamlit.components.v1 as components
 from streamlit_gsheets import GSheetsConnection
@@ -12,30 +12,41 @@ except Exception:
     st.warning("⚠️ Configuración pendiente: Por favor, añade la API Key en los Secrets de Streamlit.")
     st.stop()
 
-# --- CONEXIÓN A BASE DE DATOS (Agregado para persistencia de usos) ---
+# --- CONEXIÓN A BASE DE DATOS (Agregado para persistencia de usos y PLANES) ---
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 def obtener_datos_db():
     try:
         return conn.read(worksheet="Sheet1", ttl=0)
     except:
-        return pd.DataFrame(columns=['email', 'usos'])
+        # Agregamos la columna 'plan' a la base de datos
+        return pd.DataFrame(columns=['email', 'usos', 'plan'])
 
-def actualizar_usos_db(email, nuevos_usos):
+def actualizar_usos_db(email, nuevos_usos, plan="Gratis"):
     df = obtener_datos_db()
     if email in df['email'].values:
         df.loc[df['email'] == email, 'usos'] = nuevos_usos
+        df.loc[df['email'] == email, 'plan'] = plan
     else:
-        nueva_fila = pd.DataFrame({"email": [email], "usos": [nuevos_usos]})
+        nueva_fila = pd.DataFrame({"email": [email], "usos": [nuevos_usos], "plan": [plan]})
         df = pd.concat([df, nueva_fila], ignore_index=True)
     conn.update(worksheet="Sheet1", data=df)
 
-def generar_texto(prompt):
+def generar_texto(prompt, tono="Profesional"):
+    # Mejora de prompt según el tono seleccionado
+    estilos = {
+        "Storytelling": "Usa una narrativa emocional.",
+        "Directo": "Sé muy directo y enfocado a ventas.",
+        "Minimalista": "Usa pocas palabras, muy elegante.",
+        "Profesional": "Tono de experto inmobiliario estándar."
+    }
+    sistema = f"Eres un experto inmobiliario de lujo. {estilos.get(tono, '')}"
+    
     try:
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "Eres un experto inmobiliario de lujo."},
+                {"role": "system", "content": sistema},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7
@@ -57,8 +68,10 @@ if "usos" not in st.session_state:
     st.session_state.usos = 0
 if "email_usuario" not in st.session_state:
     st.session_state.email_usuario = ""
+if "plan_usuario" not in st.session_state:
+    st.session_state.plan_usuario = "Gratis"
 
-# --- 3. DICCIONARIO MAESTRO (Traducciones actualizadas con Paywall) ---
+# --- 3. DICCIONARIO MAESTRO (Traducciones completas respetadas) ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
@@ -90,7 +103,8 @@ traducciones = {
         "test3_txt": "La mejor inversión para mi agencia este año. El plan Pro vale cada centavo.", "test3_au": "Luis P. (Independiente)",
         "foot_desc": "Herramientas de Inteligencia Artificial para Inmuebles.",
         "foot_links": "Términos de Servicio | Política de Privacidad | Soporte",
-        "mail_label": "📧 Ingresa tu Email para comenzar", "limit_msg": "🚫 Límite gratuito alcanzado.", "upgrade_msg": "Pásate a PRO para seguir vendiendo."
+        "mail_label": "📧 Ingresa tu Email para comenzar", "limit_msg": "🚫 Límite gratuito alcanzado.", "upgrade_msg": "Pásate a PRO para seguir vendiendo.",
+        "sel_tono": "Tono:", "sel_idioma": "Idioma de salida:"
     },
     "English": {
         "title1": "Turn Boring Listings into", "title2": "Sales Magnets",
@@ -122,7 +136,8 @@ traducciones = {
         "test3_txt": "Best investment for my agency this year. Pro plan is worth every penny.", "test3_au": "Luis P. (Independent)",
         "foot_desc": "Artificial Intelligence Tools for Real Estate.",
         "foot_links": "Terms of Service | Privacy Policy | Support",
-        "mail_label": "📧 Enter your Email to start", "limit_msg": "🚫 Free limit reached.", "upgrade_msg": "Upgrade to PRO to keep selling."
+        "mail_label": "📧 Enter your Email to start", "limit_msg": "🚫 Free limit reached.", "upgrade_msg": "Upgrade to PRO to keep selling.",
+        "sel_tono": "Tone:", "sel_idioma": "Output Language:"
     },
     "Português": {
         "title1": "Transforme Anúncios Tediosos em", "title2": "Ímãs de Vendas",
@@ -145,7 +160,7 @@ traducciones = {
         "btn1": "REGISTRO GRÁTIS", "btn2": "MELHORAR AGORA", "btn3": "CONTATO VENDAS",
         "how_title": "Como funciona o AI Realty Pro?",
         "step1_t": "Cole o Link", "step1_d": "Ou escreva uma breve descrição.",
-        "step2_t": "IA Analisa", "step2_d": "Otimizamos para SEO e vendas.",
+        "step2_t": "IA Analiza", "step2_d": "Otimizamos para SEO e vendas.",
         "step3_t": "Publique", "step3_d": "Copie o texto e atraia clientes.",
         "stat1": "Anúncios Otimizados", "stat2": "Tempo Economizado", "stat3": "Mais Consultas",
         "test_title": "O que dizem os Especialistas",
@@ -153,8 +168,9 @@ traducciones = {
         "test2_txt": "Incrível como resume os links dos portais. Economizo horas.", "test2_au": "Ana M. (Century 21)",
         "test3_txt": "Melhor investimento para minha agência este ano. O plano Pro vale cada centavo.", "test3_au": "Luis P. (Independente)",
         "foot_desc": "Ferramentas de Inteligencia Artificial para Imóveis.",
-        "foot_links": "Termos de Servicio | Política de Privacidade | Suporte",
-        "mail_label": "📧 Insira seu e-mail para começar", "limit_msg": "🚫 Limite grátis atingido.", "upgrade_msg": "Atualize para PRO para continuar vendendo."
+        "foot_links": "Términos de Servicio | Política de Privacidade | Suporte",
+        "mail_label": "📧 Insira seu e-mail para começar", "limit_msg": "🚫 Limite grátis atingido.", "upgrade_msg": "Atualize para PRO para continuar vendendo.",
+        "sel_tono": "Tom:", "sel_idioma": "Idioma de saída:"
     },
     "中文": {
         "title1": "将枯燥的广告转化为", "title2": "销售磁铁",
@@ -186,7 +202,8 @@ traducciones = {
         "test3_txt": "今年我代理机构的最佳投资。专业版物超所值。", "test3_au": "Luis P. (独立)",
         "foot_desc": "房地产人工智能工具。",
         "foot_links": "服务条款 | 隐私政策 | 支持",
-        "mail_label": "📧 输入邮箱开始", "limit_msg": "🚫 已达到免费限制。", "upgrade_msg": "升级到专业版继续销售。"
+        "mail_label": "📧 输入邮箱开始", "limit_msg": "🚫 已达到免费限制。", "upgrade_msg": "升级到专业版继续销售。",
+        "sel_tono": "语气:", "sel_idioma": "输出语言:"
     },
     "Français": {
         "title1": "Transformez vos Annonces en", "title2": "Aimants à Ventes",
@@ -218,7 +235,8 @@ traducciones = {
         "test3_txt": "Le meilleur investissement pour mon agence cette année. Le plan Pro vaut chaque centime.", "test3_au": "Luis P. (Indépendant)",
         "foot_desc": "Outils d'Intelligence Artificielle pour l'Immobilier.",
         "foot_links": "Conditions d'Utilisation | Politique de Confidentialité | Support",
-        "mail_label": "📧 Entrez votre email pour commencer", "limit_msg": "🚫 Limite gratuite atteinte.", "upgrade_msg": "Passez à PRO pour continuer à vendre."
+        "mail_label": "📧 Entrez votre email pour commencer", "limit_msg": "🚫 Limite gratuite atteinte.", "upgrade_msg": "Passez à PRO pour continuer à vendre.",
+        "sel_tono": "Ton:", "sel_idioma": "Langue de sortie:"
     },
     "Deutsch": {
         "title1": "Verwandeln Sie Anzeigen in", "title2": "Verkaufsmagnete",
@@ -250,7 +268,8 @@ traducciones = {
         "test3_txt": "Die beste Investition für meine Agentur dieses Jahr. Pro-Plan ist jeden Cent wert.", "test3_au": "Luis P. (Unabhängig)",
         "foot_desc": "Künstliche Intelligenz Tools für Immobilien.",
         "foot_links": "Nutzungsbedingungen | Datenschutzrichtlinie | Support",
-        "mail_label": "📧 E-Mail eingeben, um zu starten", "limit_msg": "🚫 Gratis-Limit erreicht.", "upgrade_msg": "Upgrade auf PRO, um weiter zu verkaufen."
+        "mail_label": "📧 E-Mail eingeben, um zu starten", "limit_msg": "🚫 Gratis-Limit erreicht.", "upgrade_msg": "Upgrade auf PRO, um weiter zu verkaufen.",
+        "sel_tono": "Ton:", "sel_idioma": "Ausgabesprache:"
     }
 }
 
@@ -353,8 +372,10 @@ with c2:
                 df_actual = obtener_datos_db()
                 if email_input in df_actual['email'].values:
                     st.session_state.usos = int(df_actual[df_actual['email'] == email_input]['usos'].values[0])
+                    st.session_state.plan_usuario = df_actual[df_actual['email'] == email_input]['plan'].values[0]
                 else:
                     st.session_state.usos = 0
+                    st.session_state.plan_usuario = "Gratis"
                 st.session_state.email_usuario = email_input
                 st.rerun()
             else:
@@ -362,18 +383,45 @@ with c2:
     
     # --- PASO 2: LOGICA DE GENERACIÓN ---
     elif st.session_state.email_usuario:
-        if st.session_state.usos < 3:
+        es_pro = st.session_state.plan_usuario in ["Pro", "Agencia"]
+        limite_efectivo = 9999 if es_pro else 3
+        
+        if st.session_state.usos < limite_efectivo:
+            # --- SELECTORES PRO (Tono e Idioma) ---
+            col_t1, col_t2 = st.columns(2)
+            with col_t1:
+                tono_sel = st.selectbox(L["sel_tono"], ["Profesional", "Storytelling", "Directo", "Minimalista"])
+            with col_t2:
+                idioma_out = st.selectbox(L["sel_idioma"], list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
+
             user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
+            
             if st.button(L['btn_gen'], key="main_gen", type="primary"):
                 if user_input:
                     with st.spinner("Generando..."):
-                        prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
-                        resultado = generar_texto(prompt)
+                        # Lógica de scraping implícita en el prompt
+                        final_input = user_input
+                        if "http" in user_input:
+                            final_input = f"Analiza la información de este enlace y extrae lo más importante: {user_input}"
+                        
+                        prompt = f"Crea un anuncio en {idioma_out} basado en: {final_input}. Tono: {tono_sel}."
+                        resultado = generar_texto(prompt, tono_sel)
+                        
                         if "ERROR_TECNICO" not in resultado:
                             st.session_state.usos += 1
-                            actualizar_usos_db(st.session_state.email_usuario, st.session_state.usos)
+                            actualizar_usos_db(st.session_state.email_usuario, st.session_state.usos, st.session_state.plan_usuario)
                             st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
-                            st.info(f"Usos restantes: {3 - st.session_state.usos}")
+                            
+                            # --- PACK REDES SOCIALES (Solo PRO) ---
+                            if es_pro:
+                                st.divider()
+                                st.subheader("📱 Pack Redes Sociales")
+                                redes_prompt = f"Basado en este anuncio: {resultado}, crea un post para Instagram con hashtags y un guion corto para un Reel."
+                                redes_res = generar_texto(redes_prompt, "Directo")
+                                st.info(redes_res)
+                            
+                            if not es_pro:
+                                st.info(f"Usos restantes: {3 - st.session_state.usos}")
                         else:
                             st.error("Error de conexión.")
                 else:
@@ -383,7 +431,6 @@ with c2:
             st.error(L["limit_msg"])
             st.markdown(f"#### {L['upgrade_msg']}")
             
-            # Botón de PayPal directo para Agente Pro ($49) en el centro
             paypal_bloqueo = """
             <div id="paypal-bloqueo-container"></div>
             <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
