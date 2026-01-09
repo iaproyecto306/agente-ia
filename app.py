@@ -236,29 +236,23 @@ with c2:
     ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     
-    if not st.session_state.email_usuario:
+  if not st.session_state.email_usuario:
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
-      if st.button("COMENZAR GRATIS / START FREE", type="primary"):
+        if st.button("COMENZAR GRATIS / START FREE", type="primary"):
             if email_input and "@" in email_input:
                 df_actual = obtener_datos_db()
-                # Buscamos la fila del usuario
                 user_row = df_actual[df_actual['email'] == email_input]
-                
                 if not user_row.empty:
-                    # Si el usuario existe, extraemos sus datos con seguridad
                     try:
                         raw_usos = user_row['usos'].values[0]
-                        # Convertimos a número por si el Excel lo devuelve como texto o vacío
                         st.session_state.usos = int(pd.to_numeric(raw_usos, errors='coerce')) if pd.notnull(raw_usos) else 0
                         st.session_state.plan = str(user_row['plan'].values[0])
                     except:
                         st.session_state.usos = 0
                         st.session_state.plan = "Gratis"
                 else:
-                    # Si el usuario no existe en el Excel
                     st.session_state.usos = 0
                     st.session_state.plan = "Gratis"
-                
                 st.session_state.email_usuario = email_input
                 st.rerun()
             else:
