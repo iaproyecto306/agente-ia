@@ -12,31 +12,54 @@ except Exception:
     st.warning("⚠️ Configuración pendiente: Por favor, añade la API Key en los Secrets de Streamlit.")
     st.stop()
 
-# --- CONEXIÓN A BASE DE DATOS (Agregado para persistencia de usos) ---
+# --- CONEXIÓN A BASE DE DATOS ---
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 def obtener_datos_db():
     try:
+        # Ahora incluimos la columna 'plan'
         return conn.read(worksheet="Sheet1", ttl=0)
     except:
-        return pd.DataFrame(columns=['email', 'usos'])
+        return pd.DataFrame(columns=['email', 'usos', 'plan'])
 
-def actualizar_usos_db(email, nuevos_usos):
+def actualizar_usos_db(email, nuevos_usos, plan="Gratis"):
     df = obtener_datos_db()
     if email in df['email'].values:
         df.loc[df['email'] == email, 'usos'] = nuevos_usos
+        # No sobreescribimos el plan si ya es Pro o Agencia
+        if df.loc[df['email'] == email, 'plan'].values[0] not in ["Pro", "Agencia"]:
+            df.loc[df['email'] == email, 'plan'] = plan
     else:
-        nueva_fila = pd.DataFrame({"email": [email], "usos": [nuevos_usos]})
+        nueva_fila = pd.DataFrame({"email": [email], "usos": [nuevos_usos], "plan": [plan]})
         df = pd.concat([df, nueva_fila], ignore_index=True)
     conn.update(worksheet="Sheet1", data=df)
 
-def generar_texto(prompt):
+# --- NUEVA FUNCIÓN DE GENERACIÓN PREMIUM ---
+def generar_contenido_ia(user_input, plan_usuario, idioma):
+    instrucciones_plan = ""
+    if plan_usuario == "Gratis":
+        instrucciones_plan = "Genera únicamente una descripción de lujo para portales inmobiliarios."
+    else:
+        instrucciones_plan = """
+        Genera un informe de marketing inmobiliario dividido en 3 secciones:
+        SECCION 1: DESCRIPCIÓN PRO (Texto persuasivo y elegante).
+        SECCION 2: PACK REDES (Un post para Instagram con emojis y un guion de Reel/TikTok corto).
+        SECCION 3: ESTRATEGIA SEO (3 etiquetas clave y recomendación de venta).
+        """
+
+    prompt_sistema = f"""
+    Eres un experto en marketing inmobiliario de lujo. 
+    Tu objetivo es vender propiedades de alto nivel en {idioma}.
+    {instrucciones_plan}
+    Usa un tono persuasivo, sofisticado y profesional.
+    """
+
     try:
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "Eres un experto inmobiliario de lujo."},
-                {"role": "user", "content": prompt}
+                {"role": "system", "content": prompt_sistema},
+                {"role": "user", "content": f"Datos de la propiedad: {user_input}"}
             ],
             temperature=0.7
         )
@@ -52,13 +75,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- LÓGICA DE CONTROL DE USOS (PAYWALL) ---
-if "usos" not in st.session_state:
-    st.session_state.usos = 0
-if "email_usuario" not in st.session_state:
-    st.session_state.email_usuario = ""
+# --- LÓGICA DE CONTROL DE SESIÓN ---
+if "usos" not in st.session_state: st.session_state.usos = 0
+if "email_usuario" not in st.session_state: st.session_state.email_usuario = ""
+if "plan" not in st.session_state: st.session_state.plan = "Gratis"
 
-# --- 3. DICCIONARIO MAESTRO (Traducciones actualizadas con Paywall) ---
+# --- 3. DICCIONARIO MAESTRO ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
@@ -123,138 +145,10 @@ traducciones = {
         "foot_desc": "Artificial Intelligence Tools for Real Estate.",
         "foot_links": "Terms of Service | Privacy Policy | Support",
         "mail_label": "📧 Enter your Email to start", "limit_msg": "🚫 Free limit reached.", "upgrade_msg": "Upgrade to PRO to keep selling."
-    },
-    "Português": {
-        "title1": "Transforme Anúncios Tediosos em", "title2": "Ímãs de Vendas",
-        "sub": "A ferramenta de IA secreta dos agentes de alto desempenho.",
-        "placeholder": "🏠 Cole o link do imóvel ou descreva brevemente...",
-        "btn_gen": "✨ GERAR DESCRIÇÃO", "p_destacada": "IMÓVEL EM DESTAQUE",
-        "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
-        "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
-        "desc1": "3 descrições / día", "t1_1": "Limite diário de gerações para novos usuários.",
-        "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail com resposta em menos de 48 horas.",
-        "desc3": "Marca d'Água", "t1_3": "Os textos incluyen uma pequena menção à nossa plataforma.",
-        "desc4": "Gerações Ilimitadas", "t2_1": "Crie quantas descrições precisar, sem restrições.",
-        "desc5": "Pack Redes Sociais", "t2_2": "Gere automaticamente posts para Instagram, Facebook e TikTok com hashtags.",
-        "desc6": "Otimização SEO", "t2_3": "Textos estruturados para aparecer primeiro nos motores de busca.",
-        "desc7": "Banner Principal", "t2_4": "Seus imóveis de destaque rodarão em nossa página inicial.",
-        "desc8": "5 Usuários / Contas", "t3_1": "Acesso individual para até 5 membros da sua equipe imobiliária.",
-        "desc9": "Painel de Equipe", "t3_2": "Supervisione e gerencie as descrições criadas por seus agentes.",
-        "desc10": "Acesso via API", "t3_3": "Conecte nossa IA diretamente com seu próprio software ou CRM.",
-        "desc11": "Prioridade no Banner", "t3_4": "Seus anúncios aparecerão com o dobro de frequência na home.",
-        "btn1": "REGISTRO GRÁTIS", "btn2": "MELHORAR AGORA", "btn3": "CONTATO VENDAS",
-        "how_title": "Como funciona o AI Realty Pro?",
-        "step1_t": "Cole o Link", "step1_d": "Ou escreva uma breve descrição.",
-        "step2_t": "IA Analisa", "step2_d": "Otimizamos para SEO e vendas.",
-        "step3_t": "Publique", "step3_d": "Copie o texto e atraia clientes.",
-        "stat1": "Anúncios Otimizados", "stat2": "Tempo Economizado", "stat3": "Mais Consultas",
-        "test_title": "O que dizem os Especialistas",
-        "test1_txt": "Minhas vendas no Instagram subiram 50% desde que uso a IA para legendas.", "test1_au": "Carlos R. (RE/MAX)",
-        "test2_txt": "Incrível como resume os links dos portais. Economizo horas.", "test2_au": "Ana M. (Century 21)",
-        "test3_txt": "Melhor investimento para minha agência este ano. O plano Pro vale cada centavo.", "test3_au": "Luis P. (Independente)",
-        "foot_desc": "Ferramentas de Inteligencia Artificial para Imóveis.",
-        "foot_links": "Termos de Servicio | Política de Privacidade | Suporte",
-        "mail_label": "📧 Insira seu e-mail para começar", "limit_msg": "🚫 Limite grátis atingido.", "upgrade_msg": "Atualize para PRO para continuar vendendo."
-    },
-    "中文": {
-        "title1": "将枯燥的广告转化为", "title2": "销售磁铁",
-        "sub": "顶级房产经纪人的秘密人工智能工具。",
-        "placeholder": "🏠 粘贴房产链接或简要描述...",
-        "btn_gen": "✨ 生成描述", "p_destacada": "精选房产",
-        "comunidad": "社区房产", "popular": "最受欢迎",
-        "plan1": "基础版", "plan2": "专业经纪人", "plan3": "机构版",
-        "desc1": "每天 3 条描述", "t1_1": "新用户的每日生成限制。",
-        "desc2": "基础支持", "t1_2": "通过电子邮件提供技术帮助，48小时内回复。",
-        "desc3": "水印", "t1_3": "生成的文本包含对我们平台的简短提及。",
-        "desc4": "无限生成", "t2_1": "根据需要创建任意数量的描述，无任何限制。",
-        "desc5": "社交媒体包", "t2_2": "自动为 Instagram、Facebook 和 TikTok 生成带标签的帖子。",
-        "desc6": "SEO 优化", "t2_3": "结构化文本，旨在搜索引擎中排名第一。",
-        "desc7": "主页横幅", "t2_4": "您的精选房产将在我们的主页上轮播展示。",
-        "desc8": "5 个用户/账户", "t3_1": "房产团队中最多 5 名成员的个人访问权限。",
-        "desc9": "团队面板", "t3_2": "监控并管理您的经纪人创建的描述。",
-        "desc10": "API 访问", "t3_3": "将我们的人工智能直接与您自己的软件或 CRM 连接。",
-        "desc11": "横幅优先级", "t3_4": "您的广告在主页上出现的频率将增加一倍。",
-        "btn1": "免费注册", "btn2": "立即升级", "btn3": "联系销售",
-        "how_title": "AI Realty Pro 如何运作？",
-        "step1_t": "粘贴链接", "step1_d": "或写简短描述。",
-        "step2_t": "AI 分析", "step2_d": "我们针对 SEO 和销售进行优化。",
-        "step3_t": "发布", "step3_d": "复制文本并吸引客户。",
-        "stat1": "已优化广告", "stat2": "节省时间", "stat3": "更多咨询",
-        "test_title": "专家怎么说",
-        "test1_txt": "自从使用 AI 撰写文案以来，我的 Instagram 销售额增长了 50%。", "test1_au": "Carlos R. (RE/MAX)",
-        "test2_txt": "令人难以置信的是它如何总结门户网站链接。我节省了几个小时。", "test2_au": "Ana M. (Century 21)",
-        "test3_txt": "今年我代理机构的最佳投资。专业版物超所值。", "test3_au": "Luis P. (独立)",
-        "foot_desc": "房地产人工智能工具。",
-        "foot_links": "服务条款 | 隐私政策 | 支持",
-        "mail_label": "📧 输入邮箱开始", "limit_msg": "🚫 已达到免费限制。", "upgrade_msg": "升级到专业版继续销售。"
-    },
-    "Français": {
-        "title1": "Transformez vos Annonces en", "title2": "Aimants à Ventes",
-        "sub": "L'outil IA secret des agents immobiliers les plus performants.",
-        "placeholder": "🏠 Collez le lien de la propriété ou décrivez brièvement...",
-        "btn_gen": "✨ GÉNÉRER LA DESCRIPTION", "p_destacada": "PROPRIÉTÉ À LA UNE",
-        "comunidad": "Propriétés de la Communauté", "popular": "PLUS POPULAIRE",
-        "plan1": "Initial", "plan2": "Agent Pro", "plan3": "Agence",
-        "desc1": "3 descriptions / jour", "t1_1": "Limite quotidienne de générations pour les nouveaux utilisateurs.",
-        "desc2": "Support de Base", "t1_2": "Aide technique par e-mail avec réponse en moins de 48 heures.",
-        "desc3": "Filigrane", "t1_3": "Les textes incluent une petite mention de notre plateforme.",
-        "desc4": "Générations Illimitées", "t2_1": "Créez autant de descriptions que nécessaire sans restrictions.",
-        "desc5": "Pack Réseaux Sociaux", "t2_2": "Générez automatiquement des posts pour Instagram, Facebook et TikTok avec hashtags.",
-        "desc6": "Optimización SEO", "t2_3": "Textos estructurados pour apparaître en premier dans les moteurs de recherche.",
-        "desc7": "Bannière Principale", "t2_4": "Vos propriétés à la une tourneront sur notre page d'accueil.",
-        "desc8": "5 Utilisateurs / Comptes", "t3_1": "Accès individuel pour jusqu'à 5 membres de votre équipe immobilière.",
-        "desc9": "Tableau de Bord Équipe", "t3_2": "Supervisez et gérez les descriptions créées par vos agents.",
-        "desc10": "Accès via API", "t3_3": "Connectez notre IA directement à votre propre logiciel ou CRM.",
-        "desc11": "Priorité Bannière", "t3_4": "Vos annonces apparaîtront deux fois plus souvent sur la page d'accueil.",
-        "btn1": "INSCRIPTION GRATUITE", "btn2": "AMÉLIORER MAINTENANT", "btn3": "CONTACTER VENTES",
-        "how_title": "Comment fonctionne AI Realty Pro ?",
-        "step1_t": "Collez le lien", "step1_d": "Ou écrivez une brève description.",
-        "step2_t": "IA Analyse", "step2_d": "Nous optimisons pour le SEO et la vente.",
-        "step3_t": "Publiez", "step3_d": "Copiez le texte et attirez des clients.",
-        "stat1": "Annonces Optimisées", "stat2": "Temps Gagné", "stat3": "Plus de Demandes",
-        "test_title": "Ce que disent les Experts",
-        "test1_txt": "Mes ventes sur Instagram ont augmenté de 50% depuis que j'utilise l'IA.", "test1_au": "Carlos R. (RE/MAX)",
-        "test2_txt": "Incroyable comment il résume les liens des portails. Je gagne des heures.", "test2_au": "Ana M. (Century 21)",
-        "test3_txt": "Le meilleur investissement pour mon agence cette année. Le plan Pro vaut chaque centime.", "test3_au": "Luis P. (Indépendant)",
-        "foot_desc": "Outils d'Intelligence Artificielle pour l'Immobilier.",
-        "foot_links": "Conditions d'Utilisation | Politique de Confidentialité | Support",
-        "mail_label": "📧 Entrez votre email pour commencer", "limit_msg": "🚫 Limite gratuite atteinte.", "upgrade_msg": "Passez à PRO pour continuer à vendre."
-    },
-    "Deutsch": {
-        "title1": "Verwandeln Sie Anzeigen in", "title2": "Verkaufsmagnete",
-        "sub": "Das geheime KI-Tool der Top-Immobilienmakler.",
-        "placeholder": "🏠 Link einfügen oder kurz beschreiben...",
-        "btn_gen": "✨ BESCHREIBUNG GENERIEREN", "p_destacada": "TOP-IMMOBILIE",
-        "comunidad": "Community-Immobilien", "popular": "AM BELIEBTESTEN",
-        "plan1": "Basis", "plan2": "Pro Makler", "plan3": "Agentur",
-        "desc1": "3 Beschreibungen / Tag", "t1_1": "Tägliches Limit für neue Benutzer.",
-        "desc2": "Basis-Support", "t1_2": "Technische Hilfe per E-Mail mit Antwort in weniger als 48 Stunden.",
-        "desc3": "Wasserzeichen", "t1_3": "Die Texte enthalten einen kleinen Hinweis auf unsere Plattform.",
-        "desc4": "Unbegrenzte Generierungen", "t2_1": "Erstellen Sie so viele Beschreibungen wie nötig ohne Einschränkungen.",
-        "desc5": "Social Media Paket", "t2_2": "Erstellen Sie automáticamente Posts für Instagram, Facebook und TikTok mit Hashtags.",
-        "desc6": "SEO-Optimierung", "t2_3": "Strukturierte Texte, um in Suchmaschinen ganz oben zu stehen.",
-        "desc7": "Haupt-Banner", "t2_4": "Ihre Top-Immobilien rotieren auf unserer Startseite.",
-        "desc8": "5 Benutzer / Konten", "t3_1": "Einzelzugriff für bis zu 5 Mitglieder Ihres Immobilienteams.",
-        "desc9": "Team-Panel", "t3_2": "Überwachen und verwalten Sie die von Ihren Maklern erstellten Beschreibungen.",
-        "desc10": "API-Zugang", "t3_3": "Verbinden Sie unsere KI direkt mit Ihrer eigenen Software oder Ihrem CRM.",
-        "desc11": "Banner-Priorität", "t3_4": "Ihre Anzeigen erscheinen doppelt so häufig auf der Startseite.",
-        "btn1": "GRATIS REGISTRIEREN", "btn2": "JETZT UPGRADEN", "btn3": "VERTRIEB KONTAKTIEREN",
-        "how_title": "Wie funktioniert AI Realty Pro?",
-        "step1_t": "Link einfügen", "step1_d": "Oder kurze Beschreibung schreiben.",
-        "step2_t": "KI Analysiert", "step2_d": "Wir optimieren für SEO und Verkauf.",
-        "step3_t": "Veröffentlichen", "step3_d": "Text kopieren und Kunden gewinnen.",
-        "stat1": "Optimierte Anzeigen", "stat2": "Zeit Gespart", "stat3": "More Inquiries",
-        "test_title": "Was Experten sagen",
-        "test1_txt": "Meine Instagram-Verkäufe stiegen um 50%, seit ich KI für Captions nutze.", "test1_au": "Carlos R. (RE/MAX)",
-        "test2_txt": "Unglaublich, wie es Portal-Links zusammenfasst. Ich spare Stunden.", "test2_au": "Ana M. (Century 21)",
-        "test3_txt": "Die beste Investition für meine Agentur dieses Jahr. Pro-Plan ist jeden Cent wert.", "test3_au": "Luis P. (Unabhängig)",
-        "foot_desc": "Künstliche Intelligenz Tools für Immobilien.",
-        "foot_links": "Nutzungsbedingungen | Datenschutzrichtlinie | Support",
-        "mail_label": "📧 E-Mail eingeben, um zu starten", "limit_msg": "🚫 Gratis-Limit erreicht.", "upgrade_msg": "Upgrade auf PRO, um weiter zu verkaufen."
     }
 }
 
-# --- 4. ESTILOS CSS (Respetado íntegramente) ---
+# --- 4. ESTILOS CSS ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -281,11 +175,8 @@ st.markdown("""
     .glass-container { background: rgba(38, 39, 48, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; text-align: center; position: relative; height: 100%; }
     
     .free-card { box-shadow: 0 0 20px rgba(255, 255, 255, 0.03); }
-    .free-card:hover { box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1); }
     .pro-card { border: 1px solid rgba(0, 210, 255, 0.4) !important; box-shadow: 0 0 25px rgba(0, 210, 255, 0.15); }
-    .pro-card:hover { box-shadow: 0 15px 60px rgba(0, 210, 255, 0.5); }
     .agency-card { border: 1px solid rgba(221, 160, 221, 0.4) !important; box-shadow: 0 0 25px rgba(221, 160, 221, 0.15); }
-    .agency-card:hover { box-shadow: 0 15px 60px rgba(221, 160, 221, 0.5); }
 
     /* TOOLTIPS */
     .info-icon { display: inline-block; width: 16px; height: 16px; border-radius: 50%; text-align: center; font-size: 11px; line-height: 16px; margin-left: 8px; cursor: help; position: relative; font-weight: bold; }
@@ -334,7 +225,7 @@ L = traducciones[st.session_state.idioma]
 st.markdown(f"<h1 class='neon-title'>{L['title1']} <br><span class='neon-highlight'>{L['title2']}</span></h1>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
-# --- 6. SECCIÓN CENTRAL (BLOQUEO DE USOS Y CAPTURA) ---
+# --- 6. SECCIÓN CENTRAL ---
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
     st.markdown(f'''
@@ -345,7 +236,6 @@ with c2:
     ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     
-    # --- PASO 1: CAPTURA DE EMAIL SI NO EXISTE ---
     if not st.session_state.email_usuario:
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
         if st.button("COMENZAR GRATIS / START FREE", type="primary"):
@@ -353,37 +243,54 @@ with c2:
                 df_actual = obtener_datos_db()
                 if email_input in df_actual['email'].values:
                     st.session_state.usos = int(df_actual[df_actual['email'] == email_input]['usos'].values[0])
+                    # Cargamos el plan desde la DB
+                    st.session_state.plan = str(df_actual[df_actual['email'] == email_input]['plan'].values[0])
                 else:
                     st.session_state.usos = 0
+                    st.session_state.plan = "Gratis"
                 st.session_state.email_usuario = email_input
                 st.rerun()
             else:
                 st.error("Por favor ingresa un email válido.")
     
-    # --- PASO 2: LOGICA DE GENERACIÓN ---
     elif st.session_state.email_usuario:
-        if st.session_state.usos < 3:
+        # Lógica de permiso según Plan o Usos
+        if st.session_state.usos < 3 or st.session_state.plan in ["Pro", "Agencia"]:
             user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
             if st.button(L['btn_gen'], key="main_gen", type="primary"):
                 if user_input:
-                    with st.spinner("Generando..."):
-                        prompt = f"Actúa como un experto inmobiliario de lujo. Crea un anuncio persuasivo en {st.session_state.idioma} basado en la siguiente información: {user_input}. Usa un tono profesional y atractivo."
-                        resultado = generar_texto(prompt)
+                    with st.spinner("Diseñando tu estrategia de lujo..."):
+                        resultado = generar_contenido_ia(user_input, st.session_state.plan, st.session_state.idioma)
+                        
                         if "ERROR_TECNICO" not in resultado:
                             st.session_state.usos += 1
-                            actualizar_usos_db(st.session_state.email_usuario, st.session_state.usos)
-                            st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
-                            st.info(f"Usos restantes: {3 - st.session_state.usos}")
+                            actualizar_usos_db(st.session_state.email_usuario, st.session_state.usos, st.session_state.plan)
+                            
+                            # INTERFAZ DE RESULTADOS POR PESTAÑAS (Solo para Pro/Agencia)
+                            if st.session_state.plan != "Gratis":
+                                t1, t2, t3 = st.tabs(["🏠 Descripción", "📱 Pack Redes", "🎯 SEO & Venta"])
+                                with t1:
+                                    st.markdown(f"<div style='color:white;'>{resultado.split('SECCION 2')[0]}</div>", unsafe_allow_html=True)
+                                with t2:
+                                    if "SECCION 2" in resultado:
+                                        redes = resultado.split("SECCION 2")[1].split("SECCION 3")[0]
+                                        st.info(redes)
+                                with t3:
+                                    if "SECCION 3" in resultado:
+                                        seo = resultado.split("SECCION 3")[1]
+                                        st.success(seo)
+                            else:
+                                # Resultado simple para Gratis
+                                st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
+                                st.warning("Pásate a PRO para desbloquear el Pack de Redes Sociales.")
                         else:
                             st.error("Error de conexión.")
                 else:
                     st.warning("Por favor, ingresa los detalles.")
         else:
-            # --- PASO 3: BLOQUEO (PAYWALL) ---
             st.error(L["limit_msg"])
             st.markdown(f"#### {L['upgrade_msg']}")
             
-            # Botón de PayPal directo para Agente Pro ($49) en el centro
             paypal_bloqueo = """
             <div id="paypal-bloqueo-container"></div>
             <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
@@ -398,21 +305,20 @@ with c2:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- CÓMO FUNCIONA (Respetado íntegramente) ---
+# --- SECCIONES INFERIORES ---
 st.markdown(f"<br><br><h2 style='text-align:center; color:white;'>{L['how_title']}</h2>", unsafe_allow_html=True)
 ch1, ch2, ch3 = st.columns(3)
 with ch1: st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>{L['step1_t']}</b><br>{L['step1_d']}</p></div>", unsafe_allow_html=True)
 with ch2: st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>{L['step2_t']}</b><br>{L['step2_d']}</p></div>", unsafe_allow_html=True)
 with ch3: st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>{L['step3_t']}</b><br>{L['step3_d']}</p></div>", unsafe_allow_html=True)
 
-# --- ESTADÍSTICAS (Respetado íntegramente) ---
 st.markdown("<br>", unsafe_allow_html=True)
 col_stat1, col_stat2, col_stat3 = st.columns(3)
 with col_stat1: st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+10k</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat1"]}</p></div>', unsafe_allow_html=True)
 with col_stat2: st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">-80%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat2"]}</p></div>', unsafe_allow_html=True)
 with col_stat3: st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+45%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p></div>', unsafe_allow_html=True)
 
-# --- 7. PLANES INTEGRADOS CON PAYPAL (Respetado íntegramente) ---
+# --- 7. PLANES INTEGRADOS CON PAYPAL ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
@@ -424,7 +330,6 @@ with col1:
 with col2:
     desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_1']}'>i</span><br>{L['desc5']}<span class='info-icon i-pro' data-tooltip='{L['t2_2']}'>i</span><br>{L['desc6']}<span class='info-icon i-pro' data-tooltip='{L['t2_3']}'>i</span><br><b>{L['desc7']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_4']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper pro-card'><div class='glass-container'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'>{desc_p}</div></div>", unsafe_allow_html=True)
-    
     paypal_html_49 = """
     <div id="paypal-button-container-P-3P2657040E401734NNFQQ5TY"></div>
     <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
@@ -440,7 +345,6 @@ with col2:
 with col3:
     desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
-    
     paypal_html_199 = """
     <div id="paypal-button-container-P-0S451470G5041550ENFQRB4I"></div>
     <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
