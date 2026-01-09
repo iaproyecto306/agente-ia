@@ -12,41 +12,40 @@ except Exception:
     st.warning("⚠️ Configuración pendiente: Por favor, añade la API Key en los Secrets de Streamlit.")
     st.stop()
 
-# --- CONEXIÓN A BASE DE DATOS (Agregado para persistencia de usos y PLANES) ---
+# --- CONEXIÓN A BASE DE DATOS ---
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 def obtener_datos_db():
     try:
+        # Leemos la hoja. Si es la primera vez, el try fallará y creará el DF vacío
         return conn.read(worksheet="Sheet1", ttl=0)
     except:
-        # Agregamos la columna 'plan' a la base de datos
         return pd.DataFrame(columns=['email', 'usos', 'plan'])
 
-def actualizar_usos_db(email, nuevos_usos, plan="Gratis"):
+def actualizar_usos_db(email, nuevos_usos, plan_actual):
     df = obtener_datos_db()
+    
+    # Aseguramos que exista la columna 'plan' si la hoja es vieja
+    if 'plan' not in df.columns:
+        df['plan'] = 'Gratis'
+
     if email in df['email'].values:
         df.loc[df['email'] == email, 'usos'] = nuevos_usos
-        df.loc[df['email'] == email, 'plan'] = plan
+        # No sobrescribimos el plan a menos que cambie, mantenemos el que tiene
+        if pd.isna(df.loc[df['email'] == email, 'plan']).any():
+             df.loc[df['email'] == email, 'plan'] = plan_actual
     else:
-        nueva_fila = pd.DataFrame({"email": [email], "usos": [nuevos_usos], "plan": [plan]})
+        nueva_fila = pd.DataFrame({"email": [email], "usos": [nuevos_usos], "plan": [plan_actual]})
         df = pd.concat([df, nueva_fila], ignore_index=True)
+    
     conn.update(worksheet="Sheet1", data=df)
 
-def generar_texto(prompt, tono="Profesional"):
-    # Mejora de prompt según el tono seleccionado
-    estilos = {
-        "Storytelling": "Usa una narrativa emocional.",
-        "Directo": "Sé muy directo y enfocado a ventas.",
-        "Minimalista": "Usa pocas palabras, muy elegante.",
-        "Profesional": "Tono de experto inmobiliario estándar."
-    }
-    sistema = f"Eres un experto inmobiliario de lujo. {estilos.get(tono, '')}"
-    
+def generar_texto(prompt, modelo="gpt-4o"):
     try:
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model=modelo,
             messages=[
-                {"role": "system", "content": sistema},
+                {"role": "system", "content": "Eres un experto inmobiliario de lujo y copywriter persuasivo."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7
@@ -63,15 +62,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- LÓGICA DE CONTROL DE USOS (PAYWALL) ---
-if "usos" not in st.session_state:
-    st.session_state.usos = 0
-if "email_usuario" not in st.session_state:
-    st.session_state.email_usuario = ""
-if "plan_usuario" not in st.session_state:
-    st.session_state.plan_usuario = "Gratis"
+# --- VARIABLES DE ESTADO ---
+if "usos" not in st.session_state: st.session_state.usos = 0
+if "email_usuario" not in st.session_state: st.session_state.email_usuario = ""
+if "plan_usuario" not in st.session_state: st.session_state.plan_usuario = "Gratis"
 
-# --- 3. DICCIONARIO MAESTRO (Traducciones completas respetadas) ---
+# --- 3. DICCIONARIO MAESTRO ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
@@ -104,7 +100,7 @@ traducciones = {
         "foot_desc": "Herramientas de Inteligencia Artificial para Inmuebles.",
         "foot_links": "Términos de Servicio | Política de Privacidad | Soporte",
         "mail_label": "📧 Ingresa tu Email para comenzar", "limit_msg": "🚫 Límite gratuito alcanzado.", "upgrade_msg": "Pásate a PRO para seguir vendiendo.",
-        "sel_tono": "Tono:", "sel_idioma": "Idioma de salida:"
+        "lbl_tone": "Tono:", "lbl_lang_out": "Idioma de Salida:"
     },
     "English": {
         "title1": "Turn Boring Listings into", "title2": "Sales Magnets",
@@ -137,7 +133,7 @@ traducciones = {
         "foot_desc": "Artificial Intelligence Tools for Real Estate.",
         "foot_links": "Terms of Service | Privacy Policy | Support",
         "mail_label": "📧 Enter your Email to start", "limit_msg": "🚫 Free limit reached.", "upgrade_msg": "Upgrade to PRO to keep selling.",
-        "sel_tono": "Tone:", "sel_idioma": "Output Language:"
+        "lbl_tone": "Tone:", "lbl_lang_out": "Output Language:"
     },
     "Português": {
         "title1": "Transforme Anúncios Tediosos em", "title2": "Ímãs de Vendas",
@@ -160,7 +156,7 @@ traducciones = {
         "btn1": "REGISTRO GRÁTIS", "btn2": "MELHORAR AGORA", "btn3": "CONTATO VENDAS",
         "how_title": "Como funciona o AI Realty Pro?",
         "step1_t": "Cole o Link", "step1_d": "Ou escreva uma breve descrição.",
-        "step2_t": "IA Analiza", "step2_d": "Otimizamos para SEO e vendas.",
+        "step2_t": "IA Analisa", "step2_d": "Otimizamos para SEO e vendas.",
         "step3_t": "Publique", "step3_d": "Copie o texto e atraia clientes.",
         "stat1": "Anúncios Otimizados", "stat2": "Tempo Economizado", "stat3": "Mais Consultas",
         "test_title": "O que dizem os Especialistas",
@@ -168,9 +164,9 @@ traducciones = {
         "test2_txt": "Incrível como resume os links dos portais. Economizo horas.", "test2_au": "Ana M. (Century 21)",
         "test3_txt": "Melhor investimento para minha agência este ano. O plano Pro vale cada centavo.", "test3_au": "Luis P. (Independente)",
         "foot_desc": "Ferramentas de Inteligencia Artificial para Imóveis.",
-        "foot_links": "Términos de Servicio | Política de Privacidade | Suporte",
+        "foot_links": "Termos de Servicio | Política de Privacidade | Suporte",
         "mail_label": "📧 Insira seu e-mail para começar", "limit_msg": "🚫 Limite grátis atingido.", "upgrade_msg": "Atualize para PRO para continuar vendendo.",
-        "sel_tono": "Tom:", "sel_idioma": "Idioma de saída:"
+        "lbl_tone": "Tom:", "lbl_lang_out": "Idioma de saída:"
     },
     "中文": {
         "title1": "将枯燥的广告转化为", "title2": "销售磁铁",
@@ -203,7 +199,7 @@ traducciones = {
         "foot_desc": "房地产人工智能工具。",
         "foot_links": "服务条款 | 隐私政策 | 支持",
         "mail_label": "📧 输入邮箱开始", "limit_msg": "🚫 已达到免费限制。", "upgrade_msg": "升级到专业版继续销售。",
-        "sel_tono": "语气:", "sel_idioma": "输出语言:"
+        "lbl_tone": "语气:", "lbl_lang_out": "输出语言:"
     },
     "Français": {
         "title1": "Transformez vos Annonces en", "title2": "Aimants à Ventes",
@@ -236,7 +232,7 @@ traducciones = {
         "foot_desc": "Outils d'Intelligence Artificielle pour l'Immobilier.",
         "foot_links": "Conditions d'Utilisation | Politique de Confidentialité | Support",
         "mail_label": "📧 Entrez votre email pour commencer", "limit_msg": "🚫 Limite gratuite atteinte.", "upgrade_msg": "Passez à PRO pour continuer à vendre.",
-        "sel_tono": "Ton:", "sel_idioma": "Langue de sortie:"
+        "lbl_tone": "Ton:", "lbl_lang_out": "Langue de sortie:"
     },
     "Deutsch": {
         "title1": "Verwandeln Sie Anzeigen in", "title2": "Verkaufsmagnete",
@@ -269,11 +265,11 @@ traducciones = {
         "foot_desc": "Künstliche Intelligenz Tools für Immobilien.",
         "foot_links": "Nutzungsbedingungen | Datenschutzrichtlinie | Support",
         "mail_label": "📧 E-Mail eingeben, um zu starten", "limit_msg": "🚫 Gratis-Limit erreicht.", "upgrade_msg": "Upgrade auf PRO, um weiter zu verkaufen.",
-        "sel_tono": "Ton:", "sel_idioma": "Ausgabesprache:"
+        "lbl_tone": "Ton:", "lbl_lang_out": "Ausgabesprache:"
     }
 }
 
-# --- 4. ESTILOS CSS (Respetado íntegramente) ---
+# --- 4. ESTILOS CSS ---
 st.markdown("""
 <style>
     .stApp { background-color: #0e1117; color: #FFFFFF; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -364,16 +360,19 @@ with c2:
     ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     
-    # --- PASO 1: CAPTURA DE EMAIL SI NO EXISTE ---
+    # --- PASO 1: LOGIN ---
     if not st.session_state.email_usuario:
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
         if st.button("COMENZAR GRATIS / START FREE", type="primary"):
             if email_input and "@" in email_input:
                 df_actual = obtener_datos_db()
                 if email_input in df_actual['email'].values:
-                    st.session_state.usos = int(df_actual[df_actual['email'] == email_input]['usos'].values[0])
-                    st.session_state.plan_usuario = df_actual[df_actual['email'] == email_input]['plan'].values[0]
+                    # Usuario existente: cargamos datos
+                    usuario = df_actual[df_actual['email'] == email_input].iloc[0]
+                    st.session_state.usos = int(usuario['usos'])
+                    st.session_state.plan_usuario = usuario['plan'] if 'plan' in usuario else 'Gratis'
                 else:
+                    # Usuario nuevo
                     st.session_state.usos = 0
                     st.session_state.plan_usuario = "Gratis"
                 st.session_state.email_usuario = email_input
@@ -383,42 +382,57 @@ with c2:
     
     # --- PASO 2: LOGICA DE GENERACIÓN ---
     elif st.session_state.email_usuario:
-        es_pro = st.session_state.plan_usuario in ["Pro", "Agencia"]
-        limite_efectivo = 9999 if es_pro else 3
         
-        if st.session_state.usos < limite_efectivo:
-            # --- SELECTORES PRO (Tono e Idioma) ---
+        # DEFINICIÓN DE LÍMITES POR PLAN
+        es_pro = st.session_state.plan_usuario in ["Pro", "Agencia"]
+        limite_usos = 99999 if es_pro else 3 # Generaciones Ilimitadas para Pro/Agencia
+        
+        if st.session_state.usos < limite_usos:
+            # Inputs adicionales para PRO (SEO y Tono)
             col_t1, col_t2 = st.columns(2)
             with col_t1:
-                tono_sel = st.selectbox(L["sel_tono"], ["Profesional", "Storytelling", "Directo", "Minimalista"])
+                tono = st.selectbox(L.get("lbl_tone", "Tono:"), ["Profesional", "Storytelling", "Urgencia/Venta", "Lujo/Minimalista"])
             with col_t2:
-                idioma_out = st.selectbox(L["sel_idioma"], list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
+                idioma_salida = st.selectbox(L.get("lbl_lang_out", "Idioma Salida:"), list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
 
             user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
             
             if st.button(L['btn_gen'], key="main_gen", type="primary"):
                 if user_input:
-                    with st.spinner("Generando..."):
-                        # Lógica de scraping implícita en el prompt
-                        final_input = user_input
-                        if "http" in user_input:
-                            final_input = f"Analiza la información de este enlace y extrae lo más importante: {user_input}"
+                    with st.spinner("Analizando mercado y redactando..."):
+                        # Construcción del Prompt con Optimización SEO (Cumple promesa SEO)
+                        prompt_base = f"""
+                        Actúa como un experto inmobiliario de lujo.
+                        Tarea: Crear descripción de venta inmobiliaria.
+                        Idioma de salida: {idioma_salida}.
+                        Tono: {tono}.
+                        Objetivo: Optimización SEO para portales inmobiliarios.
+                        Datos de la propiedad: {user_input}
+                        """
                         
-                        prompt = f"Crea un anuncio en {idioma_out} basado en: {final_input}. Tono: {tono_sel}."
-                        resultado = generar_texto(prompt, tono_sel)
+                        resultado = generar_texto(prompt_base)
                         
                         if "ERROR_TECNICO" not in resultado:
+                            # Sumar uso
                             st.session_state.usos += 1
                             actualizar_usos_db(st.session_state.email_usuario, st.session_state.usos, st.session_state.plan_usuario)
+                            
+                            # Mostrar Resultado Principal
                             st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
                             
-                            # --- PACK REDES SOCIALES (Solo PRO) ---
+                            # --- PACK REDES SOCIALES (Solo PRO/AGENCIA) ---
                             if es_pro:
-                                st.divider()
-                                st.subheader("📱 Pack Redes Sociales")
-                                redes_prompt = f"Basado en este anuncio: {resultado}, crea un post para Instagram con hashtags y un guion corto para un Reel."
-                                redes_res = generar_texto(redes_prompt, "Directo")
-                                st.info(redes_res)
+                                st.markdown("---")
+                                st.markdown("### 📱 Social Media Pack (Pro)")
+                                with st.spinner("Generando contenido para redes..."):
+                                    prompt_social = f"""
+                                    Basado en esta descripción: "{resultado}".
+                                    1. Crea un Copy para Instagram con Emojis y 5 Hashtags virales.
+                                    2. Crea un guion de 15 segundos para TikTok/Reels.
+                                    Separalos claramente.
+                                    """
+                                    resultado_social = generar_texto(prompt_social)
+                                    st.info(resultado_social)
                             
                             if not es_pro:
                                 st.info(f"Usos restantes: {3 - st.session_state.usos}")
@@ -431,6 +445,7 @@ with c2:
             st.error(L["limit_msg"])
             st.markdown(f"#### {L['upgrade_msg']}")
             
+            # Botón de PayPal directo para Agente Pro ($49) en el centro
             paypal_bloqueo = """
             <div id="paypal-bloqueo-container"></div>
             <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
@@ -445,21 +460,21 @@ with c2:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- CÓMO FUNCIONA (Respetado íntegramente) ---
+# --- CÓMO FUNCIONA ---
 st.markdown(f"<br><br><h2 style='text-align:center; color:white;'>{L['how_title']}</h2>", unsafe_allow_html=True)
 ch1, ch2, ch3 = st.columns(3)
 with ch1: st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>{L['step1_t']}</b><br>{L['step1_d']}</p></div>", unsafe_allow_html=True)
 with ch2: st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>{L['step2_t']}</b><br>{L['step2_d']}</p></div>", unsafe_allow_html=True)
 with ch3: st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>{L['step3_t']}</b><br>{L['step3_d']}</p></div>", unsafe_allow_html=True)
 
-# --- ESTADÍSTICAS (Respetado íntegramente) ---
+# --- ESTADÍSTICAS ---
 st.markdown("<br>", unsafe_allow_html=True)
 col_stat1, col_stat2, col_stat3 = st.columns(3)
 with col_stat1: st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+10k</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat1"]}</p></div>', unsafe_allow_html=True)
 with col_stat2: st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">-80%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat2"]}</p></div>', unsafe_allow_html=True)
 with col_stat3: st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+45%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p></div>', unsafe_allow_html=True)
 
-# --- 7. PLANES INTEGRADOS CON PAYPAL (Respetado íntegramente) ---
+# --- 7. PLANES INTEGRADOS CON PAYPAL ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 
