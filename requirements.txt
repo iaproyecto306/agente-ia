@@ -1,3 +1,4 @@
 streamlit
 openai
 st-gsheets-connection
+pip install beautifulsoup4 requests
