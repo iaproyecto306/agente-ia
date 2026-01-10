@@ -29,10 +29,10 @@ cookie_manager = st.session_state.cookie_manager
 
 def extraer_datos_inmueble(url):
     """
-    Función de scraping mejorada.
-    Detecta si es un portal conocido y extrae texto limpio.
+    Función de scraping mejorada v2.0 (Anti-Bloqueo).
+    Simula ser un navegador real para evitar bloqueos de Zillow/MeLi.
     """
-    # Lista de dominios para validación de seguridad (Feature Platinum)
+    # Lista de dominios para validación (Se mantiene igual)
     portales_validos = [
         "infocasas", 
         "mercadolibre", 
@@ -45,32 +45,43 @@ def extraer_datos_inmueble(url):
         "fotocasa", 
         "inmuebles24"
     ]
+    # Verificamos si el nombre está en la URL
     es_portal_conocido = any(portal in url.lower() for portal in portales_validos)
     
     try:
+        # HEADERS DE CAMUFLAJE (Simulamos ser un Chrome real en Windows)
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+            "Referer": "https://www.google.com/",
+            "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1"
         }
-        response = requests.get(url, headers=headers, timeout=12)
+        
+        # Hacemos la petición
+        response = requests.get(url, headers=headers, timeout=15)
         
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # Limpieza profunda de elementos basura (Scripts, Estilos, Menús)
-            for element in soup(['script', 'style', 'header', 'footer', 'nav', 'aside', 'iframe', 'button', 'input', 'noscript']):
+            # Limpieza profunda
+            for element in soup(['script', 'style', 'header', 'footer', 'nav', 'aside', 'iframe', 'button', 'input', 'noscript', 'svg']):
                 element.decompose()
             
-            # Extracción y limpieza de espacios
             texto = soup.get_text(separator=' ', strip=True)
+            return texto[:5000], es_portal_conocido
             
-            # Retornamos hasta 4500 caracteres para dar más contexto a la IA
-            return texto[:4500], es_portal_conocido
+        elif response.status_code == 403:
+            # Si nos bloquean (403), devolvemos un aviso pero NO marcamos como portal inválido
+            return "AVISO: El portal tiene protección anti-robots fuerte. La IA usará solo tus instrucciones manuales.", es_portal_conocido
+            
         else:
-            return f"Error: No se pudo acceder. Código de estado: {response.status_code}", False
+            return f"Error de acceso (Código {response.status_code}).", es_portal_conocido
             
     except Exception as e:
-        return f"Error técnico al leer el link: {str(e)}", False
-
+        # Si falla técnicamente, devolvemos el error pero respetamos que el portal era conocido
+        return f"No se pudo leer automáticamente el link (Error: {str(e)}). Por favor copia y pega la descripción manualmente.", es_portal_conocido
 # ==============================================================================
 # 2. CONFIGURACIÓN DE IA Y CONEXIONES SEGURAS
 # ==============================================================================
