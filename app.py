@@ -554,8 +554,8 @@ with col_sw2:
 if modo_anual:
     precio_pro = "490"
     precio_agency = "1,990"
-    id_pro = "P-PON_AQUI_TU_ID_ANUAL_PRO"       # <--- ¡IMPORTANTE! PEGA AQUÍ EL ID ANUAL PRO DE PAYPAL
-    id_agency = "P-PON_AQUI_TU_ID_ANUAL_AGENCIA" # <--- ¡IMPORTANTE! PEGA AQUÍ EL ID ANUAL AGENCIA DE PAYPAL
+    id_pro = "P-2PU023636P1209345NFQ7TMY"       # <--- ¡IMPORTANTE! PEGA AQUÍ EL ID ANUAL PRO DE PAYPAL
+    id_agency = "P-87X83840151393810NFQ7X6Q" # <--- ¡IMPORTANTE! PEGA AQUÍ EL ID ANUAL AGENCIA DE PAYPAL
     texto_ahorro = "✅ 2 Meses GRATIS incluidos"
 else:
     precio_pro = "49"
