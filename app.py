@@ -16,7 +16,7 @@ import extra_streamlit_components as stx # <--- NUEVA LIBRERÍA OBLIGATORIA
 # ==============================================================================
 # Esta función permite que la página recuerde al usuario aunque cierre el navegador.
 
-@st.cache_resource(experimental_allow_widgets=True)
+@st.cache_resource
 def get_manager():
     return stx.CookieManager()
 
