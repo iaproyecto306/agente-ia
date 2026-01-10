@@ -1620,4 +1620,4 @@ st.markdown(f'<div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 
 with st.expander(f"⚖️ {L.get('legal_title', 'Términos Legales')}"):
     st.write("1. No guardamos datos de tarjeta de crédito (procesado por PayPal).")
     st.write("2. Las descripciones son generadas por IA y deben ser verificadas.")
-    st.write("3. No hay reembolsos en planes mensuales. Planes anuales tienen 7 días de garantía.") este es el codigo, analizalo y mira todo lo que hicimos, estas totalmente mareado
+    st.write("3. No hay reembolsos en planes mensuales. Planes anuales tienen 7 días de garantía.")
