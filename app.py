@@ -15,7 +15,7 @@ import extra_streamlit_components as stx # <--- NUEVA LIBRERÍA OBLIGATORIA
 # 0. GESTOR DE COOKIES (MEMORIA PERMANENTE)
 # ==============================================================================
 
-@st.cache_resource(experimental_allow_widgets=True) # <-- Agregamos esto de nuevo
+# No usamos decorador @st.cache_resource para evitar conflictos de widgets
 def get_manager():
     return stx.CookieManager()
 
