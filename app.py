@@ -9,13 +9,13 @@ from datetime import datetime
 import urllib.parse
 import time
 import io
-import extra_streamlit_components as stx 
+import extra_streamlit_components as stx # <--- NUEVA LIBRERÍA OBLIGATORIA
 
 # ==============================================================================
 # 0. GESTOR DE COOKIES (MEMORIA PERMANENTE)
 # ==============================================================================
+# Esta función permite que la página recuerde al usuario aunque cierre el navegador.
 
-# CORRECCIÓN APLICADA AQUÍ: Se eliminó el argumento inválido
 @st.cache_resource
 def get_manager():
     return stx.CookieManager()
@@ -31,6 +31,7 @@ def extraer_datos_inmueble(url):
     Función de scraping mejorada.
     Detecta si es un portal conocido y extrae texto limpio.
     """
+    # Lista de dominios para validación de seguridad (Feature Platinum)
     portales_validos = [
         "infocasas", "mercadolibre", "zillow", "properati", "remax", 
         "fincaraiz", "realtor", "idealista", "fotocasa", "inmuebles24"
@@ -45,12 +46,19 @@ def extraer_datos_inmueble(url):
         
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # Limpieza profunda de elementos basura (Scripts, Estilos, Menús)
             for element in soup(['script', 'style', 'header', 'footer', 'nav', 'aside', 'iframe', 'button', 'input', 'noscript']):
                 element.decompose()
+            
+            # Extracción y limpieza de espacios
             texto = soup.get_text(separator=' ', strip=True)
+            
+            # Retornamos hasta 4500 caracteres para dar más contexto a la IA
             return texto[:4500], es_portal_conocido
         else:
             return f"Error: No se pudo acceder. Código de estado: {response.status_code}", False
+            
     except Exception as e:
         return f"Error técnico al leer el link: {str(e)}", False
 
@@ -58,6 +66,7 @@ def extraer_datos_inmueble(url):
 # 2. CONFIGURACIÓN DE IA Y CONEXIONES SEGURAS
 # ==============================================================================
 
+# Verificación de API Key de OpenAI
 try:
     api_key = st.secrets["OPENAI_API_KEY"]
     client = OpenAI(api_key=api_key)
@@ -65,51 +74,74 @@ except Exception:
     st.error("⚠️ ERROR CRÍTICO: No se detectó la OPENAI_API_KEY en los Secrets de Streamlit.")
     st.stop()
 
+# Conexión a Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 
+# --- FUNCIONES DE BASE DE DATOS (INTACTAS + AMPLIADAS) ---
+
 def obtener_datos_db():
+    """Obtiene la base de datos de usuarios principales."""
     try:
         return conn.read(worksheet="Sheet1", ttl=0)
     except:
         return pd.DataFrame(columns=['email', 'usos', 'plan'])
 
 def obtener_empleados_db():
+    """Obtiene la base de datos de empleados/equipos."""
     try:
         return conn.read(worksheet="Employees", ttl=0)
     except:
         return pd.DataFrame(columns=['BossEmail', 'EmployeeEmail'])
 
 def actualizar_usos_db(email, nuevos_usos, plan_actual):
+    """Actualiza el consumo de usos y verifica el plan."""
     df = obtener_datos_db()
+    
+    # Aseguramos compatibilidad con versiones viejas de la hoja
     if 'plan' not in df.columns:
         df['plan'] = 'Gratis'
+
     if email in df['email'].values:
         df.loc[df['email'] == email, 'usos'] = nuevos_usos
+        # Solo actualizamos el plan si está vacío en la DB
         if pd.isna(df.loc[df['email'] == email, 'plan']).any():
              df.loc[df['email'] == email, 'plan'] = plan_actual
     else:
-        nueva_fila = pd.DataFrame({"email": [email], "usos": [nuevos_usos], "plan": [plan_actual]})
+        # Creamos usuario nuevo
+        nueva_fila = pd.DataFrame({
+            "email": [email], 
+            "usos": [nuevos_usos], 
+            "plan": [plan_actual]
+        })
         df = pd.concat([df, nueva_fila], ignore_index=True)
+    
     conn.update(worksheet="Sheet1", data=df)
 
 def guardar_historial(email, input_user, output_ia):
+    """Guarda cada generación en la hoja Historial para auditoría."""
     try:
         try:
             df_hist = conn.read(worksheet="Historial", ttl=0)
         except:
             df_hist = pd.DataFrame(columns=['fecha', 'email', 'input', 'output'])
+        
         nueva_fila = pd.DataFrame({
             "fecha": [datetime.now().strftime("%Y-%m-%d %H:%M")],
             "email": [email],
-            "input": [input_user[:600]],
+            "input": [input_user[:600]], # Limitamos el input para no saturar celdas
             "output": [output_ia]
         })
+        
         df_final = pd.concat([df_hist, nueva_fila], ignore_index=True)
         conn.update(worksheet="Historial", data=df_final)
     except Exception as e:
+        # Fallo silencioso para no interrumpir la experiencia del usuario
         print(f"Error guardando historial: {e}")
 
 def generar_texto(prompt, modelo="gpt-4o"):
+    """
+    Motor de generación de texto.
+    """
     try:
         response = client.chat.completions.create(
             model=modelo,
@@ -117,7 +149,7 @@ def generar_texto(prompt, modelo="gpt-4o"):
                 {"role": "system", "content": "Eres un Broker Inmobiliario Senior de Lujo y Copywriter experto en Neuromarketing."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.75
+            temperature=0.75 # Creatividad ajustada
         )
         return response.choices[0].message.content
     except Exception as e:
@@ -131,9 +163,10 @@ st.set_page_config(
     page_title="AI Realty Pro Platinum",
     page_icon="🏢",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded" # <--- CAMBIO: Sidebar abierta por defecto
 )
 
+# Inicialización de variables de sesión
 if "usos" not in st.session_state: st.session_state.usos = 0
 if "email_usuario" not in st.session_state: st.session_state.email_usuario = ""
 if "plan_usuario" not in st.session_state: st.session_state.plan_usuario = "Gratis"
@@ -142,8 +175,10 @@ if "idioma" not in st.session_state: st.session_state.idioma = "Español"
 if "last_result" not in st.session_state: st.session_state.last_result = None
 
 # ==============================================================================
-# 4. DICCIONARIO MAESTRO 360° (EXPANDIDO)
+# 4. DICCIONARIO MAESTRO 360° (COMPLETO Y EXPANDIDO)
 # ==============================================================================
+# Este diccionario contiene TODAS las traducciones línea por línea.
+# SE HAN AGREGADO: 'logout', 'welcome', 'usage_bar' a todos los idiomas.
 
 traducciones = {
     "Español": {
@@ -970,6 +1005,7 @@ st.markdown("""
 # ==============================================================================
 # 6. SIDEBAR PROFESIONAL Y NAVEGACIÓN (NUEVO)
 # ==============================================================================
+# Movemos el selector de idioma y perfil aquí para liberar la pantalla principal.
 
 with st.sidebar:
     st.markdown('<div style="text-align:center; font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: 1px;">🏢 AI REALTY</div>', unsafe_allow_html=True)
