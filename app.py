@@ -144,8 +144,30 @@ def guardar_historial(email, input_user, output_ia):
         df_final = pd.concat([df_hist, nueva_fila], ignore_index=True)
         conn.update(worksheet="Historial", data=df_final)
     except Exception as e:
-        # Fallo silencioso para no interrumpir la experiencia del usuario
         print(f"Error guardando historial: {e}")
+
+# --- NUEVA FUNCIÓN: GUARDAR FEEDBACK EN GOOGLE SHEETS ---
+def guardar_feedback(email, mensaje):
+    """Guarda los mensajes de soporte en una hoja nueva."""
+    try:
+        try:
+            df_feed = conn.read(worksheet="Feedback", ttl=0)
+        except:
+            # Si no existe la hoja, creamos el DataFrame base
+            df_feed = pd.DataFrame(columns=['fecha', 'email', 'mensaje'])
+        
+        nueva_fila = pd.DataFrame({
+            "fecha": [datetime.now().strftime("%Y-%m-%d %H:%M")],
+            "email": [email if email else "Anonimo"],
+            "mensaje": [mensaje]
+        })
+        
+        df_final = pd.concat([df_feed, nueva_fila], ignore_index=True)
+        conn.update(worksheet="Feedback", data=df_final)
+        return True
+    except Exception as e:
+        print(f"Error feedback: {e}")
+        return False
 
 def generar_texto(prompt, modelo="gpt-4o"):
     """
@@ -187,7 +209,6 @@ if "last_result" not in st.session_state: st.session_state.last_result = None
 # 4. DICCIONARIO MAESTRO 360° (COMPLETO Y EXPANDIDO)
 # ==============================================================================
 # Este diccionario contiene TODAS las traducciones línea por línea.
-# Mantenemos el formato vertical para facilitar la lectura y edición futura.
 
 traducciones = {
     "Español": {
@@ -863,7 +884,7 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
-    /* 9. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ (OPTIMIZADO PERO EXTENDIDO) */
+    /* 9. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ */
     .card-wrapper { 
         transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
@@ -1097,10 +1118,19 @@ with st.sidebar:
     
     st.markdown(f"📧 **{L.get('support_mail', 'Soporte')}: support@airealtypro.com**")
     
-    feedback = st.text_area("", placeholder=L.get("feedback_lbl", "Escribe tu sugerencia o error..."), height=100, label_visibility="collapsed")
+    # Text Area del Feedback
+    fb_text = st.text_area("", placeholder=L.get("feedback_lbl", "Escribe tu sugerencia o error..."), height=100, label_visibility="collapsed", key="fb_input")
     
     if st.button(L.get("feedback_btn", "Enviar"), use_container_width=True):
-        st.toast("✅ Feedback enviado. ¡Gracias!")
+        if fb_text:
+            with st.spinner("Enviando..."):
+                ok = guardar_feedback(st.session_state.email_usuario, fb_text)
+                if ok:
+                    st.toast("✅ Feedback enviado y guardado. ¡Gracias!")
+                else:
+                    st.error("Error al guardar. Verifica la hoja 'Feedback'.")
+        else:
+            st.warning("El mensaje está vacío.")
             
     st.markdown("---")
     st.markdown(f"<div style='text-align:center; color:#666; font-size:0.8rem;'>v2.5 Diamond Edition</div>", unsafe_allow_html=True)
@@ -1140,14 +1170,16 @@ if st.session_state.email_usuario:
 st.markdown(f"<h1 class='neon-title'>{L['title1']} <br><span class='neon-highlight'>{L['title2']}</span></h1>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
-# --- BANNER DE IMÁGENES GLOBAL (SOLUCIÓN A IMÁGENES QUE DESAPARECEN) ---
-# Al estar aquí afuera, se renderiza siempre, logueado o no.
-st.markdown(f'''
-    <div class="video-placeholder">
-        <div class="dynamic-tag">{L["p_destacada"]}</div>
-        <div style="background:rgba(0,0,0,0.6);width:100%;text-align:center;padding:10px;">{L["comunidad"]}</div>
-    </div>
-''', unsafe_allow_html=True)
+# --- BANNER DE IMÁGENES GLOBAL (TAMAÑO NORMAL CORREGIDO) ---
+# Usamos columnas [1,2,1] para centrarlo y que no ocupe todo el ancho
+col_b1, col_b2, col_b3 = st.columns([1, 2, 1])
+with col_b2:
+    st.markdown(f'''
+        <div class="video-placeholder">
+            <div class="dynamic-tag">{L["p_destacada"]}</div>
+            <div style="background:rgba(0,0,0,0.6);width:100%;text-align:center;padding:10px;">{L["comunidad"]}</div>
+        </div>
+    ''', unsafe_allow_html=True)
 
 # ==============================================================================
 # 8. LÓGICA DE NEGOCIO PRINCIPAL
