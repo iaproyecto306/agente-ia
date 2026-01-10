@@ -854,21 +854,22 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
-  /* 9. TARJETAS DE PLANES CON MOVIMIENTO Y COMPACTAS (REEMPLAZO TOTAL) */
+ /* 9. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ */
     .card-wrapper { 
-        transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); 
+        transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
         height: 480px; 
         margin-bottom: 25px;
         position: relative;
+        will-change: transform;
     }
     
     .card-wrapper:hover { 
-        transform: translateY(-15px); 
+        transform: translateY(-10px); 
     }
     
     .glass-container { 
-        background: rgba(38, 39, 48, 0.7); 
+        background: rgba(30, 31, 38, 0.95); 
         border: 1px solid rgba(255, 255, 255, 0.1); 
         border-radius: 12px; 
         padding: 25px; 
@@ -879,11 +880,10 @@ st.markdown("""
         flex-direction: column; 
         justify-content: center; 
         gap: 15px; 
-        backdrop-filter: blur(10px);
     }
     
     .free-card:hover { 
-        box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1); 
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); 
     }
     
     .pro-card { 
@@ -891,8 +891,8 @@ st.markdown("""
     }
     
     .pro-card:hover { 
-        border: 1px solid rgba(0, 210, 255, 0.8) !important;
-        box-shadow: 0 15px 50px rgba(0, 210, 255, 0.4); 
+        border: 1px solid rgba(0, 210, 255, 0.6) !important;
+        box-shadow: 0 10px 30px rgba(0, 210, 255, 0.3); 
     }
     
     .agency-card { 
@@ -900,8 +900,8 @@ st.markdown("""
     }
     
     .agency-card:hover { 
-        border: 1px solid rgba(221, 160, 221, 0.8) !important;
-        box-shadow: 0 15px 50px rgba(221, 160, 221, 0.4); 
+        border: 1px solid rgba(221, 160, 221, 0.6) !important;
+        box-shadow: 0 10px 30px rgba(221, 160, 221, 0.3); 
     }
 
     .popular-badge { 
@@ -916,13 +916,11 @@ st.markdown("""
         font-weight: 900; 
         font-size: 0.85rem; 
         z-index: 10; 
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
-        transition: all 0.3s ease;
+        transition: background 0.2s ease;
     }
 
     .card-wrapper:hover .popular-badge {
         background-color: #fff;
-        box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
     }
     /* 10. TOOLTIPS DE AYUDA */
     .info-icon { 
