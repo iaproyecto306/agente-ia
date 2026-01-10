@@ -117,14 +117,16 @@ if "email_usuario" not in st.session_state: st.session_state.email_usuario = ""
 if "plan_usuario" not in st.session_state: st.session_state.plan_usuario = "Gratis"
 if "es_empleado" not in st.session_state: st.session_state.es_empleado = False
 
-# --- 3. DICCIONARIO MAESTRO ---
+# --- 3. DICCIONARIO MAESTRO ACTUALIZADO ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
         "sub": "La herramienta IA secreta de los agentes top productores.",
         "placeholder": "🏠 Describe la propiedad o escribe instrucciones extra...",
+        "url_placeholder": "🔗 Pega aquí el link de la propiedad (InfoCasas, MercadoLibre, Zillow...)",
         "btn_gen": "✨ GENERAR DESCRIPCIÓN", "p_destacada": "PROPIEDAD DESTACADA",
         "comunidad": "Propiedades de la Comunidad", "popular": "MÁS POPULAR",
+        "plan_title": "Selecciona tu Plan", "annual_toggle": "📅 Ahorrar 20% con Pago Anual",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agencia",
         "desc1": "3 descripciones / día", "t1_1": "Límite diario de generaciones para nuevos usuarios.",
         "desc2": "Soporte Básico", "t1_2": "Ayuda técnica vía email con respuesta en menos de 48hs.",
@@ -150,14 +152,17 @@ traducciones = {
         "foot_desc": "Herramientas de Inteligencia Artificial para Inmuebles.",
         "foot_links": "Términos de Servicio | Política de Privacidad | Soporte",
         "mail_label": "📧 Ingresa tu Email para comenzar", "limit_msg": "🚫 Límite gratuito alcanzado.", "upgrade_msg": "Pásate a PRO para seguir vendiendo.",
-        "lbl_tone": "Tono:", "lbl_lang_out": "Idioma de Salida:"
+        "lbl_tone": "Tono:", "lbl_lang_out": "Idioma de Salida:",
+        "agency_console": "📊 Panel de Control de Agencia", "manage_team": "👥 Gestionar Equipo", "team_activity": "📈 Actividad del Equipo"
     },
     "English": {
         "title1": "Turn Boring Listings into", "title2": "Sales Magnets",
         "sub": "The secret AI tool used by top producing agents.",
         "placeholder": "🏠 Describe the property or add extra instructions...",
+        "url_placeholder": "🔗 Paste property link here (Zillow, Realtor, Redfin...)",
         "btn_gen": "✨ GENERATE DESCRIPTION", "p_destacada": "FEATURED PROPERTY",
         "comunidad": "Community Properties", "popular": "MOST POPULAR",
+        "plan_title": "Select Your Plan", "annual_toggle": "📅 Save 20% with Yearly Payment",
         "plan1": "Starter", "plan2": "Pro Agent", "plan3": "Agency",
         "desc1": "3 descriptions / day", "t1_1": "Daily generation limit for new users.",
         "desc2": "Basic Support", "t1_2": "Technical help via email with response in less than 48 hours.",
@@ -183,16 +188,19 @@ traducciones = {
         "foot_desc": "Artificial Intelligence Tools for Real Estate.",
         "foot_links": "Terms of Service | Privacy Policy | Support",
         "mail_label": "📧 Enter your Email to start", "limit_msg": "🚫 Free limit reached.", "upgrade_msg": "Upgrade to PRO to keep selling.",
-        "lbl_tone": "Tone:", "lbl_lang_out": "Output Language:"
+        "lbl_tone": "Tone:", "lbl_lang_out": "Output Language:",
+        "agency_console": "📊 Agency Management Console", "manage_team": "👥 Manage Team", "team_activity": "📈 Team Activity"
     },
     "Português": {
         "title1": "Transforme Anúncios Tediosos em", "title2": "Ímãs de Vendas",
         "sub": "A ferramenta de IA secreta dos agentes de alto desempenho.",
-        "placeholder": "🏠 Descreva o imóvel ou adicione instrucciones...",
+        "placeholder": "🏠 Descreva o imóvel ou adicione instruções...",
+        "url_placeholder": "🔗 Cole o link do imóvel aqui (Zap, Viva Real...)",
         "btn_gen": "✨ GERAR DESCRIÇÃO", "p_destacada": "IMÓVEL EM DESTAQUE",
         "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
+        "plan_title": "Selecione seu Plano", "annual_toggle": "📅 Economize 20% com Pagamento Anual",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
-        "desc1": "3 descrições / día", "t1_1": "Limite diário de gerações para nuevos usuários.",
+        "desc1": "3 descrições / día", "t1_1": "Limite diário de gerações para novos usuários.",
         "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail com resposta em menos de 48 horas.",
         "desc3": "Marca d'Água", "t1_3": "Os textos incluyen uma pequena menção à nossa plataforma.",
         "desc4": "Gerações Ilimitadas", "t2_1": "Crie quantas descrições precisar, sem restrições.",
@@ -216,14 +224,17 @@ traducciones = {
         "foot_desc": "Ferramentas de Inteligencia Artificial para Imóveis.",
         "foot_links": "Termos de Servicio | Política de Privacidade | Suporte",
         "mail_label": "📧 Insira seu e-mail para começar", "limit_msg": "🚫 Limite grátis atingido.", "upgrade_msg": "Atualize para PRO para continuar vendendo.",
-        "lbl_tone": "Tom:", "lbl_lang_out": "Idioma de saída:"
+        "lbl_tone": "Tom:", "lbl_lang_out": "Idioma de saída:",
+        "agency_console": "📊 Console de Gerenciamento da Agência", "manage_team": "👥 Gerenciar Equipe", "team_activity": "📈 Atividade da Equipe"
     },
     "中文": {
         "title1": "将枯燥的广告转化为", "title2": "销售磁铁",
         "sub": "顶级房产经纪人的秘密人工智能工具。",
         "placeholder": "🏠 描述房产或添加说明...",
+        "url_placeholder": "🔗 在此粘贴房产链接 (安居客, 贝壳...)",
         "btn_gen": "✨ 生成描述", "p_destacada": "精选房产",
         "comunidad": "社区房产", "popular": "最受欢迎",
+        "plan_title": "选择您的方案", "annual_toggle": "📅 年度付款可节省 20%",
         "plan1": "基础版", "plan2": "专业经纪人", "plan3": "机构版",
         "desc1": "每天 3 条描述", "t1_1": "新用户的每日生成限制。",
         "desc2": "基础支持", "t1_2": "通过电子邮件提供技术帮助，48小时内回复。",
@@ -249,14 +260,17 @@ traducciones = {
         "foot_desc": "房地产人工智能工具。",
         "foot_links": "服务条款 | 隐私政策 | 支持",
         "mail_label": "📧 输入邮箱开始", "limit_msg": "🚫 已达到免费限制。", "upgrade_msg": "升级到专业版继续销售。",
-        "lbl_tone": "语气:", "lbl_lang_out": "输出语言:"
+        "lbl_tone": "语气:", "lbl_lang_out": "输出语言:",
+        "agency_console": "📊 机构管理控制台", "manage_team": "👥 管理团队", "team_activity": "📈 团队活动"
     },
     "Français": {
         "title1": "Transformez vos Annonces en", "title2": "Aimants à Ventes",
         "sub": "L'outil IA secret des agents immobiliers les plus performants.",
         "placeholder": "🏠 Décrivez la propriété ou ajoutez des instructions...",
+        "url_placeholder": "🔗 Collez le lien de la propriété ici...",
         "btn_gen": "✨ GÉNÉRER LA DESCRIPTION", "p_destacada": "PROPRIÉTÉ À LA UNE",
         "comunidad": "Propriétés de la Communauté", "popular": "PLUS POPULAIRE",
+        "plan_title": "Choisissez votre Forfait", "annual_toggle": "📅 Économisez 20% avec le Paiement Annuel",
         "plan1": "Initial", "plan2": "Agent Pro", "plan3": "Agence",
         "desc1": "3 descriptions / jour", "t1_1": "Limite quotidienne de générations pour les nouveaux utilisateurs.",
         "desc2": "Support de Base", "t1_2": "Aide technique par e-mail avec réponse en moins de 48 heures.",
@@ -282,14 +296,17 @@ traducciones = {
         "foot_desc": "Outils d'Intelligence Artificielle pour l'Immobilier.",
         "foot_links": "Conditions d'Utilisation | Politique de Confidentialité | Support",
         "mail_label": "📧 Entrez votre email pour commencer", "limit_msg": "🚫 Limite gratuite atteinte.", "upgrade_msg": "Passez à PRO pour continuer à vendre.",
-        "lbl_tone": "Ton:", "lbl_lang_out": "Langue de sortie:"
+        "lbl_tone": "Ton:", "lbl_lang_out": "Langue de sortie:",
+        "agency_console": "📊 Console de Gestion d'Agence", "manage_team": "👥 Gérer l'Équipe", "team_activity": "📈 Activité de l'Équipe"
     },
     "Deutsch": {
         "title1": "Verwandeln Sie Anzeigen in", "title2": "Verkaufsmagnete",
         "sub": "Das geheime KI-Tool der Top-Immobilienmakler.",
         "placeholder": "🏠 Beschreiben Sie die Immobilie oder fügen Sie Anweisungen hinzu...",
+        "url_placeholder": "🔗 Immobilien-Link hier einfügen (Zillow, ImmoScout24...)",
         "btn_gen": "✨ BESCHREIBUNG GENERIEREN", "p_destacada": "TOP-IMMOBILIE",
         "comunidad": "Community-Immobilien", "popular": "AM BELIEBTESTEN",
+        "plan_title": "Wählen Sie Ihren Plan", "annual_toggle": "📅 20% sparen bei jährlicher Zahlung",
         "plan1": "Basis", "plan2": "Pro Makler", "plan3": "Agentur",
         "desc1": "3 Beschreibungen / Tag", "t1_1": "Tägliches Limit für neue Benutzer.",
         "desc2": "Basis-Support", "t1_2": "Technische Hilfe per E-Mail mit Antwort in weniger als 48 Stunden.",
@@ -305,7 +322,7 @@ traducciones = {
         "btn1": "GRATIS REGISTRIEREN", "btn2": "JETZT UPGRADEN", "btn3": "VERTRIEB KONTAKTIEREN",
         "how_title": "Wie funktioniert AI Realty Pro?",
         "step1_t": "Link einfügen", "step1_d": "Oder kurze Beschreibung schreiben.",
-        "step2_t": "KI Analysiert", "step2_d": "Wir optimieren für SEO y Verkauf.",
+        "step2_t": "KI Analysiert", "step2_d": "Wir optimieren für SEO und Verkauf.",
         "step3_t": "Veröffentlichen", "step3_d": "Text kopieren und Kunden gewinnen.",
         "stat1": "Optimierte Anzeigen", "stat2": "Zeit Gespart", "stat3": "More Inquiries",
         "test_title": "Was Experten sagen",
@@ -315,7 +332,8 @@ traducciones = {
         "foot_desc": "Künstliche Intelligenz Tools für Immobilien.",
         "foot_links": "Nutzungsbedingungen | Datenschutzrichtlinie | Support",
         "mail_label": "📧 E-Mail eingeben, um zu starten", "limit_msg": "🚫 Gratis-Limit erreicht.", "upgrade_msg": "Upgrade auf PRO, um weiter zu verkaufen.",
-        "lbl_tone": "Ton:", "lbl_lang_out": "Ausgabesprache:"
+        "lbl_tone": "Ton:", "lbl_lang_out": "Ausgabesprache:",
+        "agency_console": "📊 Agentur-Verwaltungskonsole", "manage_team": "👥 Team Verwalten", "team_activity": "📈 Teamaktivität"
     }
 }
 
