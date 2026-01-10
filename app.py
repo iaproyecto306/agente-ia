@@ -424,7 +424,7 @@ with c2:
     ''', unsafe_allow_html=True)
     st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
     
-    # --- PASO 1: LOGIN (ACTUALIZADO: JEFE Y EMPLEADOS) ---
+    # --- PASO 1: LOGIN (ACTUALIZADO: JEFE AGENCIA Y EMPLEADO PRO) ---
     if not st.session_state.email_usuario:
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
         if st.button("COMENZAR GRATIS / START FREE", type="primary"):
@@ -432,34 +432,41 @@ with c2:
                 df_actual = obtener_datos_db()
                 df_emp = obtener_empleados_db()
                 
-                # BUSCAR SI ES JEFE
+                # CASO 1: ES EL JEFE (EL QUE PAGÓ)
                 if email_input in df_actual['email'].values:
                     usuario = df_actual[df_actual['email'] == email_input].iloc[0]
                     st.session_state.usos = int(usuario['usos'])
                     st.session_state.plan_usuario = usuario['plan'] if 'plan' in usuario else 'Gratis'
-                    st.session_state.email_usuario = email_input
                     st.session_state.es_empleado = False
-                    st.rerun()
-                
-                # BUSCAR SI ES EMPLEADO
-                elif email_input in df_emp['EmployeeEmail'].values:
-                    boss_email = df_emp[df_emp['EmployeeEmail'] == email_input].iloc[0]['BossEmail']
-                    boss_data = df_actual[df_actual['email'] == boss_email].iloc[0]
-                    st.session_state.usos = 0 # O vincular usos del jefe
-                    st.session_state.plan_usuario = boss_data['plan']
                     st.session_state.email_usuario = email_input
-                    st.session_state.es_empleado = True
                     st.rerun()
                 
+                # CASO 2: ES UN EMPLEADO INVITADO
+                elif email_input in df_emp['EmployeeEmail'].values:
+                    jefe_email = df_emp[df_emp['EmployeeEmail'] == email_input].iloc[0]['BossEmail']
+                    datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
+                    
+                    st.session_state.usos = 0 # El empleado tiene sus propios usos
+                    
+                    # LÓGICA CLAVE: Si el jefe es Agencia, el empleado es PRO
+                    if datos_jefe['plan'] == "Agencia":
+                        st.session_state.plan_usuario = "Pro"
+                    else:
+                        st.session_state.plan_usuario = datos_jefe['plan']
+                    
+                    st.session_state.es_empleado = True
+                    st.session_state.email_usuario = email_input
+                    st.session_state.boss_ref = jefe_email # Guardamos quién es su jefe
+                    st.rerun()
+                
+                # CASO 3: USUARIO NUEVO / GRATIS
                 else:
-                    # Usuario nuevo
                     st.session_state.usos = 0
                     st.session_state.plan_usuario = "Gratis"
                     st.session_state.email_usuario = email_input
                     st.rerun()
             else:
                 st.error("Por favor ingresa un email válido.")
-    
     # --- PASO 2: LOGICA DE GENERACIÓN ---
     elif st.session_state.email_usuario:
         
