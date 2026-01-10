@@ -9,6 +9,18 @@ from datetime import datetime
 import urllib.parse
 import time
 import io
+import extra_streamlit_components as stx # <--- NUEVA LIBRERÍA OBLIGATORIA
+
+# ==============================================================================
+# 0. GESTOR DE COOKIES (MEMORIA PERMANENTE)
+# ==============================================================================
+# Esta función permite que la página recuerde al usuario aunque cierre el navegador.
+
+@st.cache_resource(experimental_allow_widgets=True)
+def get_manager():
+    return stx.CookieManager()
+
+cookie_manager = get_manager()
 
 # ==============================================================================
 # 1. MOTOR DE EXTRACCIÓN Y VALIDACIÓN (CEREBRO SCRAPING)
@@ -151,7 +163,7 @@ st.set_page_config(
     page_title="AI Realty Pro Platinum",
     page_icon="🏢",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded" # <--- CAMBIO: Sidebar abierta por defecto
 )
 
 # Inicialización de variables de sesión
@@ -166,6 +178,7 @@ if "last_result" not in st.session_state: st.session_state.last_result = None
 # 4. DICCIONARIO MAESTRO 360° (COMPLETO Y EXPANDIDO)
 # ==============================================================================
 # Este diccionario contiene TODAS las traducciones línea por línea.
+# SE HAN AGREGADO: 'logout', 'welcome', 'usage_bar' a todos los idiomas.
 
 traducciones = {
     "Español": {
@@ -245,7 +258,10 @@ traducciones = {
         "badge_pro": "MIEMBRO PRO",
         "badge_agency": "SOCIO AGENCIA",
         "api_soon": "Acceso API (Próximamente)",
-        "legal_title": "Términos Legales & Privacidad"
+        "legal_title": "Términos Legales & Privacidad",
+        "logout": "Cerrar Sesión",
+        "welcome": "Bienvenido",
+        "usage_bar": "Progreso Diario"
     },
     "English": {
         "title1": "Turn Boring Listings into",
@@ -324,7 +340,10 @@ traducciones = {
         "badge_pro": "PRO MEMBER",
         "badge_agency": "AGENCY PARTNER",
         "api_soon": "API Access (Coming Soon)",
-        "legal_title": "Terms & Privacy"
+        "legal_title": "Terms & Privacy",
+        "logout": "Log Out",
+        "welcome": "Welcome",
+        "usage_bar": "Daily Progress"
     },
     "Português": {
         "title1": "Transforme Anúncios em",
@@ -403,7 +422,10 @@ traducciones = {
         "badge_pro": "MEMBRO PRO",
         "badge_agency": "PARCEIRO AGÊNCIA",
         "api_soon": "API (Em breve)",
-        "legal_title": "Termos e Privacidade"
+        "legal_title": "Termos e Privacidade",
+        "logout": "Sair",
+        "welcome": "Bem-vindo",
+        "usage_bar": "Progresso Diário"
     },
     "Français": {
         "title1": "Transformez vos Annonces",
@@ -482,7 +504,10 @@ traducciones = {
         "badge_pro": "MEMBRE PRO",
         "badge_agency": "PARTENAIRE AGENCE",
         "api_soon": "API (Bientôt)",
-        "legal_title": "Mentions Légales"
+        "legal_title": "Mentions Légales",
+        "logout": "Déconnexion",
+        "welcome": "Bienvenue",
+        "usage_bar": "Progrès Quotidien"
     },
     "Deutsch": {
         "title1": "Verwandeln Sie Anzeigen",
@@ -561,7 +586,10 @@ traducciones = {
         "badge_pro": "PRO MITGLIED",
         "badge_agency": "AGENTUR PARTNER",
         "api_soon": "API (Bald)",
-        "legal_title": "Rechtliches"
+        "legal_title": "Rechtliches",
+        "logout": "Abmelden",
+        "welcome": "Willkommen",
+        "usage_bar": "Täglicher Fortschritt"
     },
     "中文": {
         "title1": "将枯燥的广告",
@@ -640,7 +668,10 @@ traducciones = {
         "badge_pro": "专业会员",
         "badge_agency": "机构伙伴",
         "api_soon": "API (即将推出)",
-        "legal_title": "条款和隐私"
+        "legal_title": "条款和隐私",
+        "logout": "退出",
+        "welcome": "欢迎",
+        "usage_bar": "每日进度"
     }
 }
 
@@ -972,19 +1003,57 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 6. INTERFAZ: CABECERA Y HUD DE IDENTIDAD
+# 6. SIDEBAR PROFESIONAL Y NAVEGACIÓN (NUEVO)
+# ==============================================================================
+# Movemos el selector de idioma y perfil aquí para liberar la pantalla principal.
+
+with st.sidebar:
+    st.markdown('<div style="text-align:center; font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: 1px;">🏢 AI REALTY</div>', unsafe_allow_html=True)
+    st.markdown("---")
+    
+    # Selector de Idioma en Sidebar
+    idioma_selec = st.selectbox("🌐 Idioma / Language", list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
+    st.session_state.idioma = idioma_selec
+    L = traducciones[st.session_state.idioma]
+
+    # Perfil del Usuario y Logout
+    if st.session_state.email_usuario:
+        st.markdown(f"### {L.get('welcome', 'Bienvenido')}")
+        st.markdown(f"**{st.session_state.email_usuario}**")
+        
+        # Barra de Progreso de Usos
+        usos = st.session_state.usos
+        es_pro_local = st.session_state.plan_usuario in ["Pro", "Agencia"]
+        limite = 99999 if es_pro_local else 3
+        
+        st.write(f"{L.get('usage_bar', 'Progreso Diario')}: {usos} / {'∞' if limite > 100 else limite}")
+        
+        if limite < 100:
+            progreso = min(usos / limite, 1.0)
+            st.progress(progreso)
+        else:
+            st.progress(1.0) # Barra llena dorada/azul para Pros
+            
+        st.markdown("---")
+        
+        # BOTÓN LOGOUT (CERRAR SESIÓN)
+        if st.button(f"🚪 {L.get('logout', 'Cerrar Sesión')}"):
+            try:
+                cookie_manager.delete("user_email")
+            except:
+                pass # Si no existe, no falla
+            st.session_state.email_usuario = ""
+            st.session_state.usos = 0
+            st.rerun()
+            
+    st.markdown("---")
+    st.markdown(f"<div style='text-align:center; color:#666; font-size:0.8rem;'>v2.5 Diamond Edition</div>", unsafe_allow_html=True)
+
+# ==============================================================================
+# 7. INTERFAZ: CABECERA Y HUD DE IDENTIDAD
 # ==============================================================================
 
-if "idioma" not in st.session_state: st.session_state.idioma = "Español"
-col_logo, _, col_lang = st.columns([2.5, 4, 1.5])
-with col_logo: st.markdown('<div style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-top:10px; letter-spacing: 1px;">🏢 AI REALTY PRO</div>', unsafe_allow_html=True)
-with col_lang:
-    idioma_selec = st.selectbox("", list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma), label_visibility="collapsed")
-    st.session_state.idioma = idioma_selec
-
-L = traducciones[st.session_state.idioma]
-
-# --- HUD DE IDENTIDAD (DINÁMICO SEGÚN PLAN Y HORA) ---
+# HUD DE IDENTIDAD (DINÁMICO SEGÚN PLAN Y HORA)
 if st.session_state.email_usuario:
     hora = datetime.now().hour
     saludo = "Buenos días" if hora < 12 else "Buenas tardes" if hora < 20 else "Buenas noches"
@@ -1011,24 +1080,44 @@ st.markdown(f"<h1 class='neon-title'>{L['title1']} <br><span class='neon-highlig
 st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
 # ==============================================================================
-# 7. LÓGICA DE NEGOCIO PRINCIPAL (LOGIN & GENERADOR)
+# 8. LÓGICA DE NEGOCIO PRINCIPAL (LOGIN CON COOKIES)
 # ==============================================================================
+
+# --- VERIFICACIÓN DE COOKIE AL INICIO ---
+if not st.session_state.email_usuario:
+    # Intentamos leer la cookie
+    cookie_val = cookie_manager.get("user_email")
+    if cookie_val:
+        # Recuperamos sesión desde Cookie automáticamente
+        st.session_state.email_usuario = cookie_val
+        # Recargamos datos de DB para asegurar plan actualizado
+        df_actual = obtener_datos_db()
+        if cookie_val in df_actual['email'].values:
+            usuario = df_actual[df_actual['email'] == cookie_val].iloc[0]
+            st.session_state.usos = int(usuario['usos'])
+            st.session_state.plan_usuario = usuario['plan']
+        # Forzamos recarga para actualizar interfaz
+        st.rerun()
 
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
-    st.markdown(f'''
-        <div class="video-placeholder">
-            <div class="dynamic-tag">{L["p_destacada"]}</div>
-            <div style="background:rgba(0,0,0,0.6);width:100%;text-align:center;padding:10px;">{L["comunidad"]}</div>
-        </div>
-    ''', unsafe_allow_html=True)
-    st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
-    
-    # --- SISTEMA DE LOGIN CON HERENCIA (PUNTO CRÍTICO) ---
+    # --- PANTALLA DE LOGIN (SI NO HAY COOKIE) ---
     if not st.session_state.email_usuario:
+        st.markdown(f'''
+            <div class="video-placeholder">
+                <div class="dynamic-tag">{L["p_destacada"]}</div>
+                <div style="background:rgba(0,0,0,0.6);width:100%;text-align:center;padding:10px;">{L["comunidad"]}</div>
+            </div>
+        ''', unsafe_allow_html=True)
+        st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
+        
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
         if st.button("COMENZAR / START", type="primary"):
             if email_input and "@" in email_input:
+                
+                # GUARDAR COOKIE (Expira en 1 año)
+                cookie_manager.set("user_email", email_input, expires_at=datetime.now().replace(year=datetime.now().year + 1))
+                
                 df_actual = obtener_datos_db()
                 df_emp = obtener_empleados_db()
                 
@@ -1039,6 +1128,7 @@ with c2:
                     st.session_state.plan_usuario = usuario['plan'] if 'plan' in usuario else 'Gratis'
                     st.session_state.es_empleado = False
                     st.session_state.email_usuario = email_input
+                    time.sleep(1) # Tiempo técnico para asentar la cookie
                     st.rerun()
                 
                 # ESCENARIO 2: ES EMPLEADO (HERENCIA DE PLAN)
@@ -1052,6 +1142,7 @@ with c2:
                     st.session_state.es_empleado = True
                     st.session_state.email_usuario = email_input
                     st.session_state.boss_ref = jefe_email
+                    time.sleep(1)
                     st.rerun()
                 
                 # ESCENARIO 3: USUARIO NUEVO
@@ -1059,9 +1150,11 @@ with c2:
                     st.session_state.usos = 0
                     st.session_state.plan_usuario = "Gratis"
                     st.session_state.email_usuario = email_input
+                    time.sleep(1)
                     st.rerun()
             else:
                 st.error("Por favor, ingresa un email válido.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # --- MOTOR DE GENERACIÓN IA PLATINUM (TRIPLE RESULTADO) ---
     elif st.session_state.email_usuario:
@@ -1069,6 +1162,7 @@ with c2:
         limite_usos = 99999 if es_pro else 3
         
         if st.session_state.usos < limite_usos:
+            st.markdown('<div class="glass-container" style="height:auto;">', unsafe_allow_html=True)
             # Inputs Pro (Tono e Idioma)
             col_t1, col_t2 = st.columns(2)
             with col_t1: 
@@ -1128,6 +1222,7 @@ with c2:
                             st.rerun()
                 else:
                     st.warning("Ingresa un link o texto para comenzar.")
+            st.markdown('</div>', unsafe_allow_html=True)
             
             # VISUALIZACIÓN DE RESULTADOS Y HERRAMIENTAS
             if st.session_state.last_result:
@@ -1176,10 +1271,8 @@ with c2:
             paypal_bloqueo = f"""<div id="pb"></div><script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script><script>paypal.Buttons({{style:{{shape:'pill',color:'blue',layout:'horizontal',label:'subscribe'}},createSubscription:function(d,a){{return a.subscription.create({{'plan_id':'P-3P2657040E401734NNFQQ5TY','custom_id':'{st.session_state.email_usuario}'}});}}}}).render('#pb');</script>"""
             components.html(paypal_bloqueo, height=100)
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
 # ==============================================================================
-# 8. CONSOLA DE AGENCIA (REVOCAR & GESTIÓN DE EQUIPO)
+# 9. CONSOLA DE AGENCIA (REVOCAR & GESTIÓN DE EQUIPO)
 # ==============================================================================
 
 if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_empleado:
@@ -1219,7 +1312,7 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
                 st.rerun()
 
 # ==============================================================================
-# 9. SECCIÓN INFORMATIVA Y PLANES
+# 10. SECCIÓN INFORMATIVA Y PLANES
 # ==============================================================================
 
 st.markdown(f"<br><br><h2 style='text-align:center; color:white;'>{L['how_title']}</h2>", unsafe_allow_html=True)
@@ -1275,14 +1368,7 @@ with col3:
     pay_age = f"""<div id="pp-age"></div><script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script><script>paypal.Buttons({{style:{{shape:'pill',color:'blue',layout:'vertical',label:'subscribe'}},createSubscription:function(d,a){{return a.subscription.create({{'plan_id':'{id_age}','custom_id':'{st.session_state.email_usuario}'}});}}}}).render('#pp-age');</script>"""
     components.html(pay_age, height=150)
 
-# --- TESTIMONIOS Y FOOTER ---
-st.markdown(f"<br><br><h2 style='text-align:center; color:white;'>{L['test_title']}</h2>", unsafe_allow_html=True)
-ct1, ct2, ct3 = st.columns(3)
-ts = '<div style="padding:20px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); height:180px;"><p style="font-style:italic; color:#ddd; font-size:0.9rem;">"{t}"</p><p style="color:#00d2ff; font-weight:bold; margin-top:15px;">- {a}</p></div>'
-with ct1: st.markdown(ts.format(t=L['test1_txt'], a=L['test1_au']), unsafe_allow_html=True)
-with ct2: st.markdown(ts.format(t=L['test2_txt'], a=L['test2_au']), unsafe_allow_html=True)
-with ct3: st.markdown(ts.format(t=L['test3_txt'], a=L['test3_au']), unsafe_allow_html=True)
-
+# --- FOOTER LEGAL ---
 st.markdown(f'<div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;"><div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 AI REALTY PRO</div><p style="color:#666; font-size:0.8rem;">© 2026 IA Realty Pro - {L["foot_desc"]}</p></div>', unsafe_allow_html=True)
 with st.expander(f"⚖️ {L.get('legal_title', 'Términos Legales')}"):
     st.write("1. No guardamos datos de tarjeta de crédito (procesado por PayPal).")
