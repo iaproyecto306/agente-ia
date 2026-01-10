@@ -1383,7 +1383,7 @@ with c2:
                             Al final del texto añade obligatoriamente: "Generado por AI Realty Pro - Versión Gratuita"
                             """
 
-                        prompt_base = f"""
+                       prompt_base = f"""
                         ACTÚA COMO: El mejor Copywriter Inmobiliario del mundo y experto en ventas.
                         IDIOMA SALIDA: {idioma_salida}. 
                         
@@ -1391,9 +1391,19 @@ with c2:
                         
                         {instrucciones_variedad}
                         
-                        DATOS DEL INMUEBLE: 
+                        DATOS DEL INMUEBLE (EXTRAÍDOS DE LA WEB): 
+                        --- COMIENZO DATOS ---
                         {datos_web} 
+                        --- FIN DATOS ---
+                        
+                        DATOS ADICIONALES DEL USUARIO:
                         {user_input}
+                        
+                        REGLA DE SEGURIDAD CRÍTICA:
+                        1. Si los "DATOS DEL INMUEBLE" dicen "Access Denied", "Captcha", "Error" o están vacíos, y el usuario NO puso nada en "DATOS ADICIONALES":
+                           NO INVENTES DATOS. NO ALUCINES.
+                           Tu respuesta debe ser únicamente: "⚠️ No pude leer el link automáticamente por seguridad del portal. Por favor, copia y pega la descripción del inmueble en la caja de texto."
+                        2. Si tienes datos parciales, úsalos para VENDER.
                         
                         INSTRUCCIONES DE SALIDA:
                         {instrucciones_plan}
