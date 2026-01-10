@@ -4,4 +4,4 @@ pandas
 streamlit
 openai
 st-gsheets-connection
-
+extra-streamlit-components
