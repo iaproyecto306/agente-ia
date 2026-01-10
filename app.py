@@ -1084,10 +1084,9 @@ st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
 # --- VERIFICACIÓN DE COOKIE AL INICIO ---
 if not st.session_state.email_usuario:
-    # Intentamos leer la cookie
+    # Intentamos obtener cookies sin forzar el caché
     cookie_val = cookie_manager.get("user_email")
     if cookie_val:
-        # Recuperamos sesión desde Cookie automáticamente
         st.session_state.email_usuario = cookie_val
         # Recargamos datos de DB para asegurar plan actualizado
         df_actual = obtener_datos_db()
