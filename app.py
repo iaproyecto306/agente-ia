@@ -12,15 +12,12 @@ import io
 import extra_streamlit_components as stx # <--- NUEVA LIBRERÍA OBLIGATORIA
 
 # ==============================================================================
-# 0. GESTOR DE COOKIES (MEMORIA PERMANENTE)
+# 0. GESTOR DE COOKIES (INICIALIZACIÓN SEGURA)
 # ==============================================================================
+if "cookie_manager" not in st.session_state:
+    st.session_state.cookie_manager = stx.CookieManager()
 
-# No usamos decorador @st.cache_resource para evitar conflictos de widgets
-def get_manager():
-    return stx.CookieManager()
-
-cookie_manager = get_manager()
-
+cookie_manager = st.session_state.cookie_manager
 # ==============================================================================
 # 1. MOTOR DE EXTRACCIÓN Y VALIDACIÓN (CEREBRO SCRAPING)
 # ==============================================================================
