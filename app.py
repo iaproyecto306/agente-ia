@@ -188,11 +188,11 @@ traducciones = {
     "Português": {
         "title1": "Transforme Anúncios Tediosos em", "title2": "Ímãs de Vendas",
         "sub": "A ferramenta de IA secreta dos agentes de alto desempenho.",
-        "placeholder": "🏠 Descreva o imóvel ou adicione instruções...",
+        "placeholder": "🏠 Descreva o imóvel ou adicione instrucciones...",
         "btn_gen": "✨ GERAR DESCRIÇÃO", "p_destacada": "IMÓVEL EM DESTAQUE",
         "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
-        "desc1": "3 descrições / día", "t1_1": "Limite diário de gerações para novos usuários.",
+        "desc1": "3 descrições / día", "t1_1": "Limite diário de gerações para nuevos usuários.",
         "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail com resposta em menos de 48 horas.",
         "desc3": "Marca d'Água", "t1_3": "Os textos incluyen uma pequena menção à nossa plataforma.",
         "desc4": "Gerações Ilimitadas", "t2_1": "Crie quantas descrições precisar, sem restrições.",
@@ -305,7 +305,7 @@ traducciones = {
         "btn1": "GRATIS REGISTRIEREN", "btn2": "JETZT UPGRADEN", "btn3": "VERTRIEB KONTAKTIEREN",
         "how_title": "Wie funktioniert AI Realty Pro?",
         "step1_t": "Link einfügen", "step1_d": "Oder kurze Beschreibung schreiben.",
-        "step2_t": "KI Analysiert", "step2_d": "Wir optimieren für SEO und Verkauf.",
+        "step2_t": "KI Analysiert", "step2_d": "Wir optimieren für SEO y Verkauf.",
         "step3_t": "Veröffentlichen", "step3_d": "Text kopieren und Kunden gewinnen.",
         "stat1": "Optimierte Anzeigen", "stat2": "Zeit Gespart", "stat3": "More Inquiries",
         "test_title": "Was Experten sagen",
@@ -327,18 +327,18 @@ st.markdown("""
     .neon-highlight { color: #00d2ff; text-shadow: 0 0 40px rgba(0, 210, 255, 0.8); }
     .subtitle { text-align: center; font-size: 1.2rem; color: #aaa; margin-bottom: 40px; }
 
-    /* CAJA DE RESULTADO ELEGANTE (SIN FORMATO CÓDIGO) */
+    /* CAJA DE RESULTADO DARK PREMIUM (ACTUALIZADO) */
     .result-container {
-        background-color: #f8f9fa;
-        color: #1a1a1a;
+        background-color: #1a1c23;
+        color: #e0e0e0;
         padding: 25px;
         border-radius: 12px;
-        border-left: 5px solid #00d2ff;
+        border: 1px solid rgba(0, 210, 255, 0.3);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1.1rem;
         line-height: 1.6;
         margin-top: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
     /* BOTÓN GENERAR */
@@ -436,7 +436,7 @@ with c2:
                 if email_input in df_actual['email'].values:
                     usuario = df_actual[df_actual['email'] == email_input].iloc[0]
                     st.session_state.usos = int(usuario['usos'])
-                    st.session_state.plan_usuario = usuario['plan'] if 'plan' in usuario else 'Gratis'
+                    st.session_state.plan_usuario = str(usuario['plan']).strip().capitalize() if 'plan' in usuario else 'Gratis'
                     st.session_state.es_empleado = False
                     st.session_state.email_usuario = email_input
                     st.rerun()
@@ -449,10 +449,11 @@ with c2:
                     st.session_state.usos = 0 # El empleado tiene sus propios usos
                     
                     # LÓGICA CLAVE: Si el jefe es Agencia, el empleado es PRO
-                    if datos_jefe['plan'] == "Agencia":
+                    plan_jefe = str(datos_jefe['plan']).strip().capitalize()
+                    if plan_jefe == "Agencia":
                         st.session_state.plan_usuario = "Pro"
                     else:
-                        st.session_state.plan_usuario = datos_jefe['plan']
+                        st.session_state.plan_usuario = plan_jefe
                     
                     st.session_state.es_empleado = True
                     st.session_state.email_usuario = email_input
@@ -470,11 +471,23 @@ with c2:
     # --- PASO 2: LOGICA DE GENERACIÓN ---
     elif st.session_state.email_usuario:
         
-        # DEFINICIÓN DE LÍMITES POR PLAN
-        es_pro = st.session_state.plan_usuario in ["Pro", "Agencia"]
-        limite_usos = 99999 if es_pro else 3 # Generaciones Ilimitadas para Pro/Agencia
+        # DEFINICIÓN DE LÍMITES POR PLAN (NORMALIZADO)
+        plan_actual_norm = str(st.session_state.plan_usuario).strip().capitalize()
+        es_pago = plan_actual_norm in ["Pro", "Agencia"]
+        limite_usos = 99999 if es_pago else 3 
         
-        if st.session_state.usos < limite_usos:
+        # VARIABLE DE CONTROL PARA MOSTRAR HERRAMIENTA O PAYWALL
+        mostrar_herramienta = False
+        mostrar_paywall = False
+
+        if es_pago:
+            mostrar_herramienta = True
+        elif st.session_state.usos < limite_usos:
+            mostrar_herramienta = True
+        else:
+            mostrar_paywall = True
+
+        if mostrar_herramienta:
             # Inputs adicionales para PRO (SEO y Tono)
             col_t1, col_t2 = st.columns(2)
             with col_t1:
@@ -524,16 +537,16 @@ with c2:
                             
                             st.success("¡Generado con éxito!")
                             
-                            # MUESTRA EL TEXTO CON DISEÑO LIMPIO (FUERA DE ST.CODE)
+                            # MUESTRA EL TEXTO CON DISEÑO DARK PREMIUM
                             st.markdown(f'<div class="result-container">{resultado.replace("\n", "<br>")}</div>', unsafe_allow_html=True)
                             
                             # BOTÓN DE COPIAR VISIBLE Y PROFESIONAL
-                            if st.button("📋 COPY DESCRIPTION"):
+                            if st.button("📋 COPY DESCRIPTION", use_container_width=True):
                                 st.copy_to_clipboard(resultado)
                                 st.toast("Description copied to clipboard!")
                             
                             # --- PACK REDES SOCIALES (Solo PRO/AGENCIA) ---
-                            if es_pro:
+                            if es_pago:
                                 st.markdown("---")
                                 st.markdown("### 📱 Social Media Pack (Pro)")
                                 with st.spinner("Generando contenido para redes..."):
@@ -545,19 +558,19 @@ with c2:
                                     """
                                     resultado_social = generar_texto(prompt_social)
                                     st.markdown(f'<div class="result-container">{resultado_social.replace("\n", "<br>")}</div>', unsafe_allow_html=True)
-                                    if st.button("📋 COPY SOCIAL MEDIA PACK"):
+                                    if st.button("📋 COPY SOCIAL MEDIA PACK", use_container_width=True):
                                         st.copy_to_clipboard(resultado_social)
                                         st.toast("Social Pack copied!")
                             
-                            if not es_pro:
+                            if not es_pago:
                                 st.info(f"Usos restantes: {3 - st.session_state.usos}")
                         else:
                             st.error("Error de conexión.")
                 else:
                     st.warning("Por favor, ingresa un link o escribe detalles.")
 
-           # --- PANEL DE AGENCIA: GESTIÓN Y MONITORIZACIÓN ---
-            if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_empleado:
+            # --- PANEL DE AGENCIA: GESTIÓN Y MONITORIZACIÓN ---
+            if plan_actual_norm == "Agencia" and not st.session_state.es_empleado:
                 st.divider()
                 st.subheader("📊 Agency Management Console")
                 
@@ -567,7 +580,6 @@ with c2:
                 with tab_team:
                     st.write("Invite up to 4 agents to your professional account:")
                     df_employees = obtener_empleados_db()
-                    # Definimos la variable correctamente aquí
                     current_team = df_employees[df_employees['BossEmail'] == st.session_state.email_usuario]['EmployeeEmail'].tolist()
                     
                     e_col1, e_col2 = st.columns([3, 1])
@@ -590,7 +602,6 @@ with c2:
                     
                     if current_team:
                         st.write("**Active Agents:**")
-                        # CORRECCIÓN: Ahora usamos current_team que es la variable definida arriba
                         for m in current_team: 
                             st.text(f"• {m}")
 
@@ -615,11 +626,13 @@ with c2:
                             st.info("No activity recorded from your team yet.")
                     except:
                         st.warning("History log not accessible. Make sure 'Historial' sheet exists.")
-            # --- PASO 3: BLOQUEO (PAYWALL) ---
+
+        # --- PASO 3: BLOQUEO (PAYWALL) ---
+        if mostrar_paywall:
             st.error(L["limit_msg"])
             st.markdown(f"#### {L['upgrade_msg']}")
             
-           # Botón de PayPal INTELIGENTE
+            # Botón de PayPal INTELIGENTE
             paypal_bloqueo = f"""
             <div id="paypal-bloqueo-container"></div>
             <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
@@ -629,13 +642,13 @@ with c2:
                   createSubscription: function(data, actions) {{
                     return actions.subscription.create({{
                       'plan_id': 'P-3P2657040E401734NNFQQ5TY',
-                      'custom_id': '{st.session_state.email_usuario}'
+                      'custom_id': '{st.session_state.email_usuario}' 
                     }});
                   }}
               }}).render('#paypal-bloqueo-container');
             </script>
             """
-            components.html(paypal_bloqueo, height=100)
+            components.html(paypal_bloqueo, height=150)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
