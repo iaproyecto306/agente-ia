@@ -9,15 +9,19 @@ from datetime import datetime
 import urllib.parse
 import time
 import io
-import extra_streamlit_components as stx # <--- NUEVA LIBRERÍA OBLIGATORIA
+import extra_streamlit_components as stx 
 
 # ==============================================================================
-# 0. GESTOR DE COOKIES (INICIALIZACIÓN SEGURA)
+# 0. GESTOR DE COOKIES (MEMORIA PERMANENTE - ARQUITECTURA SEGURA)
 # ==============================================================================
+# Esta sección maneja la persistencia para que el usuario no tenga que loguearse
+# cada vez que recarga la página. Se usa session_state como puente.
+
 if "cookie_manager" not in st.session_state:
     st.session_state.cookie_manager = stx.CookieManager()
 
 cookie_manager = st.session_state.cookie_manager
+
 # ==============================================================================
 # 1. MOTOR DE EXTRACCIÓN Y VALIDACIÓN (CEREBRO SCRAPING)
 # ==============================================================================
@@ -159,7 +163,7 @@ st.set_page_config(
     page_title="AI Realty Pro Platinum",
     page_icon="🏢",
     layout="wide",
-    initial_sidebar_state="expanded" # <--- CAMBIO: Sidebar abierta por defecto
+    initial_sidebar_state="expanded" # Sidebar abierta por defecto para mostrar soporte
 )
 
 # Inicialización de variables de sesión
@@ -174,7 +178,7 @@ if "last_result" not in st.session_state: st.session_state.last_result = None
 # 4. DICCIONARIO MAESTRO 360° (COMPLETO Y EXPANDIDO)
 # ==============================================================================
 # Este diccionario contiene TODAS las traducciones línea por línea.
-# SE HAN AGREGADO: 'logout', 'welcome', 'usage_bar' a todos los idiomas.
+# Mantenemos el formato vertical para facilitar la lectura y edición futura.
 
 traducciones = {
     "Español": {
@@ -257,7 +261,10 @@ traducciones = {
         "legal_title": "Términos Legales & Privacidad",
         "logout": "Cerrar Sesión",
         "welcome": "Bienvenido",
-        "usage_bar": "Progreso Diario"
+        "usage_bar": "Progreso Diario",
+        "feedback_lbl": "💡 Sugerencias / Soporte",
+        "feedback_btn": "Enviar Comentario",
+        "support_mail": "Soporte"
     },
     "English": {
         "title1": "Turn Boring Listings into",
@@ -339,7 +346,10 @@ traducciones = {
         "legal_title": "Terms & Privacy",
         "logout": "Log Out",
         "welcome": "Welcome",
-        "usage_bar": "Daily Progress"
+        "usage_bar": "Daily Progress",
+        "feedback_lbl": "💡 Feedback / Support",
+        "feedback_btn": "Send Feedback",
+        "support_mail": "Support"
     },
     "Português": {
         "title1": "Transforme Anúncios em",
@@ -421,7 +431,10 @@ traducciones = {
         "legal_title": "Termos e Privacidade",
         "logout": "Sair",
         "welcome": "Bem-vindo",
-        "usage_bar": "Progresso Diário"
+        "usage_bar": "Progresso Diário",
+        "feedback_lbl": "💡 Sugestões / Suporte",
+        "feedback_btn": "Enviar",
+        "support_mail": "Suporte"
     },
     "Français": {
         "title1": "Transformez vos Annonces",
@@ -503,7 +516,10 @@ traducciones = {
         "legal_title": "Mentions Légales",
         "logout": "Déconnexion",
         "welcome": "Bienvenue",
-        "usage_bar": "Progrès Quotidien"
+        "usage_bar": "Progrès Quotidien",
+        "feedback_lbl": "💡 Suggestions / Support",
+        "feedback_btn": "Envoyer",
+        "support_mail": "Support"
     },
     "Deutsch": {
         "title1": "Verwandeln Sie Anzeigen",
@@ -585,7 +601,10 @@ traducciones = {
         "legal_title": "Rechtliches",
         "logout": "Abmelden",
         "welcome": "Willkommen",
-        "usage_bar": "Täglicher Fortschritt"
+        "usage_bar": "Täglicher Fortschritt",
+        "feedback_lbl": "💡 Vorschläge / Support",
+        "feedback_btn": "Senden",
+        "support_mail": "Support"
     },
     "中文": {
         "title1": "将枯燥的广告",
@@ -667,7 +686,10 @@ traducciones = {
         "legal_title": "条款和隐私",
         "logout": "退出",
         "welcome": "欢迎",
-        "usage_bar": "每日进度"
+        "usage_bar": "每日进度",
+        "feedback_lbl": "💡 反馈 / 支持",
+        "feedback_btn": "发送反馈",
+        "support_mail": "支持"
     }
 }
 
@@ -1001,7 +1023,6 @@ st.markdown("""
 # ==============================================================================
 # 6. SIDEBAR PROFESIONAL Y NAVEGACIÓN (NUEVO)
 # ==============================================================================
-# Movemos el selector de idioma y perfil aquí para liberar la pantalla principal.
 
 with st.sidebar:
     st.markdown('<div style="text-align:center; font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: 1px;">🏢 AI REALTY</div>', unsafe_allow_html=True)
@@ -1041,6 +1062,18 @@ with st.sidebar:
             st.session_state.email_usuario = ""
             st.session_state.usos = 0
             st.rerun()
+
+    # --- ZONA DE SOPORTE & FEEDBACK (NUEVO) ---
+    st.markdown("---")
+    st.subheader(L.get("feedback_lbl", "💡 Ayuda / Soporte"))
+    
+    st.markdown(f"📧 **{L.get('support_mail', 'Soporte')}: support@airealtypro.com**")
+    
+    feedback = st.text_area("", placeholder=L.get("feedback_lbl", "Escribe tu sugerencia o error..."), height=100, label_visibility="collapsed")
+    
+    if st.button(L.get("feedback_btn", "Enviar"), use_container_width=True):
+        st.toast("✅ Feedback enviado. ¡Gracias!")
+        # Aquí podrías conectar a la DB para guardar feedback si quisieras
             
     st.markdown("---")
     st.markdown(f"<div style='text-align:center; color:#666; font-size:0.8rem;'>v2.5 Diamond Edition</div>", unsafe_allow_html=True)
@@ -1048,6 +1081,11 @@ with st.sidebar:
 # ==============================================================================
 # 7. INTERFAZ: CABECERA Y HUD DE IDENTIDAD
 # ==============================================================================
+
+# RESTAURACIÓN DEL TÍTULO PRINCIPAL EN PANTALLA (COMO PEDISTE)
+col_logo, _, col_lang = st.columns([2.5, 4, 1.5])
+with col_logo:
+    st.markdown('<div style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-top:10px; letter-spacing: 1px;">🏢 AI REALTY PRO</div>', unsafe_allow_html=True)
 
 # HUD DE IDENTIDAD (DINÁMICO SEGÚN PLAN Y HORA)
 if st.session_state.email_usuario:
@@ -1081,9 +1119,10 @@ st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
 # --- VERIFICACIÓN DE COOKIE AL INICIO ---
 if not st.session_state.email_usuario:
-    # Intentamos obtener cookies sin forzar el caché
+    # Intentamos leer la cookie
     cookie_val = cookie_manager.get("user_email")
     if cookie_val:
+        # Recuperamos sesión desde Cookie automáticamente
         st.session_state.email_usuario = cookie_val
         # Recargamos datos de DB para asegurar plan actualizado
         df_actual = obtener_datos_db()
@@ -1107,26 +1146,34 @@ with c2:
         st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
         
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
-       if st.button("COMENZAR / START", type="primary"):
+        if st.button("COMENZAR / START", type="primary"):
             if email_input and "@" in email_input:
                 
-                # 1. Intentar guardar la cookie
+                # 1. Guardar email en el estado actual para acceso inmediato
+                st.session_state.email_usuario = email_input
+                
+                # 2. Intentar guardar cookie de fondo
                 try:
                     cookie_manager.set("user_email", email_input, expires_at=datetime.now().replace(year=datetime.now().year + 1))
                 except:
-                    pass # Evita que el error de widget bloquee el login
+                    pass
                 
-                # 2. Cargar datos de la base de datos inmediatamente
+                # 3. Cargar datos de la base de datos inmediatamente
                 df_actual = obtener_datos_db()
                 df_emp = obtener_empleados_db()
-                
-                # 3. Asignar al session_state ANTES del rerun
-                st.session_state.email_usuario = email_input
                 
                 if email_input in df_actual['email'].values:
                     usuario = df_actual[df_actual['email'] == email_input].iloc[0]
                     st.session_state.usos = int(usuario['usos'])
-                    st.session_state.plan_usuario = usuario['plan']
+                    st.session_state.plan_usuario = usuario['plan'] if 'plan' in usuario else 'Gratis'
+                    st.session_state.es_empleado = False
+                elif email_input in df_emp['EmployeeEmail'].values:
+                    jefe_email = df_emp[df_emp['EmployeeEmail'] == email_input].iloc[0]['BossEmail']
+                    datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
+                    st.session_state.usos = 0
+                    st.session_state.plan_usuario = "Pro" if datos_jefe['plan'] == "Agencia" else datos_jefe['plan']
+                    st.session_state.es_empleado = True
+                    st.session_state.boss_ref = jefe_email
                 else:
                     st.session_state.usos = 0
                     st.session_state.plan_usuario = "Gratis"
@@ -1134,6 +1181,9 @@ with c2:
                 # 4. Pequeña pausa para asegurar la persistencia y refrescar
                 time.sleep(0.5)
                 st.rerun()
+            else:
+                st.error("Por favor, ingresa un email válido.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # --- MOTOR DE GENERACIÓN IA PLATINUM (TRIPLE RESULTADO) ---
     elif st.session_state.email_usuario:
