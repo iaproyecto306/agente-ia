@@ -549,38 +549,62 @@ with c2:
                 else:
                     st.warning("Por favor, ingresa un link o escribe detalles.")
 
-            # --- INCISIÓN: PANEL DE GESTIÓN DE EQUIPO (SOLO AGENCIA - SOLO JEFE) ---
+           # --- PANEL DE AGENCIA: GESTIÓN Y MONITORIZACIÓN ---
             if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_empleado:
                 st.divider()
-                with st.expander("👥 Team Management (Agency Plan)"):
-                    st.write("Add up to 4 team members to your agency account:")
+                st.subheader("📊 Agency Management Console")
+                
+                # Creamos dos pestañas dentro del panel de agencia
+                tab_team, tab_activity = st.tabs(["👥 Manage Team", "📈 Team Activity"])
+                
+                with tab_team:
+                    st.write("Invite up to 4 agents to your professional account:")
                     df_employees = obtener_empleados_db()
                     current_team = df_employees[df_employees['BossEmail'] == st.session_state.email_usuario]['EmployeeEmail'].tolist()
                     
                     e_col1, e_col2 = st.columns([3, 1])
                     with e_col1:
-                        new_member = st.text_input("Member Email", placeholder="agent@agency.com", key="new_mem_email")
+                        nuevo_e = st.text_input("New Member Email", key="new_emp_input", placeholder="agent@youragency.com")
                     with e_col2:
-                        st.write(" ") # Alineación
-                        if st.button("ADD"):
+                        st.write(" ") # Espacio para alinear el botón
+                        if st.button("ADD MEMBER"):
                             if len(current_team) < 4:
-                                if new_member and "@" in new_member:
-                                    # GUARDAR EN EXCEL
-                                    new_row = pd.DataFrame({"BossEmail": [st.session_state.email_usuario], "EmployeeEmail": [new_member]})
+                                if nuevo_e and "@" in nuevo_e:
+                                    # Guardamos en la hoja Employees
+                                    new_row = pd.DataFrame({"BossEmail": [st.session_state.email_usuario], "EmployeeEmail": [nuevo_e]})
                                     conn.update(worksheet="Employees", data=pd.concat([df_employees, new_row], ignore_index=True))
-                                    st.success("Member added!")
+                                    st.success(f"Success! {nuevo_e} can now log in.")
                                     st.rerun()
                                 else:
-                                    st.error("Invalid email.")
+                                    st.error("Please enter a valid email.")
                             else:
-                                st.warning("Limit reached (4 members max).")
+                                st.warning("Team limit reached (Max 4 members).")
                     
                     if current_team:
-                        st.write("**Your Team Members:**")
-                        for member in current_team:
-                            st.text(f"• {member}")
+                        st.write("**Active Agents:**")
+                        for m in mis_emp: st.text(f"• {m}")
 
-        else:
+                with tab_activity:
+                    st.write("Monitor the descriptions your team is generating:")
+                    try:
+                        # Leemos el historial completo
+                        df_historial = conn.read(worksheet="Historial", ttl=0)
+                        
+                        # Filtramos para mostrar solo los mails del equipo de este jefe
+                        lista_equipo = current_team + [st.session_state.email_usuario]
+                        actividad_equipo = df_historial[df_historial['email'].isin(lista_equipo)]
+                        
+                        if not actividad_equipo.empty:
+                            # Mostramos la tabla formateada
+                            st.dataframe(
+                                actividad_equipo.sort_values(by='fecha', ascending=False), 
+                                use_container_width=True,
+                                column_order=("fecha", "email", "input", "output")
+                            )
+                        else:
+                            st.info("No activity recorded from your team yet.")
+                    except:
+                        st.warning("History log not accessible. Make sure 'Historial' sheet exists.")
             # --- PASO 3: BLOQUEO (PAYWALL) ---
             st.error(L["limit_msg"])
             st.markdown(f"#### {L['upgrade_msg']}")
