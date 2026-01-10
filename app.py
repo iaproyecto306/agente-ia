@@ -854,12 +854,17 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
-   /* 9. TARJETAS DE PLANES RESPONSIVAS (VERSION COMPACTA) */
+  /* 9. TARJETAS DE PLANES CON MOVIMIENTO Y COMPACTAS (REEMPLAZO TOTAL) */
     .card-wrapper { 
-        transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); 
+        transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); 
         border-radius: 12px; 
-        height: 480px; /* Reducido de 600px a 480px */
+        height: 480px; 
         margin-bottom: 25px;
+        position: relative;
+    }
+    
+    .card-wrapper:hover { 
+        transform: translateY(-15px); 
     }
     
     .glass-container { 
@@ -872,42 +877,53 @@ st.markdown("""
         height: 100%; 
         display: flex; 
         flex-direction: column; 
-        justify-content: center; /* Cambiado de space-between a center para quitar el espacio al pedo */
-        gap: 15px; /* Esto mantiene los elementos unidos pero con aire elegante */
-    }
-
-    /* Ajuste para que la lista de features no se pegue al precio */
-    .feature-list { 
-        text-align: left; 
-        margin: 10px auto; 
-        display: inline-block; 
-        font-size: 0.95rem; 
-        color: #ddd; 
-        line-height: 1.8; /* Un poco más compacto */
+        justify-content: center; 
+        gap: 15px; 
+        backdrop-filter: blur(10px);
     }
     
-    .free-card { 
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.03); 
+    .free-card:hover { 
+        box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1); 
     }
     
     .pro-card { 
-        border: 1px solid rgba(0, 210, 255, 0.4) !important; 
-        box-shadow: 0 0 25px rgba(0, 210, 255, 0.15); 
+        border: 1px solid rgba(0, 210, 255, 0.3) !important; 
     }
     
     .pro-card:hover { 
-        box-shadow: 0 15px 60px rgba(0, 210, 255, 0.5); 
+        border: 1px solid rgba(0, 210, 255, 0.8) !important;
+        box-shadow: 0 15px 50px rgba(0, 210, 255, 0.4); 
     }
     
     .agency-card { 
-        border: 1px solid rgba(221, 160, 221, 0.4) !important; 
-        box-shadow: 0 0 25px rgba(221, 160, 221, 0.15); 
+        border: 1px solid rgba(221, 160, 221, 0.3) !important; 
     }
     
     .agency-card:hover { 
-        box-shadow: 0 15px 60px rgba(221, 160, 221, 0.5); 
+        border: 1px solid rgba(221, 160, 221, 0.8) !important;
+        box-shadow: 0 15px 50px rgba(221, 160, 221, 0.4); 
     }
 
+    .popular-badge { 
+        position: absolute; 
+        top: -12px; 
+        left: 50%; 
+        transform: translateX(-50%); 
+        background-color: #00d2ff; 
+        color: black; 
+        padding: 6px 18px; 
+        border-radius: 20px; 
+        font-weight: 900; 
+        font-size: 0.85rem; 
+        z-index: 10; 
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+        transition: all 0.3s ease;
+    }
+
+    .card-wrapper:hover .popular-badge {
+        background-color: #fff;
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+    }
     /* 10. TOOLTIPS DE AYUDA */
     .info-icon { 
         display: inline-block; 
