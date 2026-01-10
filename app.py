@@ -560,6 +560,7 @@ with c2:
                 with tab_team:
                     st.write("Invite up to 4 agents to your professional account:")
                     df_employees = obtener_empleados_db()
+                    # Definimos la variable correctamente aquí
                     current_team = df_employees[df_employees['BossEmail'] == st.session_state.email_usuario]['EmployeeEmail'].tolist()
                     
                     e_col1, e_col2 = st.columns([3, 1])
@@ -582,7 +583,9 @@ with c2:
                     
                     if current_team:
                         st.write("**Active Agents:**")
-                        for m in mis_emp: st.text(f"• {m}")
+                        # CORRECCIÓN: Ahora usamos current_team que es la variable definida arriba
+                        for m in current_team: 
+                            st.text(f"• {m}")
 
                 with tab_activity:
                     st.write("Monitor the descriptions your team is generating:")
