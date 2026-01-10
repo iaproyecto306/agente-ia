@@ -117,7 +117,7 @@ if "email_usuario" not in st.session_state: st.session_state.email_usuario = ""
 if "plan_usuario" not in st.session_state: st.session_state.plan_usuario = "Gratis"
 if "es_empleado" not in st.session_state: st.session_state.es_empleado = False
 
-# --- 3. DICCIONARIO MAESTRO ACTUALIZADO (CIRUGÍA DE IDIOMAS) ---
+# --- 3. DICCIONARIO MAESTRO ACTUALIZADO (CIRUGÍA DE IDIOMAS FINAL) ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
@@ -127,6 +127,7 @@ traducciones = {
         "btn_gen": "✨ GENERAR DESCRIPCIÓN", "p_destacada": "PROPIEDAD DESTACADA",
         "comunidad": "Propiedades de la Comunidad", "popular": "MÁS POPULAR",
         "plan_title": "Selecciona tu Plan", "annual_toggle": "📅 Ahorrar 20% con Pago Anual (Save 20% Yearly)",
+        "annual_save": "✅ 2 Meses GRATIS incluidos",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agencia",
         "desc1": "3 descripciones / día", "t1_1": "Límite diario de generaciones para nuevos usuarios.",
         "desc2": "Soporte Básico", "t1_2": "Ayuda técnica vía email con respuesta en menos de 48hs.",
@@ -163,6 +164,7 @@ traducciones = {
         "btn_gen": "✨ GENERATE DESCRIPTION", "p_destacada": "FEATURED PROPERTY",
         "comunidad": "Community Properties", "popular": "MOST POPULAR",
         "plan_title": "Select Your Plan", "annual_toggle": "📅 Save 20% with Yearly Payment",
+        "annual_save": "✅ 2 Months FREE included",
         "plan1": "Starter", "plan2": "Pro Agent", "plan3": "Agency",
         "desc1": "3 descriptions / day", "t1_1": "Daily generation limit for new users.",
         "desc2": "Basic Support", "t1_2": "Technical help via email with response in less than 48 hours.",
@@ -199,6 +201,7 @@ traducciones = {
         "btn_gen": "✨ GERAR DESCRIÇÃO", "p_destacada": "IMÓVEL EM DESTAQUE",
         "comunidad": "Propriedades da Comunidade", "popular": "MAIS POPULAR",
         "plan_title": "Selecione seu Plano", "annual_toggle": "📅 Economize 20% com Pagamento Anual",
+        "annual_save": "✅ 2 Meses GRÁTIS incluídos",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agência",
         "desc1": "3 descrições / día", "t1_1": "Limite diário de gerações para novos usuários.",
         "desc2": "Suporte Básico", "t1_2": "Ajuda técnica por e-mail com resposta em menos de 48 horas.",
@@ -213,7 +216,7 @@ traducciones = {
         "desc11": "Prioridade no Banner", "t3_4": "Seus anúncios aparecerão com o dobro de frequência na home.",
         "btn1": "REGISTRO GRÁTIS", "btn2": "MELHORAR AGORA", "btn3": "CONTATO VENDAS",
         "how_title": "Como funciona o AI Realty Pro?",
-        "step1_t": "Cole o Link", "step1_d": "Ou escreva uma breve descrição.",
+        "step1_t": "Cole o Link", "step1_d": "Ou escreva uma breve descripción.",
         "step2_t": "IA Analisa", "step2_d": "Otimizamos para SEO e vendas.",
         "step3_t": "Publique", "step3_d": "Copie o texto e atraia clientes.",
         "stat1": "Anúncios Otimizados", "stat2": "Tempo Economizado", "stat3": "Mais Consultas",
@@ -235,6 +238,7 @@ traducciones = {
         "btn_gen": "✨ 生成描述", "p_destacada": "精选房产",
         "comunidad": "社区房产", "popular": "最受欢迎",
         "plan_title": "选择您的方案", "annual_toggle": "📅 年度付款可节省 20%",
+        "annual_save": "✅ 包含 2 个月免费",
         "plan1": "基础版", "plan2": "专业经纪人", "plan3": "机构版",
         "desc1": "每天 3 条描述", "t1_1": "新用户的每日生成限制。",
         "desc2": "基础支持", "t1_2": "通过电子邮件提供技术帮助，48小时内回复。",
@@ -271,6 +275,7 @@ traducciones = {
         "btn_gen": "✨ GÉNÉRER LA DESCRIPTION", "p_destacada": "PROPRIÉTÉ À LA UNE",
         "comunidad": "Propriétés de la Communauté", "popular": "PLUS POPULAIRE",
         "plan_title": "Choisissez votre Forfait", "annual_toggle": "📅 Économisez 20% avec le Paiement Annuel",
+        "annual_save": "✅ 2 Mois GRATUITS inclus",
         "plan1": "Initial", "plan2": "Agent Pro", "plan3": "Agence",
         "desc1": "3 descriptions / jour", "t1_1": "Limite quotidienne de générations pour les nouveaux utilisateurs.",
         "desc2": "Support de Base", "t1_2": "Aide technique par e-mail avec réponse en moins de 48 heures.",
@@ -307,6 +312,7 @@ traducciones = {
         "btn_gen": "✨ BESCHREIBUNG GENERIEREN", "p_destacada": "TOP-IMMOBILIE",
         "comunidad": "Community-Immobilien", "popular": "AM BELIEBTESTEN",
         "plan_title": "Wählen Sie Ihren Plan", "annual_toggle": "📅 20% sparen bei jährlicher Zahlung",
+        "annual_save": "✅ 2 Monate GRATIS inklusive",
         "plan1": "Basis", "plan2": "Pro Makler", "plan3": "Agentur",
         "desc1": "3 Beschreibungen / Tag", "t1_1": "Tägliches Limit für neue Benutzer.",
         "desc2": "Basis-Support", "t1_2": "Technische Hilfe per E-Mail mit Antwort in weniger als 48 Stunden.",
@@ -700,7 +706,7 @@ if modo_anual:
     precio_agency = "1,990"
     id_pro = "P-PON_AQUI_TU_ID_ANUAL_PRO"       # <--- ¡IMPORTANTE! PEGA AQUÍ EL ID ANUAL PRO DE PAYPAL
     id_agency = "P-PON_AQUI_TU_ID_ANUAL_AGENCIA" # <--- ¡IMPORTANTE! PEGA AQUÍ EL ID ANUAL AGENCIA DE PAYPAL
-    texto_ahorro = "✅ 2 Meses GRATIS incluidos"
+    texto_ahorro = L["annual_save"]            # <--- CORREGIDO: Ahora usa el idioma dinámico
 else:
     precio_pro = "49"
     precio_agency = "199"
