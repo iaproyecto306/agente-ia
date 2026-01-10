@@ -33,8 +33,16 @@ def extraer_datos_inmueble(url):
     """
     # Lista de dominios para validación de seguridad (Feature Platinum)
     portales_validos = [
-        "infocasas", "mercadolibre", "zillow", "properati", "remax", 
-        "fincaraiz", "realtor", "idealista", "fotocasa", "inmuebles24"
+        "infocasas", 
+        "mercadolibre", 
+        "zillow", 
+        "properati", 
+        "remax", 
+        "fincaraiz", 
+        "realtor", 
+        "idealista", 
+        "fotocasa", 
+        "inmuebles24"
     ]
     es_portal_conocido = any(portal in url.lower() for portal in portales_validos)
     
@@ -77,17 +85,18 @@ except Exception:
 # Conexión a Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# --- FUNCIONES DE BASE DE DATOS (INTACTAS + AMPLIADAS) ---
+# --- FUNCIONES DE BASE DE DATOS (CORREGIDAS Y EXPANDIDAS) ---
 
 def obtener_datos_db():
-    """Obtiene la base de datos de usuarios principales."""
+    """Obtiene la base de datos de usuarios principales con lectura en tiempo real."""
     try:
+        # ttl=0 OBLIGATORIO para ver cambios manuales en el Excel al instante
         return conn.read(worksheet="Sheet1", ttl=0)
     except:
         return pd.DataFrame(columns=['email', 'usos', 'plan'])
 
 def obtener_empleados_db():
-    """Obtiene la base de datos de empleados/equipos."""
+    """Obtiene la base de datos de empleados/equipos en tiempo real."""
     try:
         return conn.read(worksheet="Employees", ttl=0)
     except:
@@ -854,7 +863,7 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
- /* 9. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ */
+    /* 9. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ (OPTIMIZADO PERO EXTENDIDO) */
     .card-wrapper { 
         transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
@@ -922,6 +931,7 @@ st.markdown("""
     .card-wrapper:hover .popular-badge {
         background-color: #fff;
     }
+
     /* 10. TOOLTIPS DE AYUDA */
     .info-icon { 
         display: inline-block; 
@@ -937,9 +947,21 @@ st.markdown("""
         font-weight: bold; 
     }
     
-    .i-free { background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
-    .i-pro { background-color: rgba(0, 210, 255, 0.15); color: #00d2ff; border: 1px solid rgba(0, 210, 255, 0.5); }
-    .i-agency { background-color: rgba(221, 160, 221, 0.15); color: #DDA0DD; border: 1px solid rgba(221, 160, 221, 0.5); }
+    .i-free { 
+        background-color: rgba(255, 255, 255, 0.1); 
+        color: #fff; 
+        border: 1px solid rgba(255, 255, 255, 0.3); 
+    }
+    .i-pro { 
+        background-color: rgba(0, 210, 255, 0.15); 
+        color: #00d2ff; 
+        border: 1px solid rgba(0, 210, 255, 0.5); 
+    }
+    .i-agency { 
+        background-color: rgba(221, 160, 221, 0.15); 
+        color: #DDA0DD; 
+        border: 1px solid rgba(221, 160, 221, 0.5); 
+    }
     
     .info-icon:hover::after {
         content: attr(data-tooltip); 
@@ -970,21 +992,6 @@ st.markdown("""
         line-height: 2.0; 
     }
     
-    .popular-badge { 
-        position: absolute; 
-        top: -12px; 
-        left: 50%; 
-        transform: translateX(-50%); 
-        background-color: #00d2ff; 
-        color: black; 
-        padding: 6px 18px; 
-        border-radius: 20px; 
-        font-weight: 900; 
-        font-size: 0.85rem; 
-        z-index: 10; 
-        box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); 
-    }
-
     /* 11. BANNER ANIMADO DE FONDO */
     .video-placeholder {
         border-radius: 12px; 
@@ -1042,7 +1049,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 6. SIDEBAR PROFESIONAL Y NAVEGACIÓN (NUEVO)
+# 6. SIDEBAR PROFESIONAL Y NAVEGACIÓN
 # ==============================================================================
 
 with st.sidebar:
@@ -1094,7 +1101,6 @@ with st.sidebar:
     
     if st.button(L.get("feedback_btn", "Enviar"), use_container_width=True):
         st.toast("✅ Feedback enviado. ¡Gracias!")
-        # Aquí podrías conectar a la DB para guardar feedback si quisieras
             
     st.markdown("---")
     st.markdown(f"<div style='text-align:center; color:#666; font-size:0.8rem;'>v2.5 Diamond Edition</div>", unsafe_allow_html=True)
@@ -1103,7 +1109,7 @@ with st.sidebar:
 # 7. INTERFAZ: CABECERA Y HUD DE IDENTIDAD
 # ==============================================================================
 
-# RESTAURACIÓN DEL TÍTULO PRINCIPAL EN PANTALLA (COMO PEDISTE)
+# RESTAURACIÓN DEL TÍTULO PRINCIPAL EN PANTALLA
 col_logo, _, col_lang = st.columns([2.5, 4, 1.5])
 with col_logo:
     st.markdown('<div style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-top:10px; letter-spacing: 1px;">🏢 AI REALTY PRO</div>', unsafe_allow_html=True)
@@ -1134,8 +1140,17 @@ if st.session_state.email_usuario:
 st.markdown(f"<h1 class='neon-title'>{L['title1']} <br><span class='neon-highlight'>{L['title2']}</span></h1>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
+# --- BANNER DE IMÁGENES GLOBAL (SOLUCIÓN A IMÁGENES QUE DESAPARECEN) ---
+# Al estar aquí afuera, se renderiza siempre, logueado o no.
+st.markdown(f'''
+    <div class="video-placeholder">
+        <div class="dynamic-tag">{L["p_destacada"]}</div>
+        <div style="background:rgba(0,0,0,0.6);width:100%;text-align:center;padding:10px;">{L["comunidad"]}</div>
+    </div>
+''', unsafe_allow_html=True)
+
 # ==============================================================================
-# 8. LÓGICA DE NEGOCIO PRINCIPAL (LOGIN CON COOKIES)
+# 8. LÓGICA DE NEGOCIO PRINCIPAL
 # ==============================================================================
 
 # --- VERIFICACIÓN DE COOKIE AL INICIO ---
@@ -1158,12 +1173,6 @@ c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
     # --- PANTALLA DE LOGIN (SI NO HAY COOKIE) ---
     if not st.session_state.email_usuario:
-        st.markdown(f'''
-            <div class="video-placeholder">
-                <div class="dynamic-tag">{L["p_destacada"]}</div>
-                <div style="background:rgba(0,0,0,0.6);width:100%;text-align:center;padding:10px;">{L["comunidad"]}</div>
-            </div>
-        ''', unsafe_allow_html=True)
         st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
         
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
@@ -1171,11 +1180,11 @@ with c2:
             if email_input and "@" in email_input:
                 
                 # 1. Guardar email en el estado actual para acceso inmediato
-                st.session_state.email_usuario = email_input
+                st.session_state.email_usuario = email_input.strip().lower() # Normalizamos el email
                 
                 # 2. Intentar guardar cookie de fondo
                 try:
-                    cookie_manager.set("user_email", email_input, expires_at=datetime.now().replace(year=datetime.now().year + 1))
+                    cookie_manager.set("user_email", st.session_state.email_usuario, expires_at=datetime.now().replace(year=datetime.now().year + 1))
                 except:
                     pass
                 
@@ -1183,13 +1192,13 @@ with c2:
                 df_actual = obtener_datos_db()
                 df_emp = obtener_empleados_db()
                 
-                if email_input in df_actual['email'].values:
-                    usuario = df_actual[df_actual['email'] == email_input].iloc[0]
+                if st.session_state.email_usuario in df_actual['email'].values:
+                    usuario = df_actual[df_actual['email'] == st.session_state.email_usuario].iloc[0]
                     st.session_state.usos = int(usuario['usos'])
                     st.session_state.plan_usuario = usuario['plan'] if 'plan' in usuario else 'Gratis'
                     st.session_state.es_empleado = False
-                elif email_input in df_emp['EmployeeEmail'].values:
-                    jefe_email = df_emp[df_emp['EmployeeEmail'] == email_input].iloc[0]['BossEmail']
+                elif st.session_state.email_usuario in df_emp['EmployeeEmail'].values:
+                    jefe_email = df_emp[df_emp['EmployeeEmail'] == st.session_state.email_usuario].iloc[0]['BossEmail']
                     datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
                     st.session_state.usos = 0
                     st.session_state.plan_usuario = "Pro" if datos_jefe['plan'] == "Agencia" else datos_jefe['plan']
@@ -1235,29 +1244,36 @@ with c2:
                         if not es_valido:
                             st.toast(L["link_warn"], icon="⚠️")
                         
-                        # PROMPT TRIPLE ESTRUCTURADO
+                        # --- SOLUCIÓN PROMPT REPETITIVO Y PLAN GRATIS VS PRO ---
+                        instrucciones_variedad = "REGLA DE ORO: NO uses frases cliché como 'Imagina despertar' o 'Bienvenido a'. Sé original, directo y varía la estructura de los párrafos cada vez."
+                        
+                        if es_pro:
+                            instrucciones_plan = f"""
+                            GENERA LA ESTRATEGIA COMPLETA:
+                            SECCIÓN 1: 📖 STORYTELLING (Lujo y emocional)
+                            SECCIÓN 2: 🛠️ FICHA TÉCNICA (Datos duros y bullets)
+                            SECCIÓN 3: 📲 COPY WHATSAPP (Persuasivo con emojis)
+                            SECCIÓN 4: 🔍 SEO PACK (Título <60 y Meta <160 caracteres)
+                            """
+                        else:
+                            instrucciones_plan = f"""
+                            GENERA ÚNICAMENTE:
+                            SECCIÓN 1: 📖 STORYTELLING (Estilo estándar, máximo 2 párrafos)
+                            Al final del texto añade obligatoriamente: "Generado por AI Realty Pro - Versión Gratuita"
+                            """
+
                         prompt_base = f"""
                         ACTÚA COMO: Broker Inmobiliario de Lujo. 
                         IDIOMA SALIDA: {idioma_salida}. 
-                        TONO: {tono}.
+                        TONO ELEGIDO: {tono}.
+                        
+                        {instrucciones_variedad}
                         
                         DATOS DEL INMUEBLE: 
                         {datos_web} 
                         {user_input}
                         
-                        TAREA: Genera una Estrategia de Venta Triple + SEO.
-                        
-                        SECCIÓN 1: 📖 STORYTELLING
-                        (Narrativa emocional, vende el sueño, estilo lujo)
-                        
-                        SECCIÓN 2: 🛠️ FICHA TÉCNICA
-                        (Bullet points, datos duros, superficies, acabados)
-                        
-                        SECCIÓN 3: 📲 COPY WHATSAPP
-                        (Texto corto, persuasivo, emojis, listo para enviar)
-                        
-                        SECCIÓN 4: 🔍 SEO PACK
-                        (Título optimizado <60 caracteres y Meta-Descripción <160 caracteres)
+                        {instrucciones_plan}
                         
                         FORMATO: Usa negritas para resaltar lo importante. Separa las secciones claramente.
                         """
@@ -1267,21 +1283,46 @@ with c2:
                         if "ERROR_TECNICO" not in resultado:
                             st.session_state.last_result = resultado
                             st.session_state.usos += 1
+                            
+                            # --- SOLUCIÓN PERSISTENCIA DE CRÉDITOS ---
+                            # Actualizamos DB inmediatamente para evitar truco de recarga
                             actualizar_usos_db(st.session_state.email_usuario, st.session_state.usos, st.session_state.plan_usuario)
                             guardar_historial(st.session_state.email_usuario, f"{url_input} {user_input}", resultado)
+                            
+                            # Limpiamos caché para que la app sepa que ya gastó el crédito
+                            st.cache_data.clear()
                             st.rerun()
                 else:
                     st.warning("Ingresa un link o texto para comenzar.")
             st.markdown('</div>', unsafe_allow_html=True)
             
-            # VISUALIZACIÓN DE RESULTADOS Y HERRAMIENTAS
+            # VISUALIZACIÓN DE RESULTADOS - DISEÑO PREMIUM
             if st.session_state.last_result:
-                st.markdown(f'<div class="result-container">{st.session_state.last_result.replace("\n", "<br>")}</div>', unsafe_allow_html=True)
+                st.markdown(f'''
+                    <div style="
+                        background: linear-gradient(145deg, #161b22, #0d1117);
+                        border: 1px solid rgba(0, 210, 255, 0.4);
+                        border-radius: 15px;
+                        padding: 35px;
+                        margin-top: 25px;
+                        color: #ffffff;
+                        font-family: 'Helvetica Neue', sans-serif;
+                        box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+                        line-height: 1.7;
+                    ">
+                        <div style="color: #00d2ff; font-weight: 800; margin-bottom: 15px; letter-spacing: 1px;">
+                            ESTRATEGIA GENERADA ({st.session_state.plan_usuario.upper()})
+                        </div>
+                        <div style="font-size: 1.05rem;">
+                            {st.session_state.last_result.replace("\n", "<br>")}
+                        </div>
+                    </div>
+                ''', unsafe_allow_html=True)
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 b1, b2, b3 = st.columns(3)
                 
-               # 1. Copiar (Versión Robusta)
+                # 1. Copiar (Versión Robusta)
                 with b1:
                     if st.button(f"📋 COPY"):
                         if hasattr(st, "copy_to_clipboard"):
@@ -1296,11 +1337,11 @@ with c2:
                 # 2. WhatsApp Directo
                 with b2:
                     wa_msg = urllib.parse.quote(st.session_state.last_result[:900])
-                    st.link_button(f"📲 {L['whatsapp']}", f"https://wa.me/?text={wa_msg}")
+                    st.link_button(f"📲 {L['whatsapp']}", f"https://wa.me/?text={wa_msg}", use_container_width=True)
                 
                 # 3. Descargar .txt
                 with b3:
-                    st.download_button(f"💾 {L['download']}", st.session_state.last_result, file_name=f"Estrategia_{datetime.now().strftime('%Y%m%d')}.txt")
+                    st.download_button(f"💾 {L['download']}", st.session_state.last_result, file_name=f"Estrategia_{datetime.now().strftime('%Y%m%d')}.txt", use_container_width=True)
 
                 # PACK REDES SOCIALES (SOLO PRO/AGENCIA)
                 if es_pro:
@@ -1328,44 +1369,59 @@ with c2:
             components.html(paypal_bloqueo, height=100)
 
 # ==============================================================================
-# 9. CONSOLA DE AGENCIA (REVOCAR & GESTIÓN DE EQUIPO)
+# 9. CONSOLA DE AGENCIA (REDISEÑADA Y COMPLETA)
 # ==============================================================================
 
 if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_empleado:
     st.divider()
     st.subheader(L["manage_team"])
     
+    # Pestañas para organizar mejor la información de Agencia
+    tab_equipo, tab_monitor = st.tabs(["👥 Mi Equipo", "📊 Monitor de Actividad"])
+    
     df_emp = obtener_empleados_db()
-    # Filtramos para ver solo mis empleados
     mi_equipo = df_emp[df_emp['BossEmail'] == st.session_state.email_usuario]['EmployeeEmail'].tolist()
     
-    c_add1, c_add2 = st.columns([3, 1])
-    with c_add1: 
-        nuevo_e = st.text_input("Email Agente", key="new_ag_in", placeholder="agente@tuagencia.com")
-    with c_add2:
-        st.write(" ")
-        if st.button("AÑADIR"):
-            if len(mi_equipo) < 4 and "@" in nuevo_e:
-                new_row = pd.DataFrame({"BossEmail": [st.session_state.email_usuario], "EmployeeEmail": [nuevo_e]})
-                conn.update(worksheet="Employees", data=pd.concat([df_emp, new_row], ignore_index=True))
-                st.rerun()
-            elif len(mi_equipo) >= 4:
-                st.warning("Equipo lleno (Máx 4).")
+    with tab_equipo:
+        c_add1, c_add2 = st.columns([3, 1])
+        with c_add1: 
+            nuevo_e = st.text_input("Email Agente", key="new_ag_in", placeholder="agente@tuagencia.com")
+        with c_add2:
+            st.write(" ")
+            if st.button("AÑADIR"):
+                if len(mi_equipo) < 4 and "@" in nuevo_e:
+                    new_row = pd.DataFrame({"BossEmail": [st.session_state.email_usuario], "EmployeeEmail": [nuevo_e]})
+                    conn.update(worksheet="Employees", data=pd.concat([df_emp, new_row], ignore_index=True))
+                    st.rerun()
+                elif len(mi_equipo) >= 4:
+                    st.warning("Equipo lleno (Máx 4).")
+        
+        if mi_equipo:
+            st.write("---")
+            st.write("**Miembros Activos:**")
+            for miembro in mi_equipo:
+                cm1, cm2 = st.columns([3, 1])
+                cm1.write(f"👤 {miembro}")
+                
+                # LÓGICA DE REVOCACIÓN (ELIMINACIÓN FÍSICA)
+                if cm2.button(L["revoke"], key=f"del_{miembro}"):
+                    # Filtramos todos EXCEPTO el que queremos borrar
+                    df_limpio = df_emp[~((df_emp['BossEmail'] == st.session_state.email_usuario) & (df_emp['EmployeeEmail'] == miembro))]
+                    conn.update(worksheet="Employees", data=df_limpio)
+                    st.toast(f"Acceso revocado a {miembro}")
+                    st.rerun()
     
-    if mi_equipo:
-        st.write("---")
-        st.write("**Miembros Activos:**")
-        for miembro in mi_equipo:
-            cm1, cm2 = st.columns([3, 1])
-            cm1.write(f"👤 {miembro}")
-            
-            # LÓGICA DE REVOCACIÓN (ELIMINACIÓN FÍSICA)
-            if cm2.button(L["revoke"], key=f"del_{miembro}"):
-                # Filtramos todos EXCEPTO el que queremos borrar
-                df_limpio = df_emp[~((df_emp['BossEmail'] == st.session_state.email_usuario) & (df_emp['EmployeeEmail'] == miembro))]
-                conn.update(worksheet="Employees", data=df_limpio)
-                st.toast(f"Acceso revocado a {miembro}")
-                st.rerun()
+    with tab_monitor:
+        st.info("Aquí puedes ver el consumo de tus agentes en tiempo real.")
+        # Aquí cruzamos datos para mostrar uso de los empleados
+        if mi_equipo:
+            df_total = obtener_datos_db()
+            # Filtramos solo los empleados de este jefe
+            empleados_stats = df_total[df_total['email'].isin(mi_equipo)][['email', 'usos']]
+            if not empleados_stats.empty:
+                st.dataframe(empleados_stats, use_container_width=True)
+            else:
+                st.write("Tus empleados aún no han generado contenido.")
 
 # ==============================================================================
 # 10. SECCIÓN INFORMATIVA Y PLANES
