@@ -5,6 +5,7 @@ from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime  # <--- INCISIÓN 1: Para la fecha del historial
 
 # FUNCIÓN DE SCRAPING (El "Cerebro" que lee links)
 def extraer_datos_inmueble(url):
@@ -61,6 +62,25 @@ def actualizar_usos_db(email, nuevos_usos, plan_actual):
         df = pd.concat([df, nueva_fila], ignore_index=True)
     
     conn.update(worksheet="Sheet1", data=df)
+
+# <--- INCISIÓN 2: FUNCIÓN PARA GUARDAR HISTORIAL --->
+def guardar_historial(email, input_user, output_ia):
+    try:
+        try:
+            df_hist = conn.read(worksheet="Historial", ttl=0)
+        except:
+            df_hist = pd.DataFrame(columns=['fecha', 'email', 'input', 'output'])
+        
+        nueva_fila = pd.DataFrame({
+            "fecha": [datetime.now().strftime("%Y-%m-%d %H:%M")],
+            "email": [email],
+            "input": [input_user[:500]], # Guardamos solo el inicio para no saturar
+            "output": [output_ia]
+        })
+        df_final = pd.concat([df_hist, nueva_fila], ignore_index=True)
+        conn.update(worksheet="Historial", data=df_final)
+    except Exception as e:
+        print(f"Error guardando historial: {e}")
 
 def generar_texto(prompt, modelo="gpt-4o"):
     try:
@@ -454,8 +474,12 @@ with c2:
                             st.session_state.usos += 1
                             actualizar_usos_db(st.session_state.email_usuario, st.session_state.usos, st.session_state.plan_usuario)
                             
-                            # Mostrar Resultado Principal
-                            st.markdown(f"<div style='background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; border:1px solid #00d2ff; margin-top:20px; text-align:left; color:white;'>{resultado}</div>", unsafe_allow_html=True)
+                            # <--- INCISIÓN 3: GUARDAR HISTORIAL Y BOTÓN COPIAR --->
+                            guardar_historial(st.session_state.email_usuario, f"{url_input} {user_input}", resultado)
+                            
+                            st.success("¡Generado con éxito!")
+                            st.markdown("### 📋 Copia tu descripción:")
+                            st.code(resultado, language='markdown') # ESTO CREA EL BOTÓN DE COPIAR AUTOMÁTICO
                             
                             # --- PACK REDES SOCIALES (Solo PRO/AGENCIA) ---
                             if es_pro:
@@ -469,7 +493,7 @@ with c2:
                                     Separalos claramente.
                                     """
                                     resultado_social = generar_texto(prompt_social)
-                                    st.info(resultado_social)
+                                    st.code(resultado_social, language='markdown') # Botón copiar para redes también
                             
                             if not es_pro:
                                 st.info(f"Usos restantes: {3 - st.session_state.usos}")
@@ -518,6 +542,28 @@ with col_stat3: st.markdown(f'<div style="text-align:center; padding:20px; borde
 
 # --- 7. PLANES INTEGRADOS CON PAYPAL (AUTOMATIZADOS) ---
 st.markdown("<br><br>", unsafe_allow_html=True)
+
+# <--- INCISIÓN 4: SWITCH ANUAL Y LÓGICA DE PRECIOS --->
+st.markdown("<h3 style='text-align:center;'>Selecciona tu Plan</h3>", unsafe_allow_html=True)
+col_sw1, col_sw2, col_sw3 = st.columns([1,2,1])
+with col_sw2:
+    # Interruptor para Pago Anual
+    modo_anual = st.toggle("📅 Ahorrar 20% con Pago Anual (Save 20% Yearly)", value=False)
+
+# Definimos precios e IDs según el interruptor
+if modo_anual:
+    precio_pro = "490"
+    precio_agency = "1,990"
+    id_pro = "P-PON_AQUI_TU_ID_ANUAL_PRO"       # <--- ¡IMPORTANTE! PEGA AQUÍ EL ID ANUAL PRO DE PAYPAL
+    id_agency = "P-PON_AQUI_TU_ID_ANUAL_AGENCIA" # <--- ¡IMPORTANTE! PEGA AQUÍ EL ID ANUAL AGENCIA DE PAYPAL
+    texto_ahorro = "✅ 2 Meses GRATIS incluidos"
+else:
+    precio_pro = "49"
+    precio_agency = "199"
+    id_pro = "P-3P2657040E401734NNFQQ5TY"       # ID MENSUAL PRO (Original)
+    id_agency = "P-0S451470G5041550ENFQRB4I"    # ID MENSUAL AGENCIA (Original)
+    texto_ahorro = ""
+
 col1, col2, col3 = st.columns(3)
 
 # PLAN GRATIS
@@ -526,48 +572,48 @@ with col1:
     st.markdown(f"<div class='card-wrapper free-card'><div class='glass-container'><h3>{L['plan1']}</h3><h1>$0</h1><hr style='opacity:0.2;'>{desc_f}</div></div>", unsafe_allow_html=True)
     st.button(L['btn1'], key="btn_f")
 
-# PLAN PRO ($49) - Con rastreo de email
+# PLAN PRO (Dinámico)
 with col2:
     desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_1']}'>i</span><br>{L['desc5']}<span class='info-icon i-pro' data-tooltip='{L['t2_2']}'>i</span><br>{L['desc6']}<span class='info-icon i-pro' data-tooltip='{L['t2_3']}'>i</span><br><b>{L['desc7']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_4']}'>i</span></div>"
-    st.markdown(f"<div class='card-wrapper pro-card'><div class='glass-container'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>$49</h1><hr style='border-color:#00d2ff;opacity:0.3;'>{desc_p}</div></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='card-wrapper pro-card'><div class='glass-container'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>${precio_pro}</h1><p style='color:#00d2ff; font-weight:bold; font-size:0.9rem;'>{texto_ahorro}</p><hr style='border-color:#00d2ff;opacity:0.3;'>{desc_p}</div></div>", unsafe_allow_html=True)
     
-    # Botón Pro con custom_id
+    # Botón Pro Dinámico
     paypal_html_49 = f"""
-    <div id="paypal-button-container-P-3P2657040E401734NNFQQ5TY"></div>
+    <div id="paypal-button-container-pro"></div>
     <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
     <script>
       paypal.Buttons({{
           style: {{ shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' }},
           createSubscription: function(data, actions) {{
             return actions.subscription.create({{
-              'plan_id': 'P-3P2657040E401734NNFQQ5TY',
+              'plan_id': '{id_pro}',
               'custom_id': '{st.session_state.email_usuario}'
             }});
           }}
-      }}).render('#paypal-button-container-P-3P2657040E401734NNFQQ5TY');
+      }}).render('#paypal-button-container-pro');
     </script>
     """
     components.html(paypal_html_49, height=150)
 
-# PLAN AGENCIA ($199) - Con rastreo de email
+# PLAN AGENCIA (Dinámico)
 with col3:
     desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
-    st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>$199</h1><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>${precio_agency}</h1><p style='color:#DDA0DD; font-weight:bold; font-size:0.9rem;'>{texto_ahorro}</p><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
     
-    # Botón Agencia con custom_id
+    # Botón Agencia Dinámico
     paypal_html_199 = f"""
-    <div id="paypal-button-container-P-0S451470G5041550ENFQRB4I"></div>
+    <div id="paypal-button-container-agency"></div>
     <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
     <script>
       paypal.Buttons({{
           style: {{ shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' }},
           createSubscription: function(data, actions) {{
             return actions.subscription.create({{
-              'plan_id': 'P-0S451470G5041550ENFQRB4I',
+              'plan_id': '{id_agency}',
               'custom_id': '{st.session_state.email_usuario}'
             }});
           }}
-      }}).render('#paypal-button-container-P-0S451470G5041550ENFQRB4I');
+      }}).render('#paypal-button-container-agency');
     </script>
     """
     components.html(paypal_html_199, height=150)
@@ -580,4 +626,9 @@ with ct1: st.markdown(testimonio_style.format(texto=L['test1_txt'], autor=L['tes
 with ct2: st.markdown(testimonio_style.format(texto=L['test2_txt'], autor=L['test2_au']), unsafe_allow_html=True)
 with ct3: st.markdown(testimonio_style.format(texto=L['test3_txt'], autor=L['test3_au']), unsafe_allow_html=True)
 
-st.markdown(f'<div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;"><div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 AI REALTY PRO</div><p style="color:#666; font-size:0.8rem;">© 2026 IA Realty Pro - {L["foot_desc"]}<br>{L["foot_links"]}</p></div>', unsafe_allow_html=True)
+# Footer con Expander Legal (Incision final)
+st.markdown(f'<div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;"><div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 AI REALTY PRO</div><p style="color:#666; font-size:0.8rem;">© 2026 IA Realty Pro - {L["foot_desc"]}</p></div>', unsafe_allow_html=True)
+with st.expander("⚖️ Términos Legales & Privacidad"):
+    st.write("1. No guardamos datos de tarjeta de crédito (procesado por PayPal).")
+    st.write("2. Las descripciones son generadas por IA y deben ser verificadas.")
+    st.write("3. No hay reembolsos en planes mensuales. Planes anuales tienen 7 días de garantía.")
