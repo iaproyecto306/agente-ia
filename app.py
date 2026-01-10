@@ -1107,49 +1107,33 @@ with c2:
         st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
         
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
-        if st.button("COMENZAR / START", type="primary"):
+       if st.button("COMENZAR / START", type="primary"):
             if email_input and "@" in email_input:
                 
-                # GUARDAR COOKIE (Expira en 1 año)
-                cookie_manager.set("user_email", email_input, expires_at=datetime.now().replace(year=datetime.now().year + 1))
+                # 1. Intentar guardar la cookie
+                try:
+                    cookie_manager.set("user_email", email_input, expires_at=datetime.now().replace(year=datetime.now().year + 1))
+                except:
+                    pass # Evita que el error de widget bloquee el login
                 
+                # 2. Cargar datos de la base de datos inmediatamente
                 df_actual = obtener_datos_db()
                 df_emp = obtener_empleados_db()
                 
-                # ESCENARIO 1: ES EL DUEÑO/JEFE
+                # 3. Asignar al session_state ANTES del rerun
+                st.session_state.email_usuario = email_input
+                
                 if email_input in df_actual['email'].values:
                     usuario = df_actual[df_actual['email'] == email_input].iloc[0]
                     st.session_state.usos = int(usuario['usos'])
-                    st.session_state.plan_usuario = usuario['plan'] if 'plan' in usuario else 'Gratis'
-                    st.session_state.es_empleado = False
-                    st.session_state.email_usuario = email_input
-                    time.sleep(1) # Tiempo técnico para asentar la cookie
-                    st.rerun()
-                
-                # ESCENARIO 2: ES EMPLEADO (HERENCIA DE PLAN)
-                elif email_input in df_emp['EmployeeEmail'].values:
-                    jefe_email = df_emp[df_emp['EmployeeEmail'] == email_input].iloc[0]['BossEmail']
-                    datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
-                    
-                    st.session_state.usos = 0 # Usos propios del empleado
-                    # Si el jefe es Agencia, el empleado hereda PRO
-                    st.session_state.plan_usuario = "Pro" if datos_jefe['plan'] == "Agencia" else datos_jefe['plan']
-                    st.session_state.es_empleado = True
-                    st.session_state.email_usuario = email_input
-                    st.session_state.boss_ref = jefe_email
-                    time.sleep(1)
-                    st.rerun()
-                
-                # ESCENARIO 3: USUARIO NUEVO
+                    st.session_state.plan_usuario = usuario['plan']
                 else:
                     st.session_state.usos = 0
                     st.session_state.plan_usuario = "Gratis"
-                    st.session_state.email_usuario = email_input
-                    time.sleep(1)
-                    st.rerun()
-            else:
-                st.error("Por favor, ingresa un email válido.")
-        st.markdown('</div>', unsafe_allow_html=True)
+                
+                # 4. Pequeña pausa para asegurar la persistencia y refrescar
+                time.sleep(0.5)
+                st.rerun()
 
     # --- MOTOR DE GENERACIÓN IA PLATINUM (TRIPLE RESULTADO) ---
     elif st.session_state.email_usuario:
