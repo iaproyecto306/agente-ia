@@ -1584,8 +1584,8 @@ with col_sw2:
 precio_pro = "490" if es_anual else "49"
 precio_age = "1,990" if es_anual else "199"
 # NOTA: Reemplazar con tus IDs reales de PayPal para modo Anual y Mensual
-id_pro = "P-PON_AQUI_ANUAL_PRO" if es_anual else "P-3P2657040E401734NNFQQ5TY"
-id_age = "P-PON_AQUI_ANUAL_AGE" if es_anual else "P-0S451470G5041550ENFQRB4I"
+id_pro = "P-2PU023636P1209345NFQ7TMY" if es_anual else "P-3P2657040E401734NNFQQ5TY"
+id_age = "P-87X83840151393810NFQ7X6Q" if es_anual else "P-0S451470G5041550ENFQRB4I"
 ahorro_txt = L["annual_save"] if es_anual else ""
 
 col1, col2, col3 = st.columns(3)
