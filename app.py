@@ -14,9 +14,8 @@ import extra_streamlit_components as stx # <--- NUEVA LIBRERÍA OBLIGATORIA
 # ==============================================================================
 # 0. GESTOR DE COOKIES (MEMORIA PERMANENTE)
 # ==============================================================================
-# Esta función permite que la página recuerde al usuario aunque cierre el navegador.
 
-@st.cache_resource
+@st.cache_resource(experimental_allow_widgets=True) # <-- Agregamos esto de nuevo
 def get_manager():
     return stx.CookieManager()
 
