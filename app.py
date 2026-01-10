@@ -10,6 +10,7 @@ import urllib.parse
 import time
 import io
 import extra_streamlit_components as stx 
+import random
 
 # ==============================================================================
 # 0. GESTOR DE COOKIES (MEMORIA PERMANENTE - ARQUITECTURA SEGURA)
@@ -85,25 +86,35 @@ except Exception:
 # Conexión a Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# --- FUNCIONES DE BASE DE DATOS (CORREGIDAS Y EXPANDIDAS) ---
+# --- FUNCIONES DE BASE DE DATOS (CORREGIDAS Y ROBUSTAS) ---
 
 def obtener_datos_db():
     """Obtiene la base de datos de usuarios principales con lectura en tiempo real."""
     try:
         # ttl=0 OBLIGATORIO para ver cambios manuales en el Excel al instante
-        return conn.read(worksheet="Sheet1", ttl=0)
+        df = conn.read(worksheet="Sheet1", ttl=0)
+        # Normalizamos: todo minúscula y sin espacios para evitar errores de tipeo en Excel
+        df['email'] = df['email'].astype(str).str.strip().str.lower()
+        if 'plan' in df.columns:
+            df['plan'] = df['plan'].astype(str).str.strip().str.title() # Convierte "pro" a "Pro", "agencia" a "Agencia"
+        return df
     except:
         return pd.DataFrame(columns=['email', 'usos', 'plan'])
 
 def obtener_empleados_db():
     """Obtiene la base de datos de empleados/equipos en tiempo real."""
     try:
-        return conn.read(worksheet="Employees", ttl=0)
+        df = conn.read(worksheet="Employees", ttl=0)
+        # Normalización de emails en la tabla de empleados también
+        df['BossEmail'] = df['BossEmail'].astype(str).str.strip().str.lower()
+        df['EmployeeEmail'] = df['EmployeeEmail'].astype(str).str.strip().str.lower()
+        return df
     except:
         return pd.DataFrame(columns=['BossEmail', 'EmployeeEmail'])
 
 def actualizar_usos_db(email, nuevos_usos, plan_actual):
     """Actualiza el consumo de usos y verifica el plan."""
+    email = email.strip().lower() # Asegurar formato
     df = obtener_datos_db()
     
     # Aseguramos compatibilidad con versiones viejas de la hoja
@@ -112,15 +123,15 @@ def actualizar_usos_db(email, nuevos_usos, plan_actual):
 
     if email in df['email'].values:
         df.loc[df['email'] == email, 'usos'] = nuevos_usos
-        # Solo actualizamos el plan si está vacío en la DB
-        if pd.isna(df.loc[df['email'] == email, 'plan']).any():
-             df.loc[df['email'] == email, 'plan'] = plan_actual
+        # Solo actualizamos el plan si tenemos información nueva y válida
+        if plan_actual and plan_actual != "Gratis":
+             df.loc[df['email'] == email, 'plan'] = plan_actual.title()
     else:
         # Creamos usuario nuevo
         nueva_fila = pd.DataFrame({
             "email": [email], 
             "usos": [nuevos_usos], 
-            "plan": [plan_actual]
+            "plan": [plan_actual.title() if plan_actual else "Gratis"]
         })
         df = pd.concat([df, nueva_fila], ignore_index=True)
     
@@ -146,7 +157,7 @@ def guardar_historial(email, input_user, output_ia):
     except Exception as e:
         print(f"Error guardando historial: {e}")
 
-# --- NUEVA FUNCIÓN: GUARDAR FEEDBACK EN GOOGLE SHEETS ---
+# --- FUNCIÓN: GUARDAR FEEDBACK EN GOOGLE SHEETS ---
 def guardar_feedback(email, mensaje):
     """Guarda los mensajes de soporte en una hoja nueva."""
     try:
@@ -177,7 +188,7 @@ def generar_texto(prompt, modelo="gpt-4o"):
         response = client.chat.completions.create(
             model=modelo,
             messages=[
-                {"role": "system", "content": "Eres un Broker Inmobiliario Senior de Lujo y Copywriter experto en Neuromarketing."},
+                {"role": "system", "content": "Eres un Broker Inmobiliario Senior de Lujo y Copywriter experto en Neuromarketing. Tu objetivo es VENDER."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.75 # Creatividad ajustada
@@ -294,7 +305,8 @@ traducciones = {
         "usage_bar": "Progreso Diario",
         "feedback_lbl": "💡 Sugerencias / Soporte",
         "feedback_btn": "Enviar Comentario",
-        "support_mail": "Soporte"
+        "support_mail": "Soporte",
+        "credits_left": "Créditos hoy:"
     },
     "English": {
         "title1": "Turn Boring Listings into",
@@ -379,7 +391,8 @@ traducciones = {
         "usage_bar": "Daily Progress",
         "feedback_lbl": "💡 Feedback / Support",
         "feedback_btn": "Send Feedback",
-        "support_mail": "Support"
+        "support_mail": "Support",
+        "credits_left": "Credits left:"
     },
     "Português": {
         "title1": "Transforme Anúncios em",
@@ -464,7 +477,8 @@ traducciones = {
         "usage_bar": "Progresso Diário",
         "feedback_lbl": "💡 Sugestões / Suporte",
         "feedback_btn": "Enviar",
-        "support_mail": "Suporte"
+        "support_mail": "Suporte",
+        "credits_left": "Créditos hoje:"
     },
     "Français": {
         "title1": "Transformez vos Annonces",
@@ -549,7 +563,8 @@ traducciones = {
         "usage_bar": "Progrès Quotidien",
         "feedback_lbl": "💡 Suggestions / Support",
         "feedback_btn": "Envoyer",
-        "support_mail": "Support"
+        "support_mail": "Support",
+        "credits_left": "Crédits aujourd'hui:"
     },
     "Deutsch": {
         "title1": "Verwandeln Sie Anzeigen",
@@ -634,7 +649,8 @@ traducciones = {
         "usage_bar": "Täglicher Fortschritt",
         "feedback_lbl": "💡 Vorschläge / Support",
         "feedback_btn": "Senden",
-        "support_mail": "Support"
+        "support_mail": "Support",
+        "credits_left": "Credits heute:"
     },
     "中文": {
         "title1": "将枯燥的广告",
@@ -719,7 +735,8 @@ traducciones = {
         "usage_bar": "每日进度",
         "feedback_lbl": "💡 反馈 / 支持",
         "feedback_btn": "发送反馈",
-        "support_mail": "支持"
+        "support_mail": "支持",
+        "credits_left": "今日额度:"
     }
 }
 
@@ -729,14 +746,20 @@ traducciones = {
 
 st.markdown("""
 <style>
-    /* 1. RESET Y FONDO GLOBAL */
+    /* 1. FIX DEL SCROLL SUPERIOR (PADDING REMOVIDO) */
+    .block-container {
+        padding-top: 1rem !important; /* Esto elimina el espacio gigante de arriba */
+        padding-bottom: 5rem !important;
+    }
+
+    /* 2. RESET Y FONDO GLOBAL */
     .stApp { 
         background-color: #0e1117; 
         color: #FFFFFF; 
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
     }
     
-    /* 2. ELIMINAR GHOST LINKS DE STREAMLIT (CRÍTICO) */
+    /* 3. ELIMINAR GHOST LINKS DE STREAMLIT (CRÍTICO) */
     .stMarkdown h1 a, 
     .stMarkdown h2 a, 
     .stMarkdown h3 a, 
@@ -762,7 +785,7 @@ st.markdown("""
         visibility: hidden; 
     }
 
-    /* 3. SCROLLBAR DE LUJO */
+    /* 4. SCROLLBAR DE LUJO */
     ::-webkit-scrollbar { 
         width: 6px; 
     }
@@ -780,13 +803,13 @@ st.markdown("""
         background: #00d2ff; 
     }
 
-    /* 4. SELECCIÓN DE TEXTO NEÓN */
+    /* 5. SELECCIÓN DE TEXTO NEÓN */
     ::selection { 
         background: rgba(0, 210, 255, 0.25); 
         color: #00d2ff; 
     }
 
-    /* 5. TIPOGRAFÍA Y TÍTULOS */
+    /* 6. TIPOGRAFÍA Y TÍTULOS */
     .neon-title { 
         font-size: 3.8rem; 
         font-weight: 800; 
@@ -808,7 +831,7 @@ st.markdown("""
         margin-bottom: 40px; 
     }
 
-    /* 6. HUD SUPERIOR (IDENTIDAD) */
+    /* 7. HUD SUPERIOR (IDENTIDAD) */
     .hud-bar { 
         display: flex; 
         justify-content: space-between; 
@@ -848,7 +871,7 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(221, 160, 221, 0.3); 
     }
 
-    /* 7. CAJA DE RESULTADO ELEGANTE */
+    /* 8. CAJA DE RESULTADO ELEGANTE */
     .result-container {
         background-color: #f8f9fa;
         color: #1a1a1a;
@@ -862,7 +885,7 @@ st.markdown("""
         box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     }
 
-    /* 8. BOTÓN GENERAR PLATINUM */
+    /* 9. BOTÓN GENERAR PLATINUM */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; 
         border: none !important; 
@@ -884,7 +907,7 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
-    /* 9. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ */
+    /* 10. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ */
     .card-wrapper { 
         transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
@@ -953,7 +976,7 @@ st.markdown("""
         background-color: #fff;
     }
 
-    /* 10. TOOLTIPS DE AYUDA */
+    /* 11. TOOLTIPS DE AYUDA */
     .info-icon { 
         display: inline-block; 
         width: 16px; 
@@ -1013,7 +1036,7 @@ st.markdown("""
         line-height: 2.0; 
     }
     
-    /* 11. BANNER ANIMADO DE FONDO */
+    /* 12. BANNER ANIMADO DE FONDO */
     .video-placeholder {
         border-radius: 12px; 
         height: 250px; 
@@ -1066,6 +1089,41 @@ st.markdown("""
         50% { transform: translateY(-12px); } 
         100% { transform: translateY(0px); } 
     }
+
+    /* 13. EMOJIMETRO (NUEVO) */
+    .meter-container { 
+        background: #222; 
+        border-radius: 10px; 
+        height: 30px; 
+        width: 100%; 
+        position: relative; 
+        overflow: hidden; 
+        margin-top: 10px; 
+        border: 1px solid #444; 
+    }
+    
+    .meter-fill { 
+        height: 100%; 
+        background: linear-gradient(90deg, #ff4b1f, #ff9068, #00d2ff); 
+        width: 0%; 
+        animation: fillMeter 2s ease-out forwards; 
+    }
+    
+    .meter-text { 
+        position: absolute; 
+        width: 100%; 
+        text-align: center; 
+        top: 3px; 
+        font-weight: bold; 
+        color: white; 
+        text-shadow: 1px 1px 2px black; 
+        font-size: 0.9rem; 
+    }
+    
+    @keyframes fillMeter { 
+        from { width: 0%; } 
+        to { width: 98%; } 
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -1087,12 +1145,21 @@ with st.sidebar:
         st.markdown(f"### {L.get('welcome', 'Bienvenido')}")
         st.markdown(f"**{st.session_state.email_usuario}**")
         
-        # Barra de Progreso de Usos
+        # --- CONTADOR DE CRÉDITOS VISIBLE (SOLUCIÓN A TU QUEJA) ---
         usos = st.session_state.usos
         es_pro_local = st.session_state.plan_usuario in ["Pro", "Agencia"]
         limite = 99999 if es_pro_local else 3
         
-        st.write(f"{L.get('usage_bar', 'Progreso Diario')}: {usos} / {'∞' if limite > 100 else limite}")
+        # Color rojo si queda poco, verde si hay mucho
+        color_cred = "#ff4b4b" if (not es_pro_local and 3-usos <= 1) else "#00d2ff"
+        restantes = "∞" if es_pro_local else str(3 - usos)
+        
+        st.markdown(f"""
+        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid {color_cred}; margin-bottom: 10px;">
+            <div style="font-size: 0.85rem; color: #aaa;">{L.get('credits_left', 'Créditos restantes:')}</div>
+            <div style="font-size: 1.5rem; font-weight: bold; color: {color_cred};">{restantes}</div>
+        </div>
+        """, unsafe_allow_html=True)
         
         if limite < 100:
             progreso = min(usos / limite, 1.0)
@@ -1133,7 +1200,7 @@ with st.sidebar:
             st.warning("El mensaje está vacío.")
             
     st.markdown("---")
-    st.markdown(f"<div style='text-align:center; color:#666; font-size:0.8rem;'>v2.5 Diamond Edition</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center; color:#666; font-size:0.8rem;'>v2.6 Diamond Fixed</div>", unsafe_allow_html=True)
 
 # ==============================================================================
 # 7. INTERFAZ: CABECERA Y HUD DE IDENTIDAD
@@ -1146,6 +1213,19 @@ with col_logo:
 
 # HUD DE IDENTIDAD (DINÁMICO SEGÚN PLAN Y HORA)
 if st.session_state.email_usuario:
+    # --- RE-VERIFICACIÓN SILENCIOSA DE PLAN EN CADA CARGA ---
+    # Esto soluciona el problema de que el plan no se actualice si cambiaste la DB
+    try:
+        df_check = obtener_datos_db()
+        if st.session_state.email_usuario in df_check['email'].values:
+            user_row = df_check[df_check['email'] == st.session_state.email_usuario].iloc[0]
+            real_plan = user_row['plan'] if 'plan' in user_row else 'Gratis'
+            # Normalizamos mayúsculas
+            st.session_state.plan_usuario = real_plan.title() if real_plan else "Gratis"
+            st.session_state.usos = int(user_row['usos'])
+    except Exception as e:
+        pass # Si falla la verificación silenciosa, usamos la sesión actual
+
     hora = datetime.now().hour
     saludo = "Buenos días" if hora < 12 else "Buenas tardes" if hora < 20 else "Buenas noches"
     p_name = str(st.session_state.plan_usuario).lower()
@@ -1276,13 +1356,23 @@ with c2:
                         if not es_valido:
                             st.toast(L["link_warn"], icon="⚠️")
                         
+                        # --- SOLUCIÓN DE PROMPTS SEPARADOS POR ESTILO (FIX STORYTELLING ETERNO) ---
+                        if tono == "Profesional":
+                            instrucciones_estilo = "ESTILO: Corporativo, directo, serio. Usa datos, porcentajes y listas. CERO lenguaje poético. Enfócate en la inversión y características técnicas."
+                        elif tono == "Storytelling":
+                            instrucciones_estilo = "ESTILO: Narrativo, emocional, sensorial. Describe olores, luces, sensaciones. Vende el 'estilo de vida', no la casa."
+                        elif tono == "Urgencia":
+                            instrucciones_estilo = "ESTILO: Gatillos mentales de escasez. Frases cortas. 'Oportunidad única', 'Se va rápido', 'Última chance'."
+                        else: # Lujo
+                            instrucciones_estilo = "ESTILO: Exclusivo, sofisticado, palabras de alto valor (High-Ticket). Dirigido a inversores o VIPs. Elegancia pura."
+
                         # --- SOLUCIÓN PROMPT REPETITIVO Y PLAN GRATIS VS PRO ---
                         instrucciones_variedad = "REGLA DE ORO: NO uses frases cliché como 'Imagina despertar' o 'Bienvenido a'. Sé original, directo y varía la estructura de los párrafos cada vez."
                         
                         if es_pro:
                             instrucciones_plan = f"""
                             GENERA LA ESTRATEGIA COMPLETA:
-                            SECCIÓN 1: 📖 STORYTELLING (Lujo y emocional)
+                            SECCIÓN 1: 📖 DESCRIPCIÓN PRINCIPAL ({tono.upper()})
                             SECCIÓN 2: 🛠️ FICHA TÉCNICA (Datos duros y bullets)
                             SECCIÓN 3: 📲 COPY WHATSAPP (Persuasivo con emojis)
                             SECCIÓN 4: 🔍 SEO PACK (Título <60 y Meta <160 caracteres)
@@ -1290,14 +1380,15 @@ with c2:
                         else:
                             instrucciones_plan = f"""
                             GENERA ÚNICAMENTE:
-                            SECCIÓN 1: 📖 STORYTELLING (Estilo estándar, máximo 2 párrafos)
+                            SECCIÓN 1: 📖 DESCRIPCIÓN CORTA (Estilo estándar, máximo 2 párrafos)
                             Al final del texto añade obligatoriamente: "Generado por AI Realty Pro - Versión Gratuita"
                             """
 
                         prompt_base = f"""
-                        ACTÚA COMO: Broker Inmobiliario de Lujo. 
+                        ACTÚA COMO: El mejor Copywriter Inmobiliario del mundo y experto en ventas.
                         IDIOMA SALIDA: {idioma_salida}. 
-                        TONO ELEGIDO: {tono}.
+                        
+                        {instrucciones_estilo}
                         
                         {instrucciones_variedad}
                         
@@ -1305,6 +1396,7 @@ with c2:
                         {datos_web} 
                         {user_input}
                         
+                        INSTRUCCIONES DE SALIDA:
                         {instrucciones_plan}
                         
                         FORMATO: Usa negritas para resaltar lo importante. Separa las secciones claramente.
@@ -1330,6 +1422,14 @@ with c2:
             
             # VISUALIZACIÓN DE RESULTADOS - DISEÑO PREMIUM
             if st.session_state.last_result:
+                # EMOJIMETRO (Reincorporado)
+                st.markdown(f"""
+                <div class="meter-container">
+                    <div class="meter-fill"></div>
+                    <div class="meter-text">🔥 IMPACTO DE VENTA: 98%</div>
+                </div>
+                """, unsafe_allow_html=True)
+
                 st.markdown(f'''
                     <div style="
                         background: linear-gradient(145deg, #161b22, #0d1117);
@@ -1422,7 +1522,7 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
             st.write(" ")
             if st.button("AÑADIR"):
                 if len(mi_equipo) < 4 and "@" in nuevo_e:
-                    new_row = pd.DataFrame({"BossEmail": [st.session_state.email_usuario], "EmployeeEmail": [nuevo_e]})
+                    new_row = pd.DataFrame({"BossEmail": [st.session_state.email_usuario], "EmployeeEmail": [nuevo_e.strip().lower()]})
                     conn.update(worksheet="Employees", data=pd.concat([df_emp, new_row], ignore_index=True))
                     st.rerun()
                 elif len(mi_equipo) >= 4:
@@ -1490,11 +1590,14 @@ ahorro_txt = L["annual_save"] if es_anual else ""
 
 col1, col2, col3 = st.columns(3)
 
-# PLAN GRATIS
+# PLAN GRATIS (BOTÓN ELIMINADO SI YA ESTÁ LOGUEADO)
 with col1:
     desc_f = f"<div class='feature-list'>{L['desc1']}<span class='info-icon i-free' data-tooltip='{L['t1_1']}'>i</span><br>{L['desc2']}<span class='info-icon i-free' data-tooltip='{L['t1_2']}'>i</span><br>{L['desc3']}<span class='info-icon i-free' data-tooltip='{L['t1_3']}'>i</span></div>"
     st.markdown(f"<div class='card-wrapper free-card'><div class='glass-container'><h3>{L['plan1']}</h3><h1>$0</h1><hr style='opacity:0.2;'>{desc_f}</div></div>", unsafe_allow_html=True)
-    st.button(L['btn1'], key="btn_f")
+    # Condición para ocultar el botón si ya está logueado
+    if not st.session_state.email_usuario:
+        if st.button(L['btn1'], key="btn_f"):
+            st.toast("Sube al inicio para registrarte.")
 
 # PLAN PRO
 with col2:
