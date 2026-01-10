@@ -27,61 +27,49 @@ cookie_manager = st.session_state.cookie_manager
 # 1. MOTOR DE EXTRACCIÓN Y VALIDACIÓN (CEREBRO SCRAPING)
 # ==============================================================================
 
+# ==============================================================================
+# 1. MOTOR DE EXTRACCIÓN (CAMBIAR TODO EL BLOQUE POR ESTO)
+# ==============================================================================
+
 def extraer_datos_inmueble(url):
     """
-    Función de scraping mejorada v2.0 (Anti-Bloqueo).
-    Simula ser un navegador real para evitar bloqueos de Zillow/MeLi.
+    Función de scraping v3.0 (Jina AI Bridge).
+    Usa un servicio intermedio para saltar bloqueos de Zillow/MeLi.
     """
-    # Lista de dominios para validación (Se mantiene igual)
+    # Lista de dominios (solo para control interno)
     portales_validos = [
-        "infocasas", 
-        "mercadolibre", 
-        "zillow", 
-        "properati", 
-        "remax", 
-        "fincaraiz", 
-        "realtor", 
-        "idealista", 
-        "fotocasa", 
-        "inmuebles24"
+        "infocasas", "mercadolibre", "zillow", "properati", "remax", 
+        "fincaraiz", "realtor", "idealista", "fotocasa", "inmuebles24"
     ]
-    # Verificamos si el nombre está en la URL
     es_portal_conocido = any(portal in url.lower() for portal in portales_validos)
     
     try:
-        # HEADERS DE CAMUFLAJE (Simulamos ser un Chrome real en Windows)
+        # TRUCO MAESTRO: Usamos r.jina.ai como puente
+        # Esto convierte la web compleja en texto plano para LLMs
+        url_puente = f"https://r.jina.ai/{url}"
+        
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-            "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
-            "Referer": "https://www.google.com/",
-            "Connection": "keep-alive",
-            "Upgrade-Insecure-Requests": "1"
+            "User-Agent": "Mozilla/5.0",
+            "X-With-Generated-Alt": "true" # Para que lea descripciones de fotos si puede
         }
         
-        # Hacemos la petición
-        response = requests.get(url, headers=headers, timeout=15)
+        response = requests.get(url_puente, headers=headers, timeout=20)
         
         if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
+            texto = response.text
             
-            # Limpieza profunda
-            for element in soup(['script', 'style', 'header', 'footer', 'nav', 'aside', 'iframe', 'button', 'input', 'noscript', 'svg']):
-                element.decompose()
+            # Si Jina nos devuelve muy poco texto, es que falló
+            if len(texto) < 200: 
+                return "AVISO: No se pudo leer el contenido. Por favor copia y pega la descripción manualmente.", es_portal_conocido
             
-            texto = soup.get_text(separator=' ', strip=True)
-            return texto[:5000], es_portal_conocido
-            
-        elif response.status_code == 403:
-            # Si nos bloquean (403), devolvemos un aviso pero NO marcamos como portal inválido
-            return "AVISO: El portal tiene protección anti-robots fuerte. La IA usará solo tus instrucciones manuales.", es_portal_conocido
+            # Retornamos el texto limpio que nos dio Jina
+            return texto[:6000], es_portal_conocido
             
         else:
-            return f"Error de acceso (Código {response.status_code}).", es_portal_conocido
+            return f"Error al acceder vía puente (Código {response.status_code}).", es_portal_conocido
             
     except Exception as e:
-        # Si falla técnicamente, devolvemos el error pero respetamos que el portal era conocido
-        return f"No se pudo leer automáticamente el link (Error: {str(e)}). Por favor copia y pega la descripción manualmente.", es_portal_conocido
+        return f"Error técnico: {str(e)}", False
 # ==============================================================================
 # 2. CONFIGURACIÓN DE IA Y CONEXIONES SEGURAS
 # ==============================================================================
