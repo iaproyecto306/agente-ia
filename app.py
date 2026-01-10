@@ -854,29 +854,36 @@ st.markdown("""
         border: 2px solid #00d2ff !important;
     }
 
-    /* 9. TARJETAS DE PLANES RESPONSIVAS Y GLASSMORPHISM */
+   /* 9. TARJETAS DE PLANES RESPONSIVAS (VERSION COMPACTA) */
     .card-wrapper { 
         transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); 
         border-radius: 12px; 
-        height: 600px; 
+        height: 480px; /* Reducido de 600px a 480px */
         margin-bottom: 25px;
-    }
-    
-    .card-wrapper:hover { 
-        transform: translateY(-15px); 
     }
     
     .glass-container { 
         background: rgba(38, 39, 48, 0.7); 
         border: 1px solid rgba(255, 255, 255, 0.1); 
         border-radius: 12px; 
-        padding: 30px; 
+        padding: 25px; 
         text-align: center; 
         position: relative; 
         height: 100%; 
         display: flex; 
         flex-direction: column; 
-        justify-content: space-between; 
+        justify-content: center; /* Cambiado de space-between a center para quitar el espacio al pedo */
+        gap: 15px; /* Esto mantiene los elementos unidos pero con aire elegante */
+    }
+
+    /* Ajuste para que la lista de features no se pegue al precio */
+    .feature-list { 
+        text-align: left; 
+        margin: 10px auto; 
+        display: inline-block; 
+        font-size: 0.95rem; 
+        color: #ddd; 
+        line-height: 1.8; /* Un poco más compacto */
     }
     
     .free-card { 
