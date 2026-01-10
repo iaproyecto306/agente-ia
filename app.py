@@ -1281,11 +1281,17 @@ with c2:
                 st.markdown("<br>", unsafe_allow_html=True)
                 b1, b2, b3 = st.columns(3)
                 
-                # 1. Copiar
+               # 1. Copiar (Versión Robusta)
                 with b1:
                     if st.button(f"📋 COPY"):
-                        st.copy_to_clipboard(st.session_state.last_result)
-                        st.toast(L["copy_success"])
+                        if hasattr(st, "copy_to_clipboard"):
+                            # Si la versión de Streamlit es moderna
+                            st.copy_to_clipboard(st.session_state.last_result)
+                            st.toast(L["copy_success"])
+                        else:
+                            # Si la versión es vieja, mostramos el texto para copiar a mano
+                            st.info("Copia el texto de la caja superior")
+                            st.code(st.session_state.last_result)
                 
                 # 2. WhatsApp Directo
                 with b2:
