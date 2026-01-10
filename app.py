@@ -117,7 +117,7 @@ if "email_usuario" not in st.session_state: st.session_state.email_usuario = ""
 if "plan_usuario" not in st.session_state: st.session_state.plan_usuario = "Gratis"
 if "es_empleado" not in st.session_state: st.session_state.es_empleado = False
 
-# --- 3. DICCIONARIO MAESTRO ACTUALIZADO ---
+# --- 3. DICCIONARIO MAESTRO ACTUALIZADO (CIRUGÍA DE IDIOMAS) ---
 traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en", "title2": "Imanes de Ventas",
@@ -126,7 +126,7 @@ traducciones = {
         "url_placeholder": "🔗 Pega aquí el link de la propiedad (InfoCasas, MercadoLibre, Zillow...)",
         "btn_gen": "✨ GENERAR DESCRIPCIÓN", "p_destacada": "PROPIEDAD DESTACADA",
         "comunidad": "Propiedades de la Comunidad", "popular": "MÁS POPULAR",
-        "plan_title": "Selecciona tu Plan", "annual_toggle": "📅 Ahorrar 20% con Pago Anual",
+        "plan_title": "Selecciona tu Plan", "annual_toggle": "📅 Ahorrar 20% con Pago Anual (Save 20% Yearly)",
         "plan1": "Inicial", "plan2": "Agente Pro", "plan3": "Agencia",
         "desc1": "3 descripciones / día", "t1_1": "Límite diario de generaciones para nuevos usuarios.",
         "desc2": "Soporte Básico", "t1_2": "Ayuda técnica vía email con respuesta en menos de 48hs.",
@@ -513,8 +513,8 @@ with c2:
             with col_t2:
                 idioma_salida = st.selectbox(L.get("lbl_lang_out", "Idioma Salida:"), list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
 
-            # --- MODIFICACIÓN: CAMPO PARA LINK ---
-            url_input = st.text_input("", placeholder="🔗 Pega aquí el link de la propiedad (InfoCasas, MercadoLibre, Zillow...)", label_visibility="collapsed")
+            # --- MODIFICACIÓN: CAMPO PARA LINK DINÁMICO ---
+            url_input = st.text_input("", placeholder=L["url_placeholder"], label_visibility="collapsed")
 
             user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed")
             
@@ -590,10 +590,10 @@ with c2:
             # --- PANEL DE AGENCIA: GESTIÓN Y MONITORIZACIÓN ---
             if plan_actual_norm == "Agencia" and not st.session_state.es_empleado:
                 st.divider()
-                st.subheader("📊 Agency Management Console")
+                st.subheader(L["agency_console"])
                 
-                # Creamos dos pestañas dentro del panel de agencia
-                tab_team, tab_activity = st.tabs(["👥 Manage Team", "📈 Team Activity"])
+                # Creamos dos pestañas dinámicas
+                tab_team, tab_activity = st.tabs([L["manage_team"], L["team_activity"]])
                 
                 with tab_team:
                     st.write("Invite up to 4 agents to your professional account:")
@@ -687,12 +687,12 @@ with col_stat3: st.markdown(f'<div style="text-align:center; padding:20px; borde
 # --- 7. PLANES INTEGRADOS CON PAYPAL (AUTOMATIZADOS) ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 
-# <--- INCISIÓN 4: SWITCH ANUAL Y LÓGICA DE PRECIOS --->
-st.markdown("<h3 style='text-align:center;'>Selecciona tu Plan</h3>", unsafe_allow_html=True)
+# <--- INCISIÓN 4: SWITCH ANUAL DINÁMICO --->
+st.markdown(f"<h3 style='text-align:center;'>{L['plan_title']}</h3>", unsafe_allow_html=True)
 col_sw1, col_sw2, col_sw3 = st.columns([1,2,1])
 with col_sw2:
-    # Interruptor para Pago Anual
-    modo_anual = st.toggle("📅 Ahorrar 20% con Pago Anual (Save 20% Yearly)", value=False)
+    # Interruptor para Pago Anual dinámico
+    modo_anual = st.toggle(L["annual_toggle"], value=False)
 
 # Definimos precios e IDs según el interruptor
 if modo_anual:
