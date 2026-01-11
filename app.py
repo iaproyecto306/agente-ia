@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import urllib.parse
 import time
 import io
-import extra_streamlit_components as stx 
+import extra_streamlit_components as stx
 import random
 
 # ==============================================================================
@@ -155,11 +155,10 @@ except Exception:
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 # ----------------------------------------------------------------------
-#  AQUÍ PEGA TUS URLs DE MAKE (INTEGROMAT)
+#  AQUÍ PEGA TU URL DE MAKE (INTEGROMAT)
 # ----------------------------------------------------------------------
-# Si no las pones, el pago se procesa en PayPal pero tu Excel no se entera.
-WEBHOOK_MAKE_PRO = "PEGAR_TU_WEBHOOK_PRO_AQUI" 
-WEBHOOK_MAKE_AGENCY = "PEGAR_TU_WEBHOOK_AGENCIA_AQUI"
+# Esta URL única manejará tanto Pro como Agencia.
+WEBHOOK_MAKE_GENERAL = "PEGAR_TU_WEBHOOK_AQUI" 
 
 # ==============================================================================
 #
@@ -1324,7 +1323,7 @@ st.markdown("""
     }
     @keyframes float { 
         0% { transform: translateY(0px); } 
-        50% { transform: translateY(-12px); } 
+        50% { transform: translateY(-12px); 
         100% { transform: translateY(0px); } 
     }
 
@@ -1682,13 +1681,11 @@ with c2:
                         st.rerun()
 
         else:
-            WEBHOOK_PRO = "PEGAR_TU_WEBHOOK_PRO_AQUI"
-            WEBHOOK_AGE = "PEGAR_TU_WEBHOOK_AGENCIA_AQUI"
+            # Usamos la misma variable para ambos casos
+            WEBHOOK_TARGET = WEBHOOK_MAKE_GENERAL
+            
             st.error(L["limit_msg"])
             st.markdown(f"#### {L['upgrade_msg']}")
-            
-            # NOTA: Este es el código JS que conecta con Make para actualizar la DB
-            # Reemplaza 'URL_DE_TU_WEBHOOK' con la URL real de tu escenario en Make.com
             
             paypal_bloqueo = f"""
             <div id="pb"></div>
@@ -1708,8 +1705,7 @@ with c2:
                     }});
                 }},
                 onApprove: function(data, actions) {{
-                    // AQUÍ OCURRE LA MAGIA CON MAKE
-                    fetch('{WEBHOOK_PRO}', {{
+                    fetch('{WEBHOOK_TARGET}', {{
                         method: 'POST',
                         headers: {{'Content-Type': 'application/json'}},
                         body: JSON.stringify({{
@@ -1756,9 +1752,11 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
                     st.warning("Full Team.")
         if mi_equipo:
             st.write("---")
+            # --- CORRECCIÓN DE INDENTACIÓN AQUÍ ---
             for miembro in mi_equipo:
                 cm1, cm2 = st.columns([3, 1])
                 cm1.write(f"👤 {miembro}")
+                
                 if cm2.button(L["revoke"], key=f"del_{miembro}"):
                     df_limpio = df_emp[~((df_emp['BossEmail'] == st.session_state.email_usuario) & (df_emp['EmployeeEmail'] == miembro))]
                     conn.update(worksheet="Employees", data=df_limpio)
@@ -1827,9 +1825,8 @@ ahorro_txt = L["annual_save"] if es_anual else ""
 
 col1, col2, col3 = st.columns(3)
 
-# WEBHOOKS PARA PLANES (Debes crearlos en Make.com)
-WEBHOOK_PRO = "https://hook.us1.make.com/TU_ID_PRO" 
-WEBHOOK_AGE = "https://hook.us1.make.com/TU_ID_AGENCIA"
+# WEBHOOK ÚNICO (Usamos la variable definida arriba)
+WEBHOOK_TARGET = WEBHOOK_MAKE_GENERAL
 
 # --- CARD GRATIS ---
 with col1:
@@ -1907,8 +1904,7 @@ with col2:
           }});
         }},
         onApprove: function(data, actions) {{
-            // LLAMADA A MAKE (INTEGROMAT)
-            fetch('{WEBHOOK_PRO}', {{
+            fetch('{WEBHOOK_TARGET}', {{
                 method: 'POST',
                 headers: {{'Content-Type': 'application/json'}},
                 body: JSON.stringify({{
@@ -1969,8 +1965,7 @@ with col3:
           }});
         }},
         onApprove: function(data, actions) {{
-            // LLAMADA A MAKE (INTEGROMAT)
-            fetch('{WEBHOOK_AGE}', {{
+            fetch('{WEBHOOK_TARGET}', {{
                 method: 'POST',
                 headers: {{'Content-Type': 'application/json'}},
                 body: JSON.stringify({{
