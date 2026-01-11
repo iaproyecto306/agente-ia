@@ -168,8 +168,10 @@ def actualizar_usos_db(email, nuevos_usos, plan_actual):
 
     if email in df['email'].values:
         df.loc[df['email'] == email, 'usos'] = nuevos_usos
-        if plan_actual and plan_actual != "Gratis":
-             df.loc[df['email'] == email, 'plan'] = plan_actual.title()
+        # FIX IMPORTANTE: Si el plan actual es Pro, asegurarse de que se guarde como Pro
+        # Esto evita que un empleado Pro sea degradado a Gratis por error al actualizar usos
+        if plan_actual and plan_actual.lower() in ["pro", "agencia", "agency"]:
+             df.loc[df['email'] == email, 'plan'] = "Pro"
     else:
         nueva_fila = pd.DataFrame({
             "email": [email], 
@@ -311,13 +313,6 @@ traducciones = {
         "stat1": "Optimized Ads",
         "stat2": "Time Saved",
         "stat3": "Conversion",
-        "test_title": "What Experts Say",
-        "test1_txt": "Sales went up 50%.",
-        "test1_au": "Carlos R. (RE/MAX)",
-        "test2_txt": "Saves hours of writing.",
-        "test2_au": "Ana M. (Century 21)",
-        "test3_txt": "Agency plan is vital.",
-        "test3_au": "Luis P. (Independent)",
         "foot_desc": "AI for Real Estate.",
         "mail_label": "📧 Professional Email",
         "limit_msg": "🚫 Free limit reached.",
@@ -339,7 +334,6 @@ traducciones = {
         "badge_free": "FREE USER",
         "badge_pro": "PRO MEMBER",
         "badge_agency": "AGENCY PARTNER",
-        "api_soon": "API Access (Coming Soon)",
         "legal_title": "Terms & Privacy",
         "logout": "Log Out",
         "welcome": "Welcome",
@@ -363,7 +357,6 @@ traducciones = {
         "tone_story": "Storytelling",
         "emp_email_lbl": "Agent Email",
         "emp_add_btn": "ADD",
-        # KEYS DE SECCIÓN AGREGADAS
         "sec_1": "SECTION 1: MAIN DESCRIPTION",
         "sec_2": "SECTION 2: TECHNICAL SPECS",
         "sec_3": "SECTION 3: WHATSAPP COPY",
@@ -396,7 +389,7 @@ traducciones = {
         "desc4": "Generaciones Ilimitadas",
         "t2_1": "Sin límites.",
         "desc5": "Pack Redes Sociales",
-        "t2_2": "Scripts Insta/TikTok.",
+        "t2_2": "Scripts para Instagram, TikTok y Reels.",
         "desc6": "Optimización SEO",
         "t2_3": "Palabras clave.",
         "desc7": "Banner Principal",
@@ -435,7 +428,7 @@ traducciones = {
         "upgrade_msg": "Pásate a PRO para seguir vendiendo.",
         "lbl_tone": "Tono:",
         "lbl_lang_out": "Idioma Salida:",
-        "annual_toggle": "📅 Ahorrar 20% Anual",
+        "annual_toggle": "📅 Ahorrar 20% con Pago Anual",
         "annual_save": "✅ 2 Meses GRATIS incluidos",
         "whatsapp": "Enviar a WhatsApp",
         "download": "Descargar Reporte .txt",
@@ -443,19 +436,20 @@ traducciones = {
         "revoke": "Revocar Acceso",
         "manage_team": "👥 Gestionar Equipo",
         "team_activity": "📈 Actividad",
-        "refine_pl": "🔄 Ajuste rápido...",
-        "social_title": "📱 Pack Redes Sociales",
+        "refine_pl": "🔄 Ajuste rápido (ej: hazlo más corto)...",
+        "social_title": "📱 Social Media Pack",
         "char_count": "Caracteres",
-        "link_warn": "⚠️ Link no reconocido.",
-        "badge_free": "GRATIS",
-        "badge_pro": "PRO",
-        "badge_agency": "AGENCIA",
-        "legal_title": "Legales",
+        "link_warn": "⚠️ Este link no parece ser de un portal conocido.",
+        "badge_free": "USUARIO GRATIS",
+        "badge_pro": "MIEMBRO PRO",
+        "badge_agency": "SOCIO AGENCIA",
+        "api_soon": "Acceso API (Próximamente)",
+        "legal_title": "Términos Legales & Privacidad",
         "logout": "Cerrar Sesión",
         "welcome": "Bienvenido",
-        "usage_bar": "Progreso",
-        "feedback_lbl": "💡 Ayuda",
-        "feedback_btn": "Enviar",
+        "usage_bar": "Progreso Diario",
+        "feedback_lbl": "💡 Sugerencias / Soporte",
+        "feedback_btn": "Enviar Comentario",
         "support_mail": "Soporte",
         "credits_left": "Créditos hoy:",
         "welcome_morn": "Buenos días",
@@ -465,15 +459,14 @@ traducciones = {
         "strategy_gen": "ESTRATEGIA GENERADA",
         "desc_luxury": "DESCRIPCIÓN LUJO",
         "btn_refine": "Refinar / Ajustar",
-        "analyzing_msg": "ANALIZANDO PROPIEDAD...",
-        "feedback_success": "✅ Feedback enviado.",
+        "analyzing_msg": "ANALIZANDO PROPIEDAD Y REDACTANDO ESTRATEGIA...",
+        "feedback_success": "✅ ¡Gracias! Tu comentario ha sido guardado.",
         "tone_lux": "Lujo",
         "tone_prof": "Profesional",
         "tone_urg": "Urgencia",
         "tone_story": "Storytelling",
         "emp_email_lbl": "Email Agente",
         "emp_add_btn": "AÑADIR",
-        # KEYS AGREGADAS ESPAÑOL
         "sec_1": "SECCIÓN 1: DESCRIPCIÓN PRINCIPAL",
         "sec_2": "SECCIÓN 2: FICHA TÉCNICA",
         "sec_3": "SECCIÓN 3: COPY WHATSAPP",
@@ -777,24 +770,25 @@ traducciones = {
         "link_warn": "⚠️ Link Fehler.",
         "badge_free": "GRATIS",
         "badge_pro": "PRO MITGLIED",
-        "badge_agency": "AGENTUR",
+        "badge_agency": "AGENTUR PARTNER",
+        "api_soon": "API (Bald)",
         "legal_title": "Rechtliches",
         "logout": "Abmelden",
         "welcome": "Willkommen",
-        "usage_bar": "Fortschritt",
-        "feedback_lbl": "💡 Support",
+        "usage_bar": "Täglicher Fortschritt",
+        "feedback_lbl": "💡 Vorschläge / Support",
         "feedback_btn": "Senden",
         "support_mail": "Support",
-        "credits_left": "Credits:",
+        "credits_left": "Credits heute:",
         "welcome_morn": "Guten Morgen",
         "welcome_aft": "Guten Tag",
         "welcome_eve": "Guten Abend",
-        "impact_text": "IMPAKT GESTEIGERT",
+        "impact_text": "VERKAUFSIMPAKT GESTEIGERT",
         "strategy_gen": "STRATEGIE GENERIERT",
         "desc_luxury": "LUXUS BESCHREIBUNG",
         "btn_refine": "Verfeinern",
-        "analyzing_msg": "ANALYSIEREN...",
-        "feedback_success": "✅ Danke!",
+        "analyzing_msg": "IMMOBILIE WIRD ANALYSIERT...",
+        "feedback_success": "✅ Danke für Ihr Feedback!",
         "tone_lux": "Luxus",
         "tone_prof": "Professionell",
         "tone_urg": "Dringlichkeit",
@@ -859,6 +853,13 @@ traducciones = {
         "stat1": "已优化",
         "stat2": "时间",
         "stat3": "转化",
+        "test_title": "专家评价",
+        "test1_txt": "销售额+50%。",
+        "test1_au": "Carlos R.",
+        "test2_txt": "节省时间。",
+        "test2_au": "Ana M.",
+        "test3_txt": "机构必备。",
+        "test3_au": "Luis P.",
         "foot_desc": "房地产AI。",
         "mail_label": "📧 邮箱",
         "limit_msg": "🚫 限制已达。",
@@ -880,14 +881,15 @@ traducciones = {
         "badge_free": "免费用户",
         "badge_pro": "专业会员",
         "badge_agency": "机构伙伴",
-        "legal_title": "条款",
+        "api_soon": "API (即将推出)",
+        "legal_title": "条款和隐私",
         "logout": "退出",
         "welcome": "欢迎",
-        "usage_bar": "进度",
-        "feedback_lbl": "💡 反馈",
-        "feedback_btn": "发送",
+        "usage_bar": "每日进度",
+        "feedback_lbl": "💡 反馈 / 支持",
+        "feedback_btn": "发送反馈",
         "support_mail": "支持",
-        "credits_left": "额度:",
+        "credits_left": "今日额度:",
         "welcome_morn": "早上好",
         "welcome_aft": "下午好",
         "welcome_eve": "晚上好",
@@ -895,8 +897,8 @@ traducciones = {
         "strategy_gen": "生成策略",
         "desc_luxury": "豪华描述",
         "btn_refine": "完善",
-        "analyzing_msg": "分析中...",
-        "feedback_success": "✅ 谢谢！",
+        "analyzing_msg": "正在分析属性...",
+        "feedback_success": "✅ 谢谢！您的反馈已保存。",
         "tone_lux": "豪华",
         "tone_prof": "专业",
         "tone_urg": "紧迫感",
@@ -921,7 +923,7 @@ traducciones = {
 
 st.markdown("""
 <style>
-    /* 1. FIX DEL SCROLL SUPERIOR */
+    /* 1. FIX DEL SCROLL SUPERIOR (PADDING REMOVIDO) */
     .block-container {
         padding-top: 1rem !important; 
         padding-bottom: 5rem !important;
@@ -1006,7 +1008,7 @@ st.markdown("""
         margin-bottom: 40px; 
     }
 
-    /* 7. HUD SUPERIOR */
+    /* 7. HUD SUPERIOR (IDENTIDAD) */
     .hud-bar { 
         display: flex; 
         justify-content: space-between; 
@@ -1047,7 +1049,7 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(221, 160, 221, 0.4); 
     }
 
-    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK CON BORDE VIOLETA) */
+    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK) CON BORDE VIOLETA */
     .result-container {
         background: rgba(20, 20, 20, 0.95);
         color: #f0f0f0;
@@ -1063,7 +1065,7 @@ st.markdown("""
         backdrop-filter: blur(10px);
     }
 
-    /* 9. BOTÓN GENERAR */
+    /* 9. BOTÓN GENERAR PLATINUM */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; 
         border: none !important; 
@@ -1085,7 +1087,7 @@ st.markdown("""
         border: 2px solid #00d2ff !important; 
     }
 
-    /* 10. TARJETAS DE PLANES */
+    /* 10. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ */
     .card-wrapper { 
         transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
@@ -1155,7 +1157,7 @@ st.markdown("""
         background-color: #fff;
     }
 
-    /* 11. TOOLTIPS */
+    /* 11. TOOLTIPS DE AYUDA */
     .info-icon { 
         display: inline-block; 
         width: 16px; 
@@ -1215,8 +1217,8 @@ st.markdown("""
         line-height: 2.0; 
     }
     
-    /* 12. BANNER ANIMADO */
-    .video-placeholder { 
+    /* 12. BANNER ANIMADO DE FONDO */
+    .video-placeholder {
         border-radius: 12px; 
         height: 250px; 
         display: flex; 
@@ -1537,7 +1539,7 @@ with c2:
                 st.error("Invalid Email.")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- MOTOR DE GENERACIÓN IA PLATINUM ---
+    # --- APP IA ---
     elif st.session_state.email_usuario:
         es_pro = st.session_state.plan_usuario in ["Pro", "Agencia"]
         limite_usos = 99999 if es_pro else 3
@@ -1732,8 +1734,15 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
             # FIX: Botón traducido
             if st.button(L["emp_add_btn"]):
                 if len(mi_equipo) < 4 and "@" in nuevo_e:
-                    new_row = pd.DataFrame({"BossEmail": [st.session_state.email_usuario], "EmployeeEmail": [nuevo_e.strip().lower()]})
-                    conn.update(worksheet="Employees", data=pd.concat([df_emp, new_row], ignore_index=True))
+                    new_row_emp = pd.DataFrame({"BossEmail": [st.session_state.email_usuario], "EmployeeEmail": [nuevo_e.strip().lower()]})
+                    conn.update(worksheet="Employees", data=pd.concat([df_emp, new_row_emp], ignore_index=True))
+                    
+                    # FIX: Doble escritura para agregar a Sheet1 como Pro inmediatamente
+                    df_main = obtener_datos_db()
+                    if nuevo_e.strip().lower() not in df_main['email'].values:
+                        new_row_main = pd.DataFrame({"email": [nuevo_e.strip().lower()], "usos": [0], "plan": ["Pro"]})
+                        conn.update(worksheet="Sheet1", data=pd.concat([df_main, new_row_main], ignore_index=True))
+                    
                     st.rerun()
                 elif len(mi_equipo) >= 4:
                     st.warning("Full Team (Max 4).")
