@@ -13,7 +13,9 @@ import extra_streamlit_components as stx
 import random
 
 # ==============================================================================
-# 0. GESTOR DE COOKIES (MEMORIA PERMANENTE)
+#
+#    0. GESTOR DE COOKIES (MEMORIA PERMANENTE)
+#
 # ==============================================================================
 
 if "cookie_manager" not in st.session_state:
@@ -22,7 +24,9 @@ if "cookie_manager" not in st.session_state:
 cookie_manager = st.session_state.cookie_manager
 
 # ==============================================================================
-# 1. MOTOR DE EXTRACCIÓN (NINJA V6.0)
+#
+#    1. MOTOR DE EXTRACCIÓN (NINJA V6.0)
+#
 # ==============================================================================
 
 def extraer_datos_inmueble(url):
@@ -30,6 +34,7 @@ def extraer_datos_inmueble(url):
     Función Ninja v6.0.
     Estrategia de 3 capas para intentar saltar el bloqueo de IP de servidor.
     """
+    
     # 1. Validación básica de dominio
     portales_validos = [
         "infocasas", 
@@ -47,9 +52,10 @@ def extraer_datos_inmueble(url):
     es_portal_conocido = any(portal in url.lower() for portal in portales_validos)
     texto_final = ""
     
-    # --- MÉTODO A: PUENTE JINA AI ---
+    # --------------------------------------------------------------------------
+    # CAPA 1: JINA AI
+    # --------------------------------------------------------------------------
     try:
-        # Añadimos un timestamp para evitar caché
         url_jina = f"https://r.jina.ai/{url}"
         
         headers_jina = {
@@ -68,7 +74,9 @@ def extraer_datos_inmueble(url):
     except:
         pass
 
-    # --- MÉTODO B: IMITACIÓN NAVEGADOR PC ---
+    # --------------------------------------------------------------------------
+    # CAPA 2: NAVEGADOR PC
+    # --------------------------------------------------------------------------
     if not texto_final or len(texto_final) < 500:
         try:
             headers_pc = {
@@ -91,9 +99,11 @@ def extraer_datos_inmueble(url):
             )
             
             if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'html.parser')
+                soup = BeautifulSoup(
+                    response.text, 
+                    'html.parser'
+                )
                 
-                # Eliminamos basura
                 for element in soup(['script', 'style', 'nav', 'footer', 'iframe', 'svg', 'button']):
                     element.decompose()
                     
@@ -101,7 +111,9 @@ def extraer_datos_inmueble(url):
         except:
             pass
 
-    # --- MÉTODO C: IMITACIÓN MÓVIL ---
+    # --------------------------------------------------------------------------
+    # CAPA 3: MÓVIL
+    # --------------------------------------------------------------------------
     if not texto_final or len(texto_final) < 500:
         try:
             headers_movil = {
@@ -115,7 +127,10 @@ def extraer_datos_inmueble(url):
             )
             
             if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'html.parser')
+                soup = BeautifulSoup(
+                    response.text, 
+                    'html.parser'
+                )
                 
                 for element in soup(['script', 'style', 'nav', 'footer']):
                     element.decompose()
@@ -128,38 +143,37 @@ def extraer_datos_inmueble(url):
     if len(texto_final) > 400:
         return texto_final[:6000], es_portal_conocido
     else:
-        return "⚠️ SECURITY ALERT: Automated access blocked. Please copy/paste description manually.", es_portal_conocido
+        return "⚠️ SECURITY ALERT: Automated access blocked. Please copy description manually.", es_portal_conocido
 
 # ==============================================================================
-# 2. CONFIGURACIÓN DE IA Y CONEXIONES SEGURAS
+#
+#    2. CONFIGURACIÓN DE IA Y CONEXIONES
+#
 # ==============================================================================
 
-# Verificación de API Key de OpenAI
 try:
     api_key = st.secrets["OPENAI_API_KEY"]
     client = OpenAI(api_key=api_key)
 except Exception:
-    st.error("⚠️ CRITICAL ERROR: OPENAI_API_KEY not found in Streamlit Secrets.")
+    st.error("⚠️ CRITICAL ERROR: OPENAI_API_KEY not found.")
     st.stop()
 
-# Conexión a Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# --- FUNCIONES DE BASE DE DATOS (CON PASS, RESETEO Y VENCIMIENTO) ---
+# ==============================================================================
+#
+#    3. FUNCIONES DE BASE DE DATOS
+#
+# ==============================================================================
 
 def obtener_datos_db():
-    """Obtiene la base de datos de usuarios principales."""
     try:
-        # ttl=0 OBLIGATORIO para ver cambios manuales en el Excel al instante
         df = conn.read(worksheet="Sheet1", ttl=0)
-        
-        # Normalizamos: todo minúscula y sin espacios
         df['email'] = df['email'].astype(str).str.strip().str.lower()
         
         if 'plan' in df.columns:
             df['plan'] = df['plan'].astype(str).str.strip().str.title()
             
-        # Aseguramos columnas nuevas
         if 'vencimiento' not in df.columns:
             df['vencimiento'] = ""
             
@@ -171,10 +185,11 @@ def obtener_datos_db():
             
         return df
     except:
-        return pd.DataFrame(columns=['email', 'usos', 'plan', 'vencimiento', 'ultima_fecha', 'password'])
+        return pd.DataFrame(
+            columns=['email', 'usos', 'plan', 'vencimiento', 'ultima_fecha', 'password']
+        )
 
 def obtener_empleados_db():
-    """Obtiene la base de datos de empleados."""
     try:
         df = conn.read(worksheet="Employees", ttl=0)
         df['BossEmail'] = df['BossEmail'].astype(str).str.strip().str.lower()
@@ -184,7 +199,6 @@ def obtener_empleados_db():
         return pd.DataFrame(columns=['BossEmail', 'EmployeeEmail'])
 
 def obtener_historial_db():
-    """Obtiene el historial completo de generaciones."""
     try:
         df = conn.read(worksheet="Historial", ttl=0)
         return df
@@ -192,7 +206,6 @@ def obtener_historial_db():
         return pd.DataFrame(columns=['fecha', 'email', 'input', 'output'])
 
 def actualizar_usos_db(email, nuevos_usos, plan_actual):
-    """Actualiza el consumo de usos y la fecha de uso."""
     email = email.strip().lower() 
     df = obtener_datos_db()
     hoy_str = datetime.now().strftime("%Y-%m-%d")
@@ -204,11 +217,9 @@ def actualizar_usos_db(email, nuevos_usos, plan_actual):
         df.loc[df['email'] == email, 'usos'] = nuevos_usos
         df.loc[df['email'] == email, 'ultima_fecha'] = hoy_str
         
-        # PROTEGER PLAN PRO/AGENCIA
         if plan_actual and plan_actual.lower() in ["pro", "agencia", "agency"]:
              df.loc[df['email'] == email, 'plan'] = "Pro"
     else:
-        # ESTO ES UN FAILSAFE, NORMALMENTE EL LOGIN YA CREÓ EL USUARIO
         nueva_fila = pd.DataFrame({
             "email": [email], 
             "usos": [nuevos_usos], 
@@ -222,10 +233,6 @@ def actualizar_usos_db(email, nuevos_usos, plan_actual):
     conn.update(worksheet="Sheet1", data=df)
 
 def verificar_reseteo_diario(email):
-    """
-    Compara la fecha de hoy con la última fecha de uso.
-    Si son distintas (es un nuevo día), resetea 'usos' a 0.
-    """
     df = obtener_datos_db()
     if email in df['email'].values:
         row = df[df['email'] == email].iloc[0]
@@ -233,7 +240,6 @@ def verificar_reseteo_diario(email):
         hoy = datetime.now().strftime("%Y-%m-%d")
         
         if ultima != hoy:
-            # Nuevo día: Resetear contador
             df.loc[df['email'] == email, 'usos'] = 0
             df.loc[df['email'] == email, 'ultima_fecha'] = hoy
             conn.update(worksheet="Sheet1", data=df)
@@ -243,14 +249,10 @@ def verificar_reseteo_diario(email):
     return 0
 
 def verificar_vencimiento(email, plan_actual):
-    """
-    Revisa si el plan ha vencido.
-    """
     if plan_actual == "Gratis":
         return "Gratis"
     
     df = obtener_datos_db()
-    
     if email in df['email'].values:
         row = df[df['email'] == email].iloc[0]
         fecha_str = str(row['vencimiento']).strip()
@@ -258,24 +260,15 @@ def verificar_vencimiento(email, plan_actual):
         if fecha_str and fecha_str.lower() != "nan" and fecha_str != "":
             try:
                 fecha_venc = datetime.strptime(fecha_str, "%Y-%m-%d")
-                
-                # Si hoy es mayor que el vencimiento, CORTAR SERVICIO
                 if datetime.now() > fecha_venc:
                     df.loc[df['email'] == email, 'plan'] = 'Gratis'
                     conn.update(worksheet="Sheet1", data=df)
                     return "Gratis"
             except:
                 pass 
-                
     return plan_actual
 
 def procesar_login_registro(email, input_pass):
-    """
-    Maneja la lógica de Login Y Registro en un solo paso.
-    - Si existe: Verifica Password.
-    - Si NO existe: Crea usuario con ese Password.
-    Retorna: (Exito, Mensaje, EsNuevo)
-    """
     email = email.strip().lower()
     input_pass = input_pass.strip()
     
@@ -286,39 +279,37 @@ def procesar_login_registro(email, input_pass):
         row = df_users[df_users['email'] == email].iloc[0]
         stored_pass = str(row['password']).strip()
         
-        # Si tiene contraseña guardada, verificarla
         if stored_pass and stored_pass.lower() != "nan" and stored_pass != "":
+            # Si hay contraseña guardada, verificarla
             if input_pass != stored_pass:
-                return False, "❌ Contraseña incorrecta.", False
+                return False, "❌ Incorrect Password / Contraseña Incorrecta.", False
             else:
-                return True, "✅ Login exitoso.", False
+                return True, "✅ Login Success.", False
         else:
-            # Si NO tiene contraseña (ej: creado manualmente sin pass), dejamos pasar
-            # Opcional: Podríamos guardar la pass ahora, pero mejor no complicar.
-            return True, "✅ Login exitoso (Sin pass).", False
+            # Si no hay pass, pasa directo (Modo abierto para antiguos o gratis)
+            return True, "✅ Login Success.", False
             
     # 2. USUARIO NUEVO (AUTO-REGISTRO)
     else:
-        # Creamos el usuario con la contraseña que puso
         hoy_str = datetime.now().strftime("%Y-%m-%d")
+        
         nueva_fila = pd.DataFrame({
             "email": [email], 
             "usos": [0], 
             "plan": ["Gratis"],
             "vencimiento": [""],
             "ultima_fecha": [hoy_str],
-            "password": [input_pass] # Guardamos la contraseña para el futuro
+            "password": [input_pass]
         })
         
         try:
             df_updated = pd.concat([df_users, nueva_fila], ignore_index=True)
             conn.update(worksheet="Sheet1", data=df_updated)
-            return True, "✨ Cuenta creada exitosamente.", True
+            return True, "✨ Account Created Successfully.", True
         except Exception as e:
-            return False, f"Error creando usuario: {e}", False
+            return False, f"Error creating user: {e}", False
 
 def guardar_historial(email, input_user, output_ia):
-    """Guarda cada generación en la hoja Historial."""
     try:
         try:
             df_hist = conn.read(worksheet="Historial", ttl=0)
@@ -334,11 +325,10 @@ def guardar_historial(email, input_user, output_ia):
         
         df_final = pd.concat([df_hist, nueva_fila], ignore_index=True)
         conn.update(worksheet="Historial", data=df_final)
-    except Exception as e:
-        print(f"Error saving history: {e}")
+    except:
+        pass
 
 def guardar_feedback(email, mensaje):
-    """Guarda los mensajes de soporte."""
     try:
         try:
             df_feed = conn.read(worksheet="Feedback", ttl=0)
@@ -354,13 +344,10 @@ def guardar_feedback(email, mensaje):
         df_final = pd.concat([df_feed, nueva_fila], ignore_index=True)
         conn.update(worksheet="Feedback", data=df_final)
         return True
-    except Exception as e:
+    except:
         return False
 
 def generar_texto(prompt, modelo="gpt-4o"):
-    """
-    Motor de generación de texto IA.
-    """
     try:
         response = client.chat.completions.create(
             model=modelo,
@@ -385,12 +372,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Inicialización de variables de sesión
 if "usos" not in st.session_state: st.session_state.usos = 0
 if "email_usuario" not in st.session_state: st.session_state.email_usuario = ""
 if "plan_usuario" not in st.session_state: st.session_state.plan_usuario = "Gratis"
 if "es_empleado" not in st.session_state: st.session_state.es_empleado = False
-# FIX: IDIOMA POR DEFECTO INGLÉS
 if "idioma" not in st.session_state: st.session_state.idioma = "English"
 if "last_result" not in st.session_state: st.session_state.last_result = None
 
@@ -561,7 +546,7 @@ traducciones = {
         "stat3": "Más Consultas", 
         "foot_desc": "IA Inmobiliaria.",
         "mail_label": "📧 Email Profesional", 
-        "pass_label": "🔑 Contraseña",
+        "pass_label": "🔑 Contraseña (Si tienes)",
         "limit_msg": "🚫 Límite gratuito alcanzado.", 
         "upgrade_msg": "Pásate a PRO para seguir vendiendo.",
         "lbl_tone": "Tono:", 
@@ -629,7 +614,7 @@ traducciones = {
         "sub": "A ferramenta secreta dos top produtores.",
         "placeholder": "🏠 Descreva o imóvel...", 
         "url_placeholder": "🔗 Cole o link...", 
-        "btn_gen": "✨ GERAR ESTRATÉGIA",
+        "btn_gen": "✨ GERAR ESTRATÉGIA", 
         "p_destacada": "DESTAQUE", 
         "comunidad": "Comunidade", 
         "popular": "POPULAR",
@@ -769,7 +754,7 @@ traducciones = {
         "t3_4": "Double exposition.", 
         "btn1": "GRATUIT", 
         "btn2": "UPGRADE", 
-        "btn3": "CONTACT",
+        "btn3": "CONTACT", 
         "how_title": "Comment ça marche?", 
         "step1_t": "Lien", 
         "step1_d": "Ou écrire.",
@@ -847,10 +832,10 @@ traducciones = {
         "sub": "Das geheime KI-Tool.",
         "placeholder": "🏠 Beschreibung...", 
         "url_placeholder": "🔗 Link einfügen...", 
-        "btn_gen": "✨ STRATEGIE GENERIEREN", 
+        "btn_gen": "✨ GENERIEREN", 
         "p_destacada": "HIGHLIGHT", 
         "comunidad": "Community", 
-        "popular": "BELIEBT",
+        "popular": "BELIEBT", 
         "plan1": "Start", 
         "plan2": "Pro", 
         "plan3": "Agentur", 
@@ -891,7 +876,7 @@ traducciones = {
         "stat3": "Konversion", 
         "foot_desc": "Immo-KI.", 
         "mail_label": "📧 E-Mail", 
-        "pass_label": "🔑 Passwort",
+        "pass_label": "🔑 Passwort", 
         "limit_msg": "🚫 Limit erreicht.", 
         "upgrade_msg": "Upgrade auf PRO.", 
         "lbl_tone": "Ton:", 
@@ -946,7 +931,7 @@ traducciones = {
         "monitor_empty": "Keine Daten.", 
         "expired_msg": "⚠️ Abgelaufen.",
         "test_title": "Experten", "test1_txt": "Umsatz +50%.", "test1_au": "Carlos R.",
-        "test2_txt": "Zeit gespart.", "test2_au": "Ana M.", "test3_txt": "Wichtig.", "test3_au": "Luis P."
+        "test2_txt": "Zeit gespart.", "test2_au": "Ana M.", "test3_txt": "Wichtig.", "test3_au": "Luis P." 
     },
     "中文": {
         "title1": "广告转化", 
@@ -957,7 +942,7 @@ traducciones = {
         "btn_gen": "✨ 生成策略", 
         "p_destacada": "精选", 
         "comunidad": "社区", 
-        "popular": "最受欢迎", 
+        "popular": "热门", 
         "plan1": "基础", 
         "plan2": "专业", 
         "plan3": "机构", 
@@ -1053,7 +1038,7 @@ traducciones = {
         "monitor_empty": "无数据。", 
         "expired_msg": "⚠️ 过期。", 
         "test_title": "专家评价", "test1_txt": "销售额+50%。",
-        "test1_au": "Carlos R.", "test2_txt": "节省时间。", "test2_au": "Ana M.", "test3_txt": "机构必备。", "test3_au": "Luis P."
+        "test1_au": "Carlos R.", "test2_txt": "节省时间。", "test2_au": "Ana M.", "test3_txt": "机构必备。", "test3_au": "Luis P." 
     }
 }
 
@@ -1063,70 +1048,57 @@ traducciones = {
 
 st.markdown("""
 <style>
-    /* 1. FIX DEL SCROLL SUPERIOR */
+    /* CSS CORE */
     .block-container { 
         padding-top: 1rem !important; 
         padding-bottom: 5rem !important; 
     }
-
-    /* 2. RESET Y FONDO GLOBAL */
     .stApp { 
         background-color: #0e1117; 
         color: #FFFFFF; 
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
     }
-    
-    /* 3. ELIMINAR GHOST LINKS DE STREAMLIT */
     .stMarkdown h1 a, 
     .stMarkdown h2 a, 
     .stMarkdown h3 a, 
     .stMarkdown h4 a { 
         display: none !important; 
     }
-    
     .stMarkdown a { 
         text-decoration: none !important; 
         color: inherit !important; 
         pointer-events: none !important; 
     }
-    
     [data-testid="stHeader"] { 
         background: rgba(0,0,0,0); 
     }
-    
     #MainMenu { 
         visibility: hidden; 
     }
-    
     footer { 
         visibility: hidden; 
     }
-
-    /* 4. SCROLLBAR DE LUJO */
+    
+    /* SCROLLBAR */
     ::-webkit-scrollbar { 
         width: 6px; 
     }
-    
     ::-webkit-scrollbar-track { 
         background: #0e1117; 
     }
-    
     ::-webkit-scrollbar-thumb { 
         background: #333; 
         border-radius: 10px; 
     }
-    
     ::-webkit-scrollbar-thumb:hover { 
         background: #00d2ff; 
     }
-
-    /* 5. SELECCIÓN DE TEXTO NEÓN */
+    
+    /* UI ELEMENTS */
     ::selection { 
         background: rgba(0, 210, 255, 0.25); 
         color: #00d2ff; 
     }
-
-    /* 6. TIPOGRAFÍA Y TÍTULOS */
     .neon-title { 
         font-size: 3.8rem; 
         font-weight: 800; 
@@ -1135,20 +1107,18 @@ st.markdown("""
         color: white; 
         text-shadow: 0 0 30px rgba(0, 210, 255, 0.5); 
     }
-    
     .neon-highlight { 
         color: #00d2ff; 
         text-shadow: 0 0 45px rgba(0, 210, 255, 0.8); 
     }
-    
     .subtitle { 
         text-align: center; 
         font-size: 1.2rem; 
         color: #aaa; 
         margin-bottom: 40px; 
     }
-
-    /* 7. HUD SUPERIOR */
+    
+    /* HUD */
     .hud-bar { 
         display: flex; 
         justify-content: space-between; 
@@ -1160,7 +1130,6 @@ st.markdown("""
         margin-bottom: 35px; 
         backdrop-filter: blur(10px); 
     }
-    
     .badge-neon { 
         padding: 6px 18px; 
         border-radius: 25px; 
@@ -1170,33 +1139,28 @@ st.markdown("""
         text-transform: uppercase; 
         letter-spacing: 1px; 
     }
-    
     .badge-free { 
         border-color: #aaa; 
         color: #aaa; 
     }
-    
     .badge-pro { 
         border-color: #00d2ff; 
         color: #00d2ff; 
         box-shadow: 0 0 15px rgba(0,210,255,0.3); 
     }
-    
-    /* FIX: AGENCIA VIOLETA (#DDA0DD) RESTAURADO */
     .badge-agency { 
         border-color: #DDA0DD; 
         color: #DDA0DD; 
         box-shadow: 0 0 15px rgba(221, 160, 221, 0.4); 
     }
-
-    /* 8. RESULTADO LUXURY - ESTÉTICA DINÁMICA */
+    
+    /* RESULTS */
     .result-container { 
         background: rgba(20, 20, 20, 0.95); 
         color: #f0f0f0; 
         padding: 30px; 
         border-radius: 15px; 
         border: 1px solid rgba(255, 255, 255, 0.1); 
-        /* Border top dinámico */
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         font-size: 1.1rem; 
         line-height: 1.6; 
@@ -1204,8 +1168,8 @@ st.markdown("""
         box-shadow: 0 15px 40px rgba(0,0,0,0.8); 
         backdrop-filter: blur(10px); 
     }
-
-    /* 9. BOTÓN GENERAR PLATINUM */
+    
+    /* BUTTONS */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; 
         border: none !important; 
@@ -1218,7 +1182,6 @@ st.markdown("""
         border-radius: 12px !important; 
         text-transform: uppercase; 
     }
-    
     div.stButton > button[kind="primary"]:hover { 
         background: #000000 !important; 
         color: #ffffff !important; 
@@ -1226,8 +1189,8 @@ st.markdown("""
         box-shadow: 0 0 50px rgba(0, 210, 255, 1), 0 0 20px rgba(0, 210, 255, 0.6) !important; 
         border: 2px solid #00d2ff !important; 
     }
-
-    /* 10. TARJETAS DE PLANES */
+    
+    /* CARDS */
     .card-wrapper { 
         transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
@@ -1236,11 +1199,9 @@ st.markdown("""
         position: relative; 
         will-change: transform; 
     }
-    
     .card-wrapper:hover { 
         transform: translateY(-10px); 
     }
-    
     .glass-container { 
         background: rgba(30, 31, 38, 0.95); 
         border: 1px solid rgba(255, 255, 255, 0.1); 
@@ -1254,29 +1215,24 @@ st.markdown("""
         justify-content: center; 
         gap: 15px; 
     }
-    
     .free-card:hover { 
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); 
+        box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2); 
+        border-color: rgba(255,255,255,0.4); 
     }
-    
     .pro-card { 
         border: 1px solid rgba(0, 210, 255, 0.3) !important; 
     }
-    
     .pro-card:hover { 
         border: 1px solid rgba(0, 210, 255, 0.6) !important; 
         box-shadow: 0 10px 30px rgba(0, 210, 255, 0.3); 
     }
-    
     .agency-card { 
         border: 1px solid rgba(221, 160, 221, 0.3) !important; 
     }
-    
     .agency-card:hover { 
         border: 1px solid rgba(221, 160, 221, 0.6) !important; 
         box-shadow: 0 10px 30px rgba(221, 160, 221, 0.3); 
     }
-
     .popular-badge { 
         position: absolute; 
         top: -12px; 
@@ -1289,14 +1245,12 @@ st.markdown("""
         font-weight: 900; 
         font-size: 0.85rem; 
         z-index: 10; 
-        transition: background 0.2s ease; 
+    }
+    .glass-container h3 { 
+        margin-top: 15px !important; 
     }
 
-    .card-wrapper:hover .popular-badge { 
-        background-color: #fff; 
-    }
-
-    /* 11. TOOLTIPS */
+    /* TOOLTIPS */
     .info-icon { 
         display: inline-block; 
         width: 16px; 
@@ -1310,25 +1264,21 @@ st.markdown("""
         position: relative; 
         font-weight: bold; 
     }
-    
     .i-free { 
         background-color: rgba(255, 255, 255, 0.1); 
         color: #fff; 
         border: 1px solid rgba(255, 255, 255, 0.3); 
     }
-    
     .i-pro { 
         background-color: rgba(0, 210, 255, 0.15); 
         color: #00d2ff; 
         border: 1px solid rgba(0, 210, 255, 0.5); 
     }
-    
     .i-agency { 
         background-color: rgba(221, 160, 221, 0.15); 
         color: #DDA0DD; 
         border: 1px solid rgba(221, 160, 221, 0.5); 
     }
-    
     .info-icon:hover::after { 
         content: attr(data-tooltip); 
         position: absolute; 
@@ -1340,25 +1290,23 @@ st.markdown("""
         padding: 12px 16px; 
         border-radius: 8px; 
         font-size: 12px; 
-        width: 230px; 
+        width: 220px; 
         z-index: 999; 
         box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
         border: 1px solid rgba(255,255,255,0.1); 
-        line-height: 1.5; 
-        text-align: left; 
-        font-weight: normal; 
+        line-height: 1.4; 
+        text-align: center; 
     }
-    
     .feature-list { 
         text-align: left; 
-        margin: 15px auto; 
+        margin: 10px auto; 
         display: inline-block; 
         font-size: 0.95rem; 
         color: #ddd; 
-        line-height: 2.0; 
+        line-height: 1.8; 
     }
     
-    /* 12. BANNER */
+    /* ANIMATIONS */
     .video-placeholder { 
         border-radius: 12px; 
         height: 250px; 
@@ -1375,7 +1323,6 @@ st.markdown("""
         animation: float 5s ease-in-out infinite, adCarousel 24s infinite alternate, auraChange 24s infinite alternate; 
         border: 1px solid rgba(255,255,255,0.1); 
     }
-    
     .dynamic-tag { 
         position: absolute; 
         top: 15px; 
@@ -1388,50 +1335,44 @@ st.markdown("""
         transition: background-color 0.8s ease; 
         animation: tagColorChange 24s infinite alternate; 
     }
-
     @keyframes auraChange { 
         0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
         75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
     }
-    
     @keyframes tagColorChange { 
         0%, 70% { background: rgba(0, 210, 255, 1); } 
         75%, 100% { background: rgba(221, 160, 221, 1); } 
     }
-    
     @keyframes adCarousel { 
         0%, 20% { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'); opacity: 1; } 
         30%, 45% { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'); opacity: 1; } 
         55%, 70% { background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'); opacity: 1; } 
         80%, 100% { background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80'); opacity: 1; } 
     }
-    
     @keyframes float { 
         0% { transform: translateY(0px); } 
         50% { transform: translateY(-12px); } 
         100% { transform: translateY(0px); } 
     }
 
-    /* 13. BARRA DE IMPACTO FINA Y ELEGANTE */
+    /* METER */
     .meter-container { 
         background: rgba(255, 255, 255, 0.05); 
         border-radius: 4px; 
-        height: 3px; /* Fina */
+        height: 3px; 
         width: 100%; 
         position: relative; 
         overflow: hidden; 
         margin-top: 15px; 
-        border: none;
+        border: none; 
     }
-    
     .meter-fill { 
         height: 100%; 
         background: linear-gradient(90deg, #D4AF37, #FFD700, #F2D06B); 
         width: 0%; 
         animation: fillMeter 2s ease-out forwards; 
-        box-shadow: 0 0 10px rgba(255, 215, 0, 0.6); /* Brillo sutil */
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.6); 
     }
-    
     .meter-text { 
         width: 100%; 
         text-align: left; 
@@ -1440,9 +1381,8 @@ st.markdown("""
         color: #D4AF37; 
         text-transform: uppercase; 
         font-size: 0.8rem; 
-        letter-spacing: 2px;
+        letter-spacing: 2px; 
     }
-    
     @keyframes fillMeter { 
         from { width: 0%; } 
         to { width: 100%; } 
@@ -1451,110 +1391,86 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 6. SIDEBAR PROFESIONAL Y NAVEGACIÓN
+# 6. SIDEBAR
 # ==============================================================================
 
 with st.sidebar:
     st.markdown('<div style="text-align:center; font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: 1px;">🏢 AI REALTY</div>', unsafe_allow_html=True)
     st.markdown("---")
     
-    # Selector de Idioma en Sidebar
     idioma_selec = st.selectbox("🌐 Idioma / Language", list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
     st.session_state.idioma = idioma_selec
     L = traducciones[st.session_state.idioma]
 
-    # Perfil del Usuario y Logout
     if st.session_state.email_usuario:
         st.markdown(f"### {L.get('welcome', 'Bienvenido')}")
         st.markdown(f"**{st.session_state.email_usuario}**")
         
-        # --- CONTADOR DE CRÉDITOS VISIBLE ---
         usos = st.session_state.usos
         es_pro_local = st.session_state.plan_usuario in ["Pro", "Agencia"]
         limite = 99999 if es_pro_local else 3
-        
-        # Color rojo si queda poco, verde si hay mucho
         color_cred = "#ff4b4b" if (not es_pro_local and 3-usos <= 1) else "#00d2ff"
         restantes = "∞" if es_pro_local else str(3 - usos)
         
         st.markdown(f"""
         <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid {color_cred}; margin-bottom: 10px;">
-            <div style="font-size: 0.85rem; color: #aaa;">{L.get('credits_left', 'Créditos restantes:')}</div>
+            <div style="font-size: 0.85rem; color: #aaa;">{L.get('credits_left', 'Créditos:')}</div>
             <div style="font-size: 1.5rem; font-weight: bold; color: {color_cred};">{restantes}</div>
         </div>
         """, unsafe_allow_html=True)
         
-        if limite < 100:
+        if limite < 100: 
             st.progress(min(usos / limite, 1.0))
-        else:
-            st.progress(1.0) 
+        else: 
+            st.progress(1.0)
             
         st.markdown("---")
-        
-        # BOTÓN LOGOUT (CERRAR SESIÓN)
-        if st.button(f"🚪 {L.get('logout', 'Cerrar Sesión')}"):
-            try:
+        if st.button(f"🚪 {L.get('logout', 'Salir')}"):
+            try: 
                 cookie_manager.delete("user_email")
-            except:
-                pass # Si no existe, no falla
+            except: 
+                pass
             st.session_state.email_usuario = ""
             st.session_state.usos = 0
             st.rerun()
 
-    # --- ZONA DE SOPORTE & FEEDBACK (NUEVO) ---
     st.markdown("---")
-    st.subheader(L.get("feedback_lbl", "💡 Ayuda / Soporte"))
-    
+    st.subheader(L.get("feedback_lbl", "💡 Ayuda"))
     st.markdown(f"📧 **{L.get('support_mail', 'Soporte')}: support@airealtypro.com**")
-    
-    # Text Area del Feedback
-    fb_text = st.text_area("", placeholder=L.get("feedback_lbl", "Escribe tu sugerencia o error..."), height=100, label_visibility="collapsed", key="fb_input")
+    fb_text = st.text_area("", placeholder=L.get("feedback_lbl", "..."), height=100, label_visibility="collapsed", key="fb_input")
     
     if st.button(L.get("feedback_btn", "Enviar"), use_container_width=True):
         if fb_text:
             with st.spinner("Enviando..."):
                 ok = guardar_feedback(st.session_state.email_usuario, fb_text)
-                if ok:
+                if ok: 
                     st.toast(L["feedback_success"])
-                else:
-                    st.error("Error al guardar. Verifica la hoja 'Feedback'.")
-        else:
-            st.warning("El mensaje está vacío.")
-            
+                else: 
+                    st.error("Error.")
     st.markdown("---")
     st.markdown(f"<div style='text-align:center; color:#666; font-size:0.8rem;'>v2.7 Final Build</div>", unsafe_allow_html=True)
 
 # ==============================================================================
-# 7. INTERFAZ: CABECERA Y HUD DE IDENTIDAD
+# 7. INTERFAZ
 # ==============================================================================
 
-# RESTAURACIÓN DEL TÍTULO PRINCIPAL EN PANTALLA
 col_logo, _, col_lang = st.columns([2.5, 4, 1.5])
 with col_logo:
     st.markdown('<div style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-top:10px; letter-spacing: 1px;">🏢 AI REALTY PRO</div>', unsafe_allow_html=True)
 
-# HUD DE IDENTIDAD (DINÁMICO SEGÚN PLAN Y HORA)
 if st.session_state.email_usuario:
-    # --- RE-VERIFICACIÓN SILENCIOSA DE PLAN EN CADA CARGA ---
     try:
         df_check = obtener_datos_db()
         if st.session_state.email_usuario in df_check['email'].values:
             user_row = df_check[df_check['email'] == st.session_state.email_usuario].iloc[0]
             real_plan = user_row['plan'] if 'plan' in user_row else 'Gratis'
-            # Normalizamos mayúsculas
             st.session_state.plan_usuario = real_plan.title() if real_plan else "Gratis"
             st.session_state.usos = int(user_row['usos'])
-    except Exception as e:
-        pass # Si falla la verificación silenciosa, usamos la sesión actual
+    except: 
+        pass
 
     hora = datetime.now().hour
-    # FIX: TRADUCCIÓN DEL SALUDO
-    saludo = L["welcome_morn"]
-    if hora >= 12 and hora < 19:
-        saludo = L["welcome_aft"]
-    elif hora >= 19:
-        saludo = L["welcome_eve"]
-
+    saludo = L["welcome_morn"] if hora < 12 else L["welcome_aft"] if hora < 19 else L["welcome_eve"]
     p_name = str(st.session_state.plan_usuario).lower()
     
     if "agencia" in p_name or "agency" in p_name: 
@@ -1577,7 +1493,6 @@ if st.session_state.email_usuario:
 st.markdown(f"<h1 class='neon-title'>{L['title1']} <br><span class='neon-highlight'>{L['title2']}</span></h1>", unsafe_allow_html=True)
 st.markdown(f"<p class='subtitle'>{L['sub']}</p>", unsafe_allow_html=True)
 
-# --- BANNER DE IMÁGENES GLOBAL (TAMAÑO NORMAL CORREGIDO) ---
 col_b1, col_b2, col_b3 = st.columns([1, 2, 1])
 with col_b2:
     st.markdown(f'''
@@ -1588,10 +1503,9 @@ with col_b2:
     ''', unsafe_allow_html=True)
  
 # ==============================================================================
-# 8. LÓGICA DE NEGOCIO PRINCIPAL
+# 8. LÓGICA PRINCIPAL
 # ==============================================================================
 
-# --- VERIFICACIÓN DE COOKIE AL INICIO ---
 if not st.session_state.email_usuario:
     cookie_val = cookie_manager.get("user_email")
     if cookie_val:
@@ -1599,114 +1513,81 @@ if not st.session_state.email_usuario:
         df_actual = obtener_datos_db()
         df_emp = obtener_empleados_db()
         
-        # LOGICA COOKIE: CHECK 1 - ¿Es empleado? (Prioridad)
         if cookie_val in df_emp['EmployeeEmail'].values:
             jefe_email = df_emp[df_emp['EmployeeEmail'] == cookie_val].iloc[0]['BossEmail']
             if jefe_email in df_actual['email'].values:
                 datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
                 plan_jefe_raw = str(datos_jefe['plan']).strip()
-                # FIX COOKIE: Detectar Agencia en cualquier idioma
                 if any(p.lower() in plan_jefe_raw.lower() for p in ["agencia", "agency", "partner"]):
                     st.session_state.plan_usuario = "Pro"
                 else:
                     st.session_state.plan_usuario = plan_jefe_raw.title()
                 st.session_state.es_empleado = True
                 st.session_state.boss_ref = jefe_email
-                st.session_state.usos = 0 # Empleados suelen tener usos ilimitados o propios, aquí reset visual
+                st.session_state.usos = 0
         
-        # LOGICA COOKIE: CHECK 2 - ¿Usuario normal?
         elif cookie_val in df_actual['email'].values:
-            # FIX: Verificar Vencimiento antes de loguear
             plan_verificado = verificar_vencimiento(cookie_val, df_actual[df_actual['email'] == cookie_val].iloc[0]['plan'])
             st.session_state.plan_usuario = plan_verificado
-            
-            # FIX: Reseteo diario automático
             usos_reales = verificar_reseteo_diario(cookie_val)
             st.session_state.usos = usos_reales
-            
             usuario = df_actual[df_actual['email'] == cookie_val].iloc[0]
-        
         st.rerun()
 
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
-    # --- PANTALLA DE LOGIN ---
     if not st.session_state.email_usuario:
         st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
-        
         email_input = st.text_input(L["mail_label"], placeholder="email@example.com", key="user_email")
-        
-        # FIX: Campo Password opcional
         password_input = st.text_input(L.get("pass_label", "Password"), type="password", key="user_pass")
         
         if st.button("START / ENTRAR", type="primary"):
             if email_input and "@" in email_input:
-                
-                # ----------------------------------------------------
-                # LÓGICA DE LOGIN Y REGISTRO AUTOMÁTICO
-                # ----------------------------------------------------
-                
                 exito, mensaje, es_nuevo = procesar_login_registro(email_input, password_input)
-                
-                if not exito:
+                if not exito: 
                     st.error(mensaje)
                 else:
-                    if es_nuevo:
-                        st.toast("🎉 Account Created Successfully!")
+                    if es_nuevo: 
+                        st.toast("🎉 Account Created!")
                     
                     st.session_state.email_usuario = email_input.strip().lower()
-                    
-                    try:
+                    try: 
                         cookie_manager.set("user_email", st.session_state.email_usuario, expires_at=datetime.now().replace(year=datetime.now().year + 1))
-                    except:
+                    except: 
                         pass
                     
-                    # RE-CARGA DE DATOS PARA ASIGNAR PLAN CORRECTO
                     df_actual = obtener_datos_db()
                     df_emp = obtener_empleados_db()
                     
-                    # SI ES EMPLEADO
                     if st.session_state.email_usuario in df_emp['EmployeeEmail'].values:
                         jefe_email = df_emp[df_emp['EmployeeEmail'] == st.session_state.email_usuario].iloc[0]['BossEmail']
                         if jefe_email in df_actual['email'].values:
                             datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
                             st.session_state.usos = 0
                             plan_jefe_raw = str(datos_jefe['plan']).strip()
-                            
                             if any(p.lower() in plan_jefe_raw.lower() for p in ["agencia", "agency", "partner"]):
                                 st.session_state.plan_usuario = "Pro"
                             else:
                                 st.session_state.plan_usuario = plan_jefe_raw.title()
-                                
                             st.session_state.es_empleado = True
                             st.session_state.boss_ref = jefe_email
                         else:
                             st.session_state.plan_usuario = "Gratis"
-                    
-                    # SI ES USUARIO DIRECTO
                     elif st.session_state.email_usuario in df_actual['email'].values:
                         usuario = df_actual[df_actual['email'] == st.session_state.email_usuario].iloc[0]
-                        
-                        # Vencimiento
                         plan_verificado = verificar_vencimiento(st.session_state.email_usuario, usuario['plan'])
                         st.session_state.plan_usuario = plan_verificado
-                        
                         if plan_verificado == "Gratis" and usuario['plan'] != "Gratis":
                             st.toast(L["expired_msg"], icon="⚠️")
-                        
-                        # Reseteo Diario
                         usos_reales = verificar_reseteo_diario(st.session_state.email_usuario)
                         st.session_state.usos = usos_reales
-                        
                         st.session_state.es_empleado = False
-                    
                     time.sleep(0.5)
                     st.rerun()
-            else:
+            else: 
                 st.error("Invalid Email.")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- APP IA ---
     elif st.session_state.email_usuario:
         es_pro = st.session_state.plan_usuario in ["Pro", "Agencia"]
         limite_usos = 99999 if es_pro else 3
@@ -1714,20 +1595,10 @@ with c2:
         if st.session_state.usos < limite_usos:
             st.markdown('<div class="glass-container" style="height:auto;">', unsafe_allow_html=True)
             col_t1, col_t2 = st.columns(2)
-            
-            # FIX: Opciones traducidas
             with col_t1: 
                 tono_display = st.selectbox(L.get("lbl_tone", "Tone:"), [L["tone_story"], L["tone_prof"], L["tone_urg"], L["tone_lux"]])
-                
-                # Mapeo inverso para lógica interna
-                mapa_tonos = {
-                    L["tone_story"]: "Storytelling",
-                    L["tone_prof"]: "Profesional",
-                    L["tone_urg"]: "Urgencia",
-                    L["tone_lux"]: "Lujo"
-                }
+                mapa_tonos = {L["tone_story"]: "Storytelling", L["tone_prof"]: "Profesional", L["tone_urg"]: "Urgencia", L["tone_lux"]: "Lujo"}
                 tono = mapa_tonos.get(tono_display, "Lujo")
-                
             with col_t2: 
                 idioma_salida = st.selectbox(L.get("lbl_lang_out", "Lang:"), list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
 
@@ -1737,57 +1608,42 @@ with c2:
 
             if st.button(L['btn_gen'], key="main_gen", type="primary"):
                 if user_input or url_input: 
-                    # FIX: Cartel de carga traducido
                     with st.spinner(f"🚀 {L['analyzing_msg']}"):
-                        
                         datos_web, es_valido = extraer_datos_inmueble(url_input) if url_input else ("", True)
-                        if not es_valido: st.toast(L["link_warn"], icon="⚠️")
+                        if not es_valido: 
+                            st.toast(L["link_warn"], icon="⚠️")
                         
-                        # Ajustes de Tono
-                        if tono == "Profesional":
-                            instrucciones_estilo = "STYLE: Corporate, direct, data-driven."
-                        elif tono == "Storytelling":
-                            instrucciones_estilo = "STYLE: Narrative, emotional, sensory. Describe smells, light."
-                        elif tono == "Urgencia":
-                            instrucciones_estilo = "STYLE: Scarcity triggers, short sentences."
-                        else: # Lujo
-                            instrucciones_estilo = "STYLE: Exclusive, sophisticated, high-ticket vocabulary."
+                        if tono == "Profesional": 
+                            instr_estilo = "STYLE: Corporate, direct, data-driven."
+                        elif tono == "Storytelling": 
+                            instr_estilo = "STYLE: Narrative, emotional, sensory. Describe smells, light."
+                        elif tono == "Urgencia": 
+                            instr_estilo = "STYLE: Scarcity triggers, short sentences."
+                        else: 
+                            instr_estilo = "STYLE: Exclusive, sophisticated, high-ticket vocabulary."
 
                         sec1, sec2, sec3, sec4 = L["sec_1"], L["sec_2"], L["sec_3"], L["sec_4"]
                         
                         if es_pro:
                             instrucciones_plan = f"""
                             GENERATE FULL STRATEGY:
-                            {sec_1_txt} ({tono.upper()})
-                            {sec_2_txt} (Technical Bullets)
-                            {sec_3_txt} (Persuasive w/ emojis)
-                            {sec_4_txt} (Title <60 chars, Meta <160 chars)
+                            {sec_1} ({tono.upper()})
+                            {sec_2} (Technical Bullets)
+                            {sec_3} (Persuasive w/ emojis)
+                            {sec_4} (Title <60 chars, Meta <160 chars)
                             """
                         else:
-                            instrucciones_plan = f"""
-                            GENERATE ONLY:
-                            {sec_short} (Standard style, max 2 paragraphs)
-                            At the end append strictly: "{L['desc3']}"
-                            """
+                            instrucciones_plan = f'GENERATE ONLY: {L["sec_short"]}. Append at the end: "{L["desc3"]}"'
 
                         prompt_base = f"""
-                        ACT AS: World Class Real Estate Copywriter.
+                        ACT AS: Expert Real Estate Copywriter. 
                         OUTPUT LANGUAGE: {idioma_salida}. 
-                        
-                        {instrucciones_estilo}
-                        {instrucciones_variedad}
-                        
-                        PROPERTY DATA (WEB): {datos_web}
-                        MANUAL DATA: {user_input}
-                        
-                        SAFETY RULE: If WEB DATA says 'ERROR' and no manual data, return an error message only.
-                        
-                        OUTPUT INSTRUCTIONS:
-                        {instrucciones_plan}
-                        
-                        FORMAT: Markdown with bolding.
+                        {instr_estilo}. 
+                        WEB DATA: {datos_web}. 
+                        MANUAL DATA: {user_input}. 
+                        {instrucciones_plan}. 
+                        FORMAT: Markdown.
                         """
-                        
                         resultado = generar_texto(prompt_base)
                         
                         if "ERROR_TECNICO" not in resultado:
@@ -1797,50 +1653,23 @@ with c2:
                             guardar_historial(st.session_state.email_usuario, f"{url_input} {user_input}", resultado)
                             st.cache_data.clear()
                             st.rerun()
-                else:
-                    st.warning("Please enter a link or description.")
+                else: 
+                    st.warning("Input required.")
             st.markdown('</div>', unsafe_allow_html=True)
             
-            # --- VISUALIZACIÓN DE RESULTADOS ---
             if st.session_state.last_result:
-                
-                # LOGICA DE COLOR DINÁMICO
                 p_u = st.session_state.plan_usuario.lower()
-                if "agencia" in p_u or "agency" in p_u:
-                    res_color = "#DDA0DD" # Violeta
-                elif "pro" in p_u:
-                    res_color = "#00d2ff" # Azul
-                else:
-                    res_color = "#cccccc" # Gris
-
-                # BARRA FINA Y SUTIL
+                res_color = "#DDA0DD" if ("agencia" in p_u or "agency" in p_u) else "#00d2ff" if "pro" in p_u else "#cccccc"
+                
                 st.markdown(f"""
                 <div class="meter-text">{L['impact_text']}</div>
                 <div class="meter-container"><div class="meter-fill"></div></div>
-                """, unsafe_allow_html=True)
-                
-                # ESTILOS DEL REFLEJO (SHINE)
-                st.markdown(f"""
                 <style>
-                    @keyframes shine {{
-                        0% {{ background-position: -200% center; }}
-                        100% {{ background-position: 200% center; }}
-                    }}
-                    .shine-text {{
-                        background: linear-gradient(to right, {res_color} 0%, #ffffff 50%, {res_color} 100%);
-                        background-size: 200% auto;
-                        color: #000;
-                        background-clip: text;
-                        text-fill-color: transparent;
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                        animation: shine 3s linear infinite;
-                        font-weight: 900;
-                    }}
+                    @keyframes shine {{ 0% {{ background-position: -200% center; }} 100% {{ background-position: 200% center; }} }}
+                    .shine-text {{ background: linear-gradient(to right, {res_color} 0%, #ffffff 50%, {res_color} 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 3s linear infinite; font-weight: 900; }}
                 </style>
                 """, unsafe_allow_html=True)
                 
-                # RESULTADO
                 st.markdown(f'''
                     <div class="result-container" style="border-top: 4px solid {res_color}; border-left: 1px solid {res_color}40; border-right: 1px solid {res_color}40; box-shadow: 0 0 20px {res_color}20;">
                         <div class="shine-text" style="margin-bottom: 15px; letter-spacing: 1.5px; font-size: 1.1rem;">
@@ -1851,25 +1680,16 @@ with c2:
                         </div>
                     </div>
                 ''', unsafe_allow_html=True)
-                
                 st.markdown("<br>", unsafe_allow_html=True)
                 
-                # COLUMNAS DE ACCIÓN (FIXED ALIGNMENT)
                 b1, b2, b3 = st.columns(3)
-                
                 with b1:
                     if st.button(f"📋 COPY"):
-                        if hasattr(st, "copy_to_clipboard"):
-                            st.copy_to_clipboard(st.session_state.last_result)
-                            st.toast(L["copy_success"])
-                        else:
-                            st.info("Copy text above")
-                            st.code(st.session_state.last_result)
-                
+                        st.code(st.session_state.last_result)
+                        st.toast(L["copy_success"])
                 with b2:
                     wa_msg = urllib.parse.quote(st.session_state.last_result[:900])
                     st.link_button(f"📲 {L['whatsapp']}", f"https://wa.me/?text={wa_msg}", use_container_width=True)
-                
                 with b3:
                     st.download_button(f"💾 {L['download']}", st.session_state.last_result, file_name=f"Strategy_{datetime.now().strftime('%Y%m%d')}.txt", use_container_width=True)
 
@@ -1881,7 +1701,7 @@ with c2:
                             st.markdown(res_social)
                 
                 st.divider()
-                refine = st.text_input("", placeholder=L.get("refine_pl", "Quick adjust..."))
+                refine = st.text_input("", placeholder=L.get("refine_pl", "..."))
                 if st.button(L["btn_refine"]):
                     with st.spinner("Refining..."):
                         nuevo_res = generar_texto(f"Adjust this: {st.session_state.last_result}. User: {refine}")
@@ -1902,7 +1722,6 @@ with c2:
 if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_empleado:
     st.divider()
     st.subheader(L["manage_team"])
-    
     tab_equipo, tab_monitor = st.tabs([L["tab_team"], L["tab_monitor"]])
     df_emp = obtener_empleados_db()
     mi_equipo = df_emp[df_emp['BossEmail'] == st.session_state.email_usuario]['EmployeeEmail'].tolist()
@@ -1910,55 +1729,44 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
     with tab_equipo:
         c_add1, c_add2 = st.columns([3, 1])
         with c_add1: 
-            # FIX: Placeholder traducido
             nuevo_e = st.text_input(L["emp_email_lbl"], key="new_ag_in", placeholder="agent@agency.com")
         with c_add2:
             st.write(" ")
-            # FIX: Botón traducido
             if st.button(L["emp_add_btn"]):
                 if len(mi_equipo) < 4 and "@" in nuevo_e:
                     new_row_emp = pd.DataFrame({"BossEmail": [st.session_state.email_usuario], "EmployeeEmail": [nuevo_e.strip().lower()]})
                     conn.update(worksheet="Employees", data=pd.concat([df_emp, new_row_emp], ignore_index=True))
                     
-                    # FIX: Doble escritura para agregar a Sheet1 como Pro inmediatamente
                     df_main = obtener_datos_db()
                     if nuevo_e.strip().lower() not in df_main['email'].values:
                         new_row_main = pd.DataFrame({"email": [nuevo_e.strip().lower()], "usos": [0], "plan": ["Pro"], "vencimiento": [""], "ultima_fecha": [""]})
                         conn.update(worksheet="Sheet1", data=pd.concat([df_main, new_row_main], ignore_index=True))
                     st.rerun()
-                elif len(mi_equipo) >= 4:
-                    st.warning("Full Team (Max 4).")
-        
+                elif len(mi_equipo) >= 4: 
+                    st.warning("Full Team.")
         if mi_equipo:
             st.write("---")
             for miembro in mi_equipo:
                 cm1, cm2 = st.columns([3, 1])
                 cm1.write(f"👤 {miembro}")
-                
                 if cm2.button(L["revoke"], key=f"del_{miembro}"):
                     df_limpio = df_emp[~((df_emp['BossEmail'] == st.session_state.email_usuario) & (df_emp['EmployeeEmail'] == miembro))]
                     conn.update(worksheet="Employees", data=df_limpio)
                     st.toast(f"Revoked: {miembro}")
                     st.rerun()
-    
     with tab_monitor:
         st.info(L["monitor_desc"])
         if mi_equipo:
             df_hist = obtener_historial_db()
             if not df_hist.empty:
-                # Filtrar solo el historial de los empleados de este jefe
                 team_history = df_hist[df_hist['email'].isin(mi_equipo)]
-                
                 if not team_history.empty:
-                    # Mostrar tabla ordenada por fecha (más reciente primero)
-                    st.dataframe(
-                        team_history.sort_values(by="fecha", ascending=False), 
-                        use_container_width=True
-                    )
-                else:
+                    st.dataframe(team_history.sort_values(by="fecha", ascending=False), use_container_width=True)
+                else: 
                     st.write(L["monitor_empty"])
-            else:
+            else: 
                 st.write(L["monitor_empty"])
+
 # ==============================================================================
 # 10. SECCIÓN INFORMATIVA Y PLANES DE SUSCRIPCIÓN
 # ==============================================================================
@@ -2012,8 +1820,8 @@ col1, col2, col3 = st.columns(3)
 # --- CARD GRATIS ---
 with col1:
     # Tooltips para Gratis
-    tt_limite = "Tus 3 créditos se recargan automáticamente cada 24hs. Ideal para probar."
-    tt_soporte = "Soporte básico por email en horario comercial."
+    tt_limite = "Tus 3 créditos se recargan automáticamente cada 24hs."
+    tt_soporte = "Soporte básico por email."
     
     desc_f = f"""
     <div class='feature-list'>
@@ -2041,9 +1849,9 @@ with col1:
 # --- CARD PRO ---
 with col2:
     # Tooltips para Pro
-    tt_unlimited = "Genera, reescribe y ajusta descripciones infinitas. Nunca te quedas sin saldo."
-    tt_social = "Incluye scripts virales para TikTok/Reels y textos de cierre para WhatsApp."
-    tt_seo = "Posicionamiento en portales con palabras clave de alto tráfico."
+    tt_unlimited = "Generaciones infinitas."
+    tt_social = "Scripts virales para Redes + Estrategia de cierre WhatsApp."
+    tt_seo = "Keywords de alto tráfico."
     
     desc_p = f"""
     <div class='feature-list'>
@@ -2095,8 +1903,8 @@ with col2:
 # --- CARD AGENCIA ---
 with col3:
     # Tooltips para Agencia
-    tt_team = "Gestiona hasta 5 agentes bajo una sola facturación centralizada."
-    tt_dash = "Audita el historial y uso de cada agente en tiempo real."
+    tt_team = "Gestiona hasta 5 agentes."
+    tt_dash = "Audita a tu equipo en tiempo real."
     
     desc_a = f"""
     <div class='feature-list'>
