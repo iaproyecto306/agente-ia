@@ -1833,12 +1833,13 @@ with col1:
     # Tooltips para Gratis
     tt_limite = "Tus 3 créditos se recargan automáticamente cada 24hs. Ideal para probar."
     tt_soporte = "Soporte básico por email en horario comercial."
+    tt_watermark = "Tus textos incluirán una firma al final."
     
-    # HTML STRING FLATTENED TO AVOID </div> ERROR
+    # HTML STRING FLATTENED TO AVOID </div> ERROR + FULL TOOLTIPS
     desc_f = f"""<div class='feature-list'>
 {L['desc1']} <span class='info-icon i-free' data-tooltip='{tt_limite}'>i</span><br>
 {L['desc2']} <span class='info-icon i-free' data-tooltip='{tt_soporte}'>i</span><br>
-{L['desc3']}
+{L['desc3']} <span class='info-icon i-free' data-tooltip='{tt_watermark}'>i</span>
 </div>"""
     
     st.markdown(f'''
@@ -1862,13 +1863,14 @@ with col2:
     tt_unlimited = "Genera, reescribe y ajusta descripciones infinitas. Nunca te quedas sin saldo."
     tt_social = "Incluye scripts virales para TikTok/Reels y textos de cierre para WhatsApp."
     tt_seo = "Posicionamiento en portales con palabras clave de alto tráfico."
+    tt_banner = "Tu propiedad destacada rotará en la página principal para todos los usuarios."
     
-    # HTML STRING FLATTENED TO AVOID </div> ERROR
+    # HTML STRING FLATTENED TO AVOID </div> ERROR + FULL TOOLTIPS
     desc_p = f"""<div class='feature-list'>
 <b>{L['desc4']}</b> <span class='info-icon i-pro' data-tooltip='{tt_unlimited}'>i</span><br>
 {L['desc5']} + WhatsApp <span class='info-icon i-pro' data-tooltip='{tt_social}'>i</span><br>
 {L['desc6']} <span class='info-icon i-pro' data-tooltip='{tt_seo}'>i</span><br>
-<b>{L['desc7']}</b>
+<b>{L['desc7']}</b> <span class='info-icon i-pro' data-tooltip='{tt_banner}'>i</span>
 </div>"""
     
     st.markdown(f'''
@@ -1923,13 +1925,15 @@ with col3:
     # Tooltips para Agencia
     tt_team = "Gestiona hasta 5 agentes bajo una sola facturación centralizada."
     tt_dash = "Audita el historial y uso de cada agente en tiempo real."
+    tt_api = "Próximamente: Conecta nuestra IA directamente a tu CRM favorito."
+    tt_priority = "Tus propiedades aparecen primero en las búsquedas internas."
     
-    # HTML STRING FLATTENED TO AVOID </div> ERROR
+    # HTML STRING FLATTENED TO AVOID </div> ERROR + FULL TOOLTIPS
     desc_a = f"""<div class='feature-list'>
 {L['desc8']} <span class='info-icon i-agency' data-tooltip='{tt_team}'>i</span><br>
 {L['desc9']} <span class='info-icon i-agency' data-tooltip='{tt_dash}'>i</span><br>
-{L['desc10']}<br>
-<b>{L['desc11']}</b>
+{L['desc10']} <span class='info-icon i-agency' data-tooltip='{tt_api}'>i</span><br>
+<b>{L['desc11']}</b> <span class='info-icon i-agency' data-tooltip='{tt_priority}'>i</span>
 </div>"""
     
     st.markdown(f'''
