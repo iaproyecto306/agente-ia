@@ -5,7 +5,7 @@ from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 import urllib.parse
 import time
 import io
@@ -86,9 +86,11 @@ def extraer_datos_inmueble(url):
             
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
+                
                 # Eliminamos basura
                 for element in soup(['script', 'style', 'nav', 'footer', 'iframe', 'svg', 'button']):
                     element.decompose()
+                    
                 texto_final = soup.get_text(separator=' ', strip=True)
         except:
             pass
@@ -104,8 +106,10 @@ def extraer_datos_inmueble(url):
             
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
+                
                 for element in soup(['script', 'style', 'nav', 'footer']):
                     element.decompose()
+                    
                 texto_final = soup.get_text(separator=' ', strip=True)
         except:
             pass
@@ -133,20 +137,28 @@ except Exception:
 # Conexión a Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# --- FUNCIONES DE BASE DE DATOS (CON FIX DE NORMALIZACIÓN) ---
+# --- FUNCIONES DE BASE DE DATOS (CON LÓGICA VENCIMIENTO) ---
 
 def obtener_datos_db():
     """Obtiene la base de datos de usuarios principales con lectura en tiempo real."""
     try:
         # ttl=0 OBLIGATORIO para ver cambios manuales en el Excel al instante
         df = conn.read(worksheet="Sheet1", ttl=0)
+        
         # Normalizamos: todo minúscula y sin espacios para evitar errores de tipeo en Excel
         df['email'] = df['email'].astype(str).str.strip().str.lower()
+        
         if 'plan' in df.columns:
             df['plan'] = df['plan'].astype(str).str.strip().str.title() # Convierte "pro" a "Pro"
+            
+        # Aseguramos que exista la columna vencimiento
+        if 'vencimiento' not in df.columns:
+            df['vencimiento'] = ""
+            
         return df
     except:
-        return pd.DataFrame(columns=['email', 'usos', 'plan'])
+        # Estructura de respaldo si falla la lectura
+        return pd.DataFrame(columns=['email', 'usos', 'plan', 'vencimiento'])
 
 def obtener_empleados_db():
     """Obtiene la base de datos de empleados/equipos en tiempo real."""
@@ -168,7 +180,8 @@ def actualizar_usos_db(email, nuevos_usos, plan_actual):
 
     if email in df['email'].values:
         df.loc[df['email'] == email, 'usos'] = nuevos_usos
-        # FIX IMPORTANTE: Si el plan actual es Pro, asegurarse de que se guarde como Pro
+        
+        # FIX IMPORTANTE: Si el plan actual es Pro/Agencia, asegurarse de que se guarde como tal
         # Esto evita que un empleado Pro sea degradado a Gratis por error al actualizar usos
         if plan_actual and plan_actual.lower() in ["pro", "agencia", "agency"]:
              df.loc[df['email'] == email, 'plan'] = "Pro"
@@ -176,11 +189,44 @@ def actualizar_usos_db(email, nuevos_usos, plan_actual):
         nueva_fila = pd.DataFrame({
             "email": [email], 
             "usos": [nuevos_usos], 
-            "plan": [plan_actual.title() if plan_actual else "Gratis"]
+            "plan": [plan_actual.title() if plan_actual else "Gratis"],
+            "vencimiento": [""]
         })
         df = pd.concat([df, nueva_fila], ignore_index=True)
     
     conn.update(worksheet="Sheet1", data=df)
+
+def verificar_vencimiento(email, plan_actual):
+    """
+    Revisa si el plan ha vencido comparando la fecha actual con la columna 'vencimiento'.
+    Si venció, degrada el plan a 'Gratis' en la base de datos.
+    Retorna el plan actualizado.
+    """
+    if plan_actual == "Gratis":
+        return "Gratis"
+    
+    df = obtener_datos_db()
+    
+    if email in df['email'].values:
+        row = df[df['email'] == email].iloc[0]
+        fecha_str = str(row['vencimiento']).strip()
+        
+        # Si hay una fecha válida (no vacía, no 'nan')
+        if fecha_str and fecha_str.lower() != "nan" and fecha_str != "":
+            try:
+                # Asumimos formato YYYY-MM-DD
+                fecha_venc = datetime.strptime(fecha_str, "%Y-%m-%d")
+                
+                # Si hoy es mayor que el vencimiento, CORTAR SERVICIO
+                if datetime.now() > fecha_venc:
+                    df.loc[df['email'] == email, 'plan'] = 'Gratis'
+                    conn.update(worksheet="Sheet1", data=df)
+                    return "Gratis"
+            except:
+                # Si la fecha está mal escrita en el Excel, ignoramos y dejamos pasar (fail-safe)
+                pass 
+                
+    return plan_actual
 
 def guardar_historial(email, input_user, output_ia):
     """Guarda cada generación en la hoja Historial para auditoría."""
@@ -365,7 +411,8 @@ traducciones = {
         "tab_team": "👥 My Team",
         "tab_monitor": "📊 Activity Monitor",
         "monitor_desc": "Here you can see your agents' usage in real time.",
-        "monitor_empty": "Your employees haven't generated content yet."
+        "monitor_empty": "Your employees haven't generated content yet.",
+        "expired_msg": "⚠️ Your subscription has expired. Downgraded to Free Plan."
     },
     "Español": {
         "title1": "Convierte Anuncios Aburridos en",
@@ -415,13 +462,6 @@ traducciones = {
         "stat1": "Anuncios Optimizados",
         "stat2": "Tiempo Ahorrado",
         "stat3": "Más Consultas",
-        "test_title": "Lo que dicen los Expertos",
-        "test1_txt": "Mis ventas subieron 50%.",
-        "test1_au": "Carlos R. (RE/MAX)",
-        "test2_txt": "Ahorro horas de redacción.",
-        "test2_au": "Ana M. (Century 21)",
-        "test3_txt": "El plan Agencia es vital.",
-        "test3_au": "Luis P. (Independiente)",
         "foot_desc": "IA Inmobiliaria.",
         "mail_label": "📧 Email Profesional",
         "limit_msg": "🚫 Límite gratuito alcanzado.",
@@ -436,19 +476,18 @@ traducciones = {
         "revoke": "Revocar Acceso",
         "manage_team": "👥 Gestionar Equipo",
         "team_activity": "📈 Actividad",
-        "refine_pl": "🔄 Ajuste rápido (ej: hazlo más corto)...",
-        "social_title": "📱 Social Media Pack",
+        "refine_pl": "🔄 Ajuste rápido...",
+        "social_title": "📱 Pack Redes Sociales",
         "char_count": "Caracteres",
         "link_warn": "⚠️ Este link no parece ser de un portal conocido.",
         "badge_free": "USUARIO GRATIS",
         "badge_pro": "MIEMBRO PRO",
         "badge_agency": "SOCIO AGENCIA",
-        "api_soon": "Acceso API (Próximamente)",
-        "legal_title": "Términos Legales & Privacidad",
+        "legal_title": "Términos Legales",
         "logout": "Cerrar Sesión",
         "welcome": "Bienvenido",
         "usage_bar": "Progreso Diario",
-        "feedback_lbl": "💡 Sugerencias / Soporte",
+        "feedback_lbl": "💡 Sugerencias",
         "feedback_btn": "Enviar Comentario",
         "support_mail": "Soporte",
         "credits_left": "Créditos hoy:",
@@ -459,7 +498,7 @@ traducciones = {
         "strategy_gen": "ESTRATEGIA GENERADA",
         "desc_luxury": "DESCRIPCIÓN LUJO",
         "btn_refine": "Refinar / Ajustar",
-        "analyzing_msg": "ANALIZANDO PROPIEDAD Y REDACTANDO ESTRATEGIA...",
+        "analyzing_msg": "ANALIZANDO PROPIEDAD...",
         "feedback_success": "✅ ¡Gracias! Tu comentario ha sido guardado.",
         "tone_lux": "Lujo",
         "tone_prof": "Profesional",
@@ -474,8 +513,9 @@ traducciones = {
         "sec_short": "DESCRIPCIÓN CORTA",
         "tab_team": "👥 Mi Equipo",
         "tab_monitor": "📊 Monitor de Actividad",
-        "monitor_desc": "Aquí puedes ver el consumo de tus agentes en tiempo real.",
-        "monitor_empty": "Tus empleados aún no han generado contenido."
+        "monitor_desc": "Aquí puedes ver el consumo de tus agentes.",
+        "monitor_empty": "Tus empleados aún no han generado contenido.",
+        "expired_msg": "⚠️ Tu suscripción ha vencido. Cambiado a Plan Gratis."
     },
     "Português": {
         "title1": "Transforme Anúncios em",
@@ -525,13 +565,6 @@ traducciones = {
         "stat1": "Otimizados",
         "stat2": "Tempo",
         "stat3": "Conversão",
-        "test_title": "Especialistas",
-        "test1_txt": "Vendas subiram 50%.",
-        "test1_au": "Carlos R.",
-        "test2_txt": "Economizo horas.",
-        "test2_au": "Ana M.",
-        "test3_txt": "Vital para agência.",
-        "test3_au": "Luis P.",
         "foot_desc": "IA Imobiliária.",
         "mail_label": "📧 Email Profissional",
         "limit_msg": "🚫 Limite atingido.",
@@ -553,14 +586,14 @@ traducciones = {
         "badge_free": "GRÁTIS",
         "badge_pro": "PRO",
         "badge_agency": "AGÊNCIA",
-        "legal_title": "Termos e Privacidade",
+        "legal_title": "Termos",
         "logout": "Sair",
         "welcome": "Bem-vindo",
-        "usage_bar": "Progresso Diário",
-        "feedback_lbl": "💡 Sugestões / Suporte",
+        "usage_bar": "Progresso",
+        "feedback_lbl": "💡 Suporte",
         "feedback_btn": "Enviar",
         "support_mail": "Suporte",
-        "credits_left": "Créditos hoje:",
+        "credits_left": "Créditos:",
         "welcome_morn": "Bom dia",
         "welcome_aft": "Boa tarde",
         "welcome_eve": "Boa noite",
@@ -569,7 +602,7 @@ traducciones = {
         "desc_luxury": "DESCRIÇÃO DE LUXO",
         "btn_refine": "Refinar",
         "analyzing_msg": "ANALISANDO PROPRIEDADE...",
-        "feedback_success": "✅ Obrigado pelo feedback!",
+        "feedback_success": "✅ Obrigado!",
         "tone_lux": "Luxo",
         "tone_prof": "Profissional",
         "tone_urg": "Urgência",
@@ -584,7 +617,8 @@ traducciones = {
         "tab_team": "👥 Minha Equipe",
         "tab_monitor": "📊 Monitor",
         "monitor_desc": "Veja o consumo em tempo real.",
-        "monitor_empty": "Sem dados ainda."
+        "monitor_empty": "Sem dados ainda.",
+        "expired_msg": "⚠️ Sua assinatura expirou."
     },
     "Français": {
         "title1": "Transformez vos Annonces",
@@ -634,13 +668,6 @@ traducciones = {
         "stat1": "Optimisés",
         "stat2": "Temps",
         "stat3": "Conversion",
-        "test_title": "Avis Experts",
-        "test1_txt": "Ventes +50%.",
-        "test1_au": "Carlos R.",
-        "test2_txt": "Gain de temps.",
-        "test2_au": "Ana M.",
-        "test3_txt": "Vital pour agence.",
-        "test3_au": "Luis P.",
         "foot_desc": "IA Immobilier.",
         "mail_label": "📧 Email Pro",
         "limit_msg": "🚫 Limite atteinte.",
@@ -665,20 +692,20 @@ traducciones = {
         "legal_title": "Mentions Légales",
         "logout": "Déconnexion",
         "welcome": "Bienvenue",
-        "usage_bar": "Progrès Quotidien",
-        "feedback_lbl": "💡 Suggestions / Support",
+        "usage_bar": "Progrès",
+        "feedback_lbl": "💡 Support",
         "feedback_btn": "Envoyer",
         "support_mail": "Support",
-        "credits_left": "Crédits aujourd'hui:",
+        "credits_left": "Crédits:",
         "welcome_morn": "Bonjour",
         "welcome_aft": "Bonne après-midi",
         "welcome_eve": "Bonsoir",
-        "impact_text": "IMPACT DE VENTE AUGMENTÉ",
+        "impact_text": "IMPACT AUGMENTÉ",
         "strategy_gen": "STRATÉGIE GÉNÉRÉE",
         "desc_luxury": "DESCRIPTION DE LUXE",
         "btn_refine": "Raffiner",
-        "analyzing_msg": "ANALYSE DE LA PROPRIÉTÉ...",
-        "feedback_success": "✅ Merci pour vos commentaires!",
+        "analyzing_msg": "ANALYSE...",
+        "feedback_success": "✅ Merci!",
         "tone_lux": "Luxe",
         "tone_prof": "Professionnel",
         "tone_urg": "Urgence",
@@ -693,7 +720,8 @@ traducciones = {
         "tab_team": "👥 Mon Équipe",
         "tab_monitor": "📊 Moniteur",
         "monitor_desc": "Suivez la consommation en temps réel.",
-        "monitor_empty": "Pas encore de données."
+        "monitor_empty": "Pas encore de données.",
+        "expired_msg": "⚠️ Abonnement expiré."
     },
     "Deutsch": {
         "title1": "Verwandeln Sie Anzeigen",
@@ -743,13 +771,6 @@ traducciones = {
         "stat1": "Optimiert",
         "stat2": "Zeit",
         "stat3": "Konversion",
-        "test_title": "Experten",
-        "test1_txt": "Umsatz +50%.",
-        "test1_au": "Carlos R.",
-        "test2_txt": "Zeit gespart.",
-        "test2_au": "Ana M.",
-        "test3_txt": "Wichtig für Agentur.",
-        "test3_au": "Luis P.",
         "foot_desc": "Immo-KI.",
         "mail_label": "📧 E-Mail",
         "limit_msg": "🚫 Limit erreicht.",
@@ -770,25 +791,24 @@ traducciones = {
         "link_warn": "⚠️ Link Fehler.",
         "badge_free": "GRATIS",
         "badge_pro": "PRO MITGLIED",
-        "badge_agency": "AGENTUR PARTNER",
-        "api_soon": "API (Bald)",
+        "badge_agency": "AGENTUR",
         "legal_title": "Rechtliches",
         "logout": "Abmelden",
         "welcome": "Willkommen",
-        "usage_bar": "Täglicher Fortschritt",
-        "feedback_lbl": "💡 Vorschläge / Support",
+        "usage_bar": "Fortschritt",
+        "feedback_lbl": "💡 Support",
         "feedback_btn": "Senden",
         "support_mail": "Support",
-        "credits_left": "Credits heute:",
+        "credits_left": "Credits:",
         "welcome_morn": "Guten Morgen",
         "welcome_aft": "Guten Tag",
         "welcome_eve": "Guten Abend",
-        "impact_text": "VERKAUFSIMPAKT GESTEIGERT",
+        "impact_text": "IMPAKT GESTEIGERT",
         "strategy_gen": "STRATEGIE GENERIERT",
         "desc_luxury": "LUXUS BESCHREIBUNG",
         "btn_refine": "Verfeinern",
-        "analyzing_msg": "IMMOBILIE WIRD ANALYSIERT...",
-        "feedback_success": "✅ Danke für Ihr Feedback!",
+        "analyzing_msg": "ANALYSIEREN...",
+        "feedback_success": "✅ Danke!",
         "tone_lux": "Luxus",
         "tone_prof": "Professionell",
         "tone_urg": "Dringlichkeit",
@@ -803,7 +823,8 @@ traducciones = {
         "tab_team": "👥 Mein Team",
         "tab_monitor": "📊 Monitor",
         "monitor_desc": "Echtzeit-Verbrauch.",
-        "monitor_empty": "Keine Daten."
+        "monitor_empty": "Keine Daten.",
+        "expired_msg": "⚠️ Abonnement abgelaufen."
     },
     "中文": {
         "title1": "将枯燥的广告",
@@ -853,13 +874,6 @@ traducciones = {
         "stat1": "已优化",
         "stat2": "时间",
         "stat3": "转化",
-        "test_title": "专家评价",
-        "test1_txt": "销售额+50%。",
-        "test1_au": "Carlos R.",
-        "test2_txt": "节省时间。",
-        "test2_au": "Ana M.",
-        "test3_txt": "机构必备。",
-        "test3_au": "Luis P.",
         "foot_desc": "房地产AI。",
         "mail_label": "📧 邮箱",
         "limit_msg": "🚫 限制已达。",
@@ -881,15 +895,14 @@ traducciones = {
         "badge_free": "免费用户",
         "badge_pro": "专业会员",
         "badge_agency": "机构伙伴",
-        "api_soon": "API (即将推出)",
-        "legal_title": "条款和隐私",
+        "legal_title": "条款",
         "logout": "退出",
         "welcome": "欢迎",
-        "usage_bar": "每日进度",
-        "feedback_lbl": "💡 反馈 / 支持",
-        "feedback_btn": "发送反馈",
+        "usage_bar": "进度",
+        "feedback_lbl": "💡 反馈",
+        "feedback_btn": "发送",
         "support_mail": "支持",
-        "credits_left": "今日额度:",
+        "credits_left": "额度:",
         "welcome_morn": "早上好",
         "welcome_aft": "下午好",
         "welcome_eve": "晚上好",
@@ -897,8 +910,8 @@ traducciones = {
         "strategy_gen": "生成策略",
         "desc_luxury": "豪华描述",
         "btn_refine": "完善",
-        "analyzing_msg": "正在分析属性...",
-        "feedback_success": "✅ 谢谢！您的反馈已保存。",
+        "analyzing_msg": "分析中...",
+        "feedback_success": "✅ 谢谢！",
         "tone_lux": "豪华",
         "tone_prof": "专业",
         "tone_urg": "紧迫感",
@@ -913,7 +926,8 @@ traducciones = {
         "tab_team": "👥 我的团队",
         "tab_monitor": "📊 监控",
         "monitor_desc": "实时查看消耗。",
-        "monitor_empty": "暂无数据。"
+        "monitor_empty": "暂无数据。",
+        "expired_msg": "⚠️ 订阅已过期。"
     }
 }
 
@@ -923,10 +937,10 @@ traducciones = {
 
 st.markdown("""
 <style>
-    /* 1. FIX DEL SCROLL SUPERIOR (PADDING REMOVIDO) */
-    .block-container {
+    /* 1. FIX DEL SCROLL SUPERIOR */
+    .block-container { 
         padding-top: 1rem !important; 
-        padding-bottom: 5rem !important;
+        padding-bottom: 5rem !important; 
     }
 
     /* 2. RESET Y FONDO GLOBAL */
@@ -1008,7 +1022,7 @@ st.markdown("""
         margin-bottom: 40px; 
     }
 
-    /* 7. HUD SUPERIOR (IDENTIDAD) */
+    /* 7. HUD SUPERIOR */
     .hud-bar { 
         display: flex; 
         justify-content: space-between; 
@@ -1042,14 +1056,14 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(0,210,255,0.3); 
     }
     
-    /* FIX: AGENCIA VIOLETA (#DDA0DD) RESTAURADO */
+    /* FIX: VIOLETA AGENCIA (#DDA0DD) */
     .badge-agency { 
         border-color: #DDA0DD; 
         color: #DDA0DD; 
         box-shadow: 0 0 15px rgba(221, 160, 221, 0.4); 
     }
 
-    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK) CON BORDE VIOLETA */
+    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK CON BORDE VIOLETA/DORADO NEUTRO) */
     .result-container {
         background: rgba(20, 20, 20, 0.95);
         color: #f0f0f0;
@@ -1065,7 +1079,7 @@ st.markdown("""
         backdrop-filter: blur(10px);
     }
 
-    /* 9. BOTÓN GENERAR PLATINUM */
+    /* 9. BOTÓN GENERAR */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; 
         border: none !important; 
@@ -1087,7 +1101,7 @@ st.markdown("""
         border: 2px solid #00d2ff !important; 
     }
 
-    /* 10. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ */
+    /* 10. TARJETAS DE PLANES */
     .card-wrapper { 
         transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
@@ -1157,7 +1171,7 @@ st.markdown("""
         background-color: #fff;
     }
 
-    /* 11. TOOLTIPS DE AYUDA */
+    /* 11. TOOLTIPS */
     .info-icon { 
         display: inline-block; 
         width: 16px; 
@@ -1217,8 +1231,8 @@ st.markdown("""
         line-height: 2.0; 
     }
     
-    /* 12. BANNER ANIMADO DE FONDO */
-    .video-placeholder {
+    /* 12. BANNER ANIMADO */
+    .video-placeholder { 
         border-radius: 12px; 
         height: 250px; 
         display: flex; 
@@ -1271,7 +1285,7 @@ st.markdown("""
         100% { transform: translateY(0px); } 
     }
 
-    /* 13. BARRA DE IMPACTO (DORADA COMPLETA, VIOLETA EN SOMBRA) */
+    /* 13. BARRA DE IMPACTO */
     .meter-container { 
         background: #111; 
         border-radius: 10px; 
@@ -1300,8 +1314,8 @@ st.markdown("""
         color: #000; 
         text-shadow: 0px 0px 2px rgba(255,255,255,0.7); 
         font-size: 1rem; 
-        letter-spacing: 1px;
-        text-transform: uppercase;
+        letter-spacing: 1px; 
+        text-transform: uppercase; 
     }
     
     @keyframes fillMeter { 
@@ -1477,9 +1491,12 @@ if not st.session_state.email_usuario:
         
         # LOGICA COOKIE: CHECK 2 - ¿Usuario normal?
         elif cookie_val in df_actual['email'].values:
+            # FIX: Verificar Vencimiento antes de loguear
+            plan_verificado = verificar_vencimiento(cookie_val, df_actual[df_actual['email'] == cookie_val].iloc[0]['plan'])
+            st.session_state.plan_usuario = plan_verificado
+            
             usuario = df_actual[df_actual['email'] == cookie_val].iloc[0]
             st.session_state.usos = int(usuario['usos'])
-            st.session_state.plan_usuario = usuario['plan']
         
         st.rerun()
 
@@ -1525,8 +1542,14 @@ with c2:
                 # LOGIN: CHECK 2 - ¿Es usuario directo?
                 elif st.session_state.email_usuario in df_actual['email'].values:
                     usuario = df_actual[df_actual['email'] == st.session_state.email_usuario].iloc[0]
+                    
+                    # FIX: Verificar Vencimiento al Login
+                    plan_verificado = verificar_vencimiento(st.session_state.email_usuario, usuario['plan'])
+                    st.session_state.plan_usuario = plan_verificado
+                    if plan_verificado == "Gratis" and usuario['plan'] != "Gratis":
+                        st.toast(L["expired_msg"], icon="⚠️")
+                        
                     st.session_state.usos = int(usuario['usos'])
-                    st.session_state.plan_usuario = usuario['plan'] if 'plan' in usuario else 'Gratis'
                     st.session_state.es_empleado = False
                 
                 else:
@@ -1740,7 +1763,7 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
                     # FIX: Doble escritura para agregar a Sheet1 como Pro inmediatamente
                     df_main = obtener_datos_db()
                     if nuevo_e.strip().lower() not in df_main['email'].values:
-                        new_row_main = pd.DataFrame({"email": [nuevo_e.strip().lower()], "usos": [0], "plan": ["Pro"]})
+                        new_row_main = pd.DataFrame({"email": [nuevo_e.strip().lower()], "usos": [0], "plan": ["Pro"], "vencimiento": [""]})
                         conn.update(worksheet="Sheet1", data=pd.concat([df_main, new_row_main], ignore_index=True))
                     
                     st.rerun()
