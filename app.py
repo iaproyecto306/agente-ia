@@ -1279,46 +1279,37 @@ with col_b2:
             <div style="background:rgba(0,0,0,0.6);width:100%;text-align:center;padding:10px;">{L["comunidad"]}</div>
         </div>
     ''', unsafe_allow_html=True)
-  # ==============================================================================
+ # ==============================================================================
 # 8. LÓGICA DE NEGOCIO PRINCIPAL
 # ==============================================================================
 
-# --- VERIFICACIÓN DE COOKIE AL INICIO (PERSISTENCIA) ---
+# --- VERIFICACIÓN DE COOKIE AL INICIO ---
 if not st.session_state.email_usuario:
-    # Intentamos leer la cookie
     cookie_val = cookie_manager.get("user_email")
     if cookie_val:
-        # Recuperamos sesión desde Cookie automáticamente
         st.session_state.email_usuario = cookie_val
-        # Recargamos datos de DB para asegurar plan actualizado
         df_actual = obtener_datos_db()
         if cookie_val in df_actual['email'].values:
             usuario = df_actual[df_actual['email'] == cookie_val].iloc[0]
             st.session_state.usos = int(usuario['usos'])
             st.session_state.plan_usuario = usuario['plan']
-        # Forzamos recarga para actualizar interfaz
         st.rerun()
 
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
-    # --- PANTALLA DE LOGIN (SI NO HAY SESIÓN ACTIVA) ---
+    # --- PANTALLA DE LOGIN ---
     if not st.session_state.email_usuario:
         st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
         
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
         if st.button("COMENZAR / START", type="primary"):
             if email_input and "@" in email_input:
-                
-                # 1. Guardar email en el estado actual para acceso inmediato
-                st.session_state.email_usuario = email_input.strip().lower() # Normalizamos el email
-                
-                # 2. Intentar guardar cookie de fondo
+                st.session_state.email_usuario = email_input.strip().lower()
                 try:
                     cookie_manager.set("user_email", st.session_state.email_usuario, expires_at=datetime.now().replace(year=datetime.now().year + 1))
                 except:
                     pass
                 
-                # 3. Cargar datos de la base de datos inmediatamente
                 df_actual = obtener_datos_db()
                 df_emp = obtener_empleados_db()
                 
@@ -1338,57 +1329,50 @@ with c2:
                     st.session_state.usos = 0
                     st.session_state.plan_usuario = "Gratis"
                 
-                # 4. Pequeña pausa para asegurar la persistencia y refrescar
                 time.sleep(0.5)
                 st.rerun()
             else:
                 st.error("Por favor, ingresa un email válido.")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- MOTOR DE GENERACIÓN IA PLATINUM (SI HAY SESIÓN) ---
+    # --- MOTOR DE GENERACIÓN IA PLATINUM ---
     elif st.session_state.email_usuario:
         es_pro = st.session_state.plan_usuario in ["Pro", "Agencia"]
         limite_usos = 99999 if es_pro else 3
         
         if st.session_state.usos < limite_usos:
             st.markdown('<div class="glass-container" style="height:auto;">', unsafe_allow_html=True)
-            # Inputs Pro (Tono e Idioma)
             col_t1, col_t2 = st.columns(2)
             with col_t1: 
                 tono = st.selectbox(L.get("lbl_tone", "Tono:"), ["Storytelling", "Profesional", "Urgencia", "Lujo"])
             with col_t2: 
                 idioma_salida = st.selectbox(L.get("lbl_lang_out", "Idioma:"), list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
 
-            # Inputs Principales (Link y Texto)
             url_input = st.text_input("", placeholder=L["placeholder"].split(" ")[0] + " Link...", label_visibility="collapsed")
             user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed", height=150)
             
-            # Contador de Caracteres en tiempo real
             st.caption(f"{L.get('char_count', 'Caracteres')}: {len(user_input)}")
 
             if st.button(L['btn_gen'], key="main_gen", type="primary"):
                 if user_input or url_input: 
                     with st.spinner("🚀 AI Realty Pro: Analizando mercado y redactando estrategia triple..."):
                         
-                        # Scraping Híbrido (Usando la función blindada con Jina)
                         datos_web, es_valido = extraer_datos_inmueble(url_input) if url_input else ("", True)
                         if not es_valido:
                             st.toast(L["link_warn"], icon="⚠️")
                         
-                        # --- SELECCIÓN DE ESTILO ---
+                        # Ajustes de Tono
                         if tono == "Profesional":
-                            instrucciones_estilo = "ESTILO: Corporativo, directo, serio. Usa datos, porcentajes y listas. CERO lenguaje poético. Enfócate en la inversión y características técnicas."
+                            instrucciones_estilo = "ESTILO: Corporativo, directo, serio. Usa datos, porcentajes y listas. CERO lenguaje poético."
                         elif tono == "Storytelling":
-                            instrucciones_estilo = "ESTILO: Narrativo, emocional, sensorial. Describe olores, luces, sensaciones. Vende el 'estilo de vida', no la casa."
+                            instrucciones_estilo = "ESTILO: Narrativo, emocional, sensorial. Describe olores, luces, sensaciones."
                         elif tono == "Urgencia":
-                            instrucciones_estilo = "ESTILO: Gatillos mentales de escasez. Frases cortas. 'Oportunidad única', 'Se va rápido', 'Última chance'."
+                            instrucciones_estilo = "ESTILO: Gatillos mentales de escasez. Frases cortas. 'Oportunidad única'."
                         else: # Lujo
-                            instrucciones_estilo = "ESTILO: Exclusivo, sofisticado, palabras de alto valor (High-Ticket). Dirigido a inversores o VIPs. Elegancia pura."
+                            instrucciones_estilo = "ESTILO: Exclusivo, sofisticado, palabras de alto valor (High-Ticket)."
 
-                        # --- INSTRUCCIONES DE VARIADAD ---
-                        instrucciones_variedad = "REGLA DE ORO: NO uses frases cliché como 'Imagina despertar' o 'Bienvenido a'. Sé original, directo y varía la estructura de los párrafos cada vez."
+                        instrucciones_variedad = "REGLA DE ORO: NO uses frases cliché como 'Imagina despertar' o 'Bienvenido a'. Sé original."
                         
-                        # --- ESTRUCTURA DE SALIDA SEGÚN PLAN ---
                         if es_pro:
                             instrucciones_plan = f"""
                             GENERA LA ESTRATEGIA COMPLETA:
@@ -1404,32 +1388,22 @@ with c2:
                             Al final del texto añade obligatoriamente: "Generado por AI Realty Pro - Versión Gratuita"
                             """
 
-                        # --- CONSTRUCCIÓN DEL PROMPT (FIX INDENTACIÓN AQUÍ) ---
                         prompt_base = f"""
-                        ACTÚA COMO: El mejor Copywriter Inmobiliario del mundo y experto en ventas.
+                        ACTÚA COMO: El mejor Copywriter Inmobiliario del mundo.
                         IDIOMA SALIDA: {idioma_salida}. 
                         
                         {instrucciones_estilo}
                         {instrucciones_variedad}
                         
-                        DATOS DEL INMUEBLE (EXTRAÍDOS DE LA WEB): 
-                        --- COMIENZO DATOS ---
-                        {datos_web} 
-                        --- FIN DATOS ---
+                        DATOS DEL INMUEBLE (WEB): {datos_web}
+                        DATOS MANUALES: {user_input}
                         
-                        DATOS ADICIONALES DEL USUARIO:
-                        {user_input}
-                        
-                        REGLA DE SEGURIDAD CRÍTICA:
-                        1. Si los "DATOS DEL INMUEBLE" dicen "ERROR_LECTURA" o están vacíos, y el usuario NO puso nada en "DATOS ADICIONALES":
-                           NO INVENTES DATOS. NO ALUCINES.
-                           Tu respuesta debe ser únicamente: "⚠️ No pude leer el link automáticamente por seguridad del portal. Por favor, copia y pega la descripción del inmueble en la caja de texto."
-                        2. Si tienes datos parciales, úsalos para VENDER.
+                        REGLA SEGURIDAD: Si DATOS WEB dice 'ERROR_LECTURA' y no hay datos manuales, responde SOLO con un aviso de error. No inventes.
                         
                         INSTRUCCIONES DE SALIDA:
                         {instrucciones_plan}
                         
-                        FORMATO: Usa negritas para resaltar lo importante. Separa las secciones claramente.
+                        FORMATO: Markdown con negritas.
                         """
                         
                         resultado = generar_texto(prompt_base)
@@ -1437,21 +1411,16 @@ with c2:
                         if "ERROR_TECNICO" not in resultado:
                             st.session_state.last_result = resultado
                             st.session_state.usos += 1
-                            
-                            # Actualización inmediata en BD
                             actualizar_usos_db(st.session_state.email_usuario, st.session_state.usos, st.session_state.plan_usuario)
                             guardar_historial(st.session_state.email_usuario, f"{url_input} {user_input}", resultado)
-                            
-                            # Limpieza de caché para evitar "F5 cheat"
                             st.cache_data.clear()
                             st.rerun()
                 else:
                     st.warning("Ingresa un link o texto para comenzar.")
             st.markdown('</div>', unsafe_allow_html=True)
             
-            # --- VISUALIZACIÓN DE RESULTADOS ---
+            # --- VISUALIZACIÓN DE RESULTADOS (AQUÍ ESTABA EL ERROR) ---
             if st.session_state.last_result:
-                # EMOJIMETRO
                 st.markdown(f"""
                 <div class="meter-container">
                     <div class="meter-fill"></div>
@@ -1459,7 +1428,6 @@ with c2:
                 </div>
                 """, unsafe_allow_html=True)
 
-                # CONTENEDOR DE TEXTO
                 st.markdown(f'''
                     <div class="result-container">
                         <div style="color: #00d2ff; font-weight: 800; margin-bottom: 15px; letter-spacing: 1px;">
@@ -1471,35 +1439,31 @@ with c2:
                     </div>
                 ''', unsafe_allow_html=True)
                 
+                # --- AGREGADO: BLOQUE DE ANÁLISIS EDUCATIVO ---
+                with st.expander("🧠 Análisis: ¿Qué mejoró la IA?"):
+                    with st.spinner("Analizando mejoras..."):
+                        prompt_analisis = f"""
+                        Actúa como un profesor de Marketing. Compara texto A y B.
+                        TEXTO A (Original): {user_input if user_input else datos_web}
+                        TEXTO B (Generado): {st.session_state.last_result}
+                        Salida: 3 puntos clave (balas) de por qué B vende más. Sé breve.
+                        """
+                        explicacion = generar_texto(prompt_analisis)
+                        st.write(explicacion)
+                # ----------------------------------------------
+
                 st.markdown("<br>", unsafe_allow_html=True)
-                b1, b2, b3 = st.columns(3)
-                # === AGREGAR ESTE BLOQUE NUEVO AQUÍ ===
-
-with st.expander("🧠 Análisis: ¿Qué mejoró la IA?"):
-    with st.spinner("Analizando mejoras..."):
-        # Le pedimos a la IA que compare brevemente
-        prompt_analisis = f"""
-        Actúa como un profesor de Marketing Inmobiliario.
-        Compara brevemente estos dos textos y dime 3 puntos clave (balas) de por qué la VERSIÓN B es mejor para vender que la A.
-        
-        TEXTO A (Original): {txt_in if txt_in else datos_web}
-        TEXTO B (Generado): {st.session_state.last_result}
-        
-        Salida: Solo los 3 puntos con emojis. Sé breve.
-        """
-        explicacion = generar_texto(prompt_analisis)
-        st.write(explicacion)
-
-# ======================================
                 
-                # BOTONES DE ACCIÓN
+                # COLUMNAS DE ACCIÓN (FIXED ALIGNMENT)
+                b1, b2, b3 = st.columns(3)
+                
                 with b1:
                     if st.button(f"📋 COPY"):
                         if hasattr(st, "copy_to_clipboard"):
                             st.copy_to_clipboard(st.session_state.last_result)
                             st.toast(L["copy_success"])
                         else:
-                            st.info("Copia el texto de la caja superior")
+                            st.info("Copia el texto de arriba")
                             st.code(st.session_state.last_result)
                 
                 with b2:
@@ -1509,7 +1473,6 @@ with st.expander("🧠 Análisis: ¿Qué mejoró la IA?"):
                 with b3:
                     st.download_button(f"💾 {L['download']}", st.session_state.last_result, file_name=f"Estrategia_{datetime.now().strftime('%Y%m%d')}.txt", use_container_width=True)
 
-                # PACK REDES SOCIALES (SOLO PRO/AGENCIA)
                 if es_pro:
                     st.markdown("---")
                     with st.expander(f"📱 {L.get('social_title', 'Social Pack')}"):
@@ -1517,7 +1480,6 @@ with st.expander("🧠 Análisis: ¿Qué mejoró la IA?"):
                             res_social = generar_texto(f"Crea Post IG con hashtags y Guion TikTok (15s) para: {st.session_state.last_result}")
                             st.markdown(res_social)
                 
-                # ASISTENTE DE REFINAMIENTO RÁPIDO
                 st.divider()
                 refine = st.text_input("", placeholder=L.get("refine_pl", "Ajuste rápido..."))
                 if st.button("Refinar / Ajustar"):
@@ -1527,22 +1489,20 @@ with st.expander("🧠 Análisis: ¿Qué mejoró la IA?"):
                         st.rerun()
 
         else:
-            # BLOQUEO DE PAGO (PAYWALL)
+            # PAYWALL
             st.error(L["limit_msg"])
             st.markdown(f"#### {L['upgrade_msg']}")
-            # Botón de bloqueo (simulado visualmente, usar ID real en producción)
             paypal_bloqueo = f"""<div id="pb"></div><script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script><script>paypal.Buttons({{style:{{shape:'pill',color:'blue',layout:'horizontal',label:'subscribe'}},createSubscription:function(d,a){{return a.subscription.create({{'plan_id':'P-3P2657040E401734NNFQQ5TY','custom_id':'{st.session_state.email_usuario}'}});}}}}).render('#pb');</script>"""
             components.html(paypal_bloqueo, height=100)
 
 # ==============================================================================
-# 9. CONSOLA DE AGENCIA (REDISEÑADA Y COMPLETA)
+# 9. CONSOLA DE AGENCIA
 # ==============================================================================
 
 if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_empleado:
     st.divider()
     st.subheader(L["manage_team"])
     
-    # Pestañas para organizar mejor la información de Agencia
     tab_equipo, tab_monitor = st.tabs(["👥 Mi Equipo", "📊 Monitor de Actividad"])
     
     df_emp = obtener_empleados_db()
@@ -1569,9 +1529,7 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
                 cm1, cm2 = st.columns([3, 1])
                 cm1.write(f"👤 {miembro}")
                 
-                # LÓGICA DE REVOCACIÓN (ELIMINACIÓN FÍSICA)
                 if cm2.button(L["revoke"], key=f"del_{miembro}"):
-                    # Filtramos todos EXCEPTO el que queremos borrar
                     df_limpio = df_emp[~((df_emp['BossEmail'] == st.session_state.email_usuario) & (df_emp['EmployeeEmail'] == miembro))]
                     conn.update(worksheet="Employees", data=df_limpio)
                     st.toast(f"Acceso revocado a {miembro}")
@@ -1579,10 +1537,8 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
     
     with tab_monitor:
         st.info("Aquí puedes ver el consumo de tus agentes en tiempo real.")
-        # Aquí cruzamos datos para mostrar uso de los empleados
         if mi_equipo:
             df_total = obtener_datos_db()
-            # Filtramos solo los empleados de este jefe
             empleados_stats = df_total[df_total['email'].isin(mi_equipo)][['email', 'usos']]
             if not empleados_stats.empty:
                 st.dataframe(empleados_stats, use_container_width=True)
