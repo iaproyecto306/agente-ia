@@ -13,10 +13,11 @@ import extra_streamlit_components as stx
 import random
 
 # ==============================================================================
-# 0. GESTOR DE COOKIES (MEMORIA PERMANENTE - ARQUITECTURA SEGURA)
+#
+#    0. GESTOR DE COOKIES (MEMORIA PERMANENTE)
+#    Maneja la sesión del usuario para que no tenga que loguearse siempre.
+#
 # ==============================================================================
-# Esta sección maneja la persistencia para que el usuario no tenga que loguearse
-# cada vez que recarga la página. Se usa session_state como puente.
 
 if "cookie_manager" not in st.session_state:
     st.session_state.cookie_manager = stx.CookieManager()
@@ -24,7 +25,10 @@ if "cookie_manager" not in st.session_state:
 cookie_manager = st.session_state.cookie_manager
 
 # ==============================================================================
-# 1. MOTOR DE EXTRACCIÓN (NINJA V6.0 - ANTI-BLOQUEO)
+#
+#    1. MOTOR DE EXTRACCIÓN (NINJA V6.0)
+#    Sistema anti-bloqueo con 3 capas de redundancia.
+#
 # ==============================================================================
 
 def extraer_datos_inmueble(url):
@@ -32,7 +36,8 @@ def extraer_datos_inmueble(url):
     Función Ninja v6.0.
     Estrategia de 3 capas para intentar saltar el bloqueo de IP de servidor.
     """
-    # 1. Validación básica de dominio
+    
+    # 1. Validación básica de dominio para saber si es un portal conocido
     portales_validos = [
         "infocasas", 
         "mercadolibre", 
@@ -49,9 +54,11 @@ def extraer_datos_inmueble(url):
     es_portal_conocido = any(portal in url.lower() for portal in portales_validos)
     texto_final = ""
     
-    # --- MÉTODO A: PUENTE JINA AI (Mejor opción para texto limpio) ---
+    # ---------------------------------------------------------
+    # CAPA 1: MÉTODO JINA AI (Mejor opción para texto limpio)
+    # ---------------------------------------------------------
     try:
-        # Añadimos un timestamp para evitar caché
+        # Añadimos un timestamp para evitar caché si fuera necesario (opcional)
         url_jina = f"https://r.jina.ai/{url}"
         
         headers_jina = {
@@ -59,14 +66,20 @@ def extraer_datos_inmueble(url):
             "X-Return-Format": "text"
         }
         
-        response = requests.get(url_jina, headers=headers_jina, timeout=25)
+        response = requests.get(
+            url_jina, 
+            headers=headers_jina, 
+            timeout=25
+        )
         
         if response.status_code == 200 and "Just a moment" not in response.text:
             texto_final = response.text
     except:
         pass
 
-    # --- MÉTODO B: IMITACIÓN NAVEGADOR PC (Si Jina falla) ---
+    # ---------------------------------------------------------
+    # CAPA 2: IMITACIÓN NAVEGADOR PC (Si Jina falla)
+    # ---------------------------------------------------------
     if not texto_final or len(texto_final) < 500:
         try:
             headers_pc = {
@@ -82,12 +95,16 @@ def extraer_datos_inmueble(url):
                 "Sec-Fetch-User": "?1"
             }
             
-            response = requests.get(url, headers=headers_pc, timeout=15)
+            response = requests.get(
+                url, 
+                headers=headers_pc, 
+                timeout=15
+            )
             
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
                 
-                # Eliminamos basura
+                # Eliminamos basura del HTML
                 for element in soup(['script', 'style', 'nav', 'footer', 'iframe', 'svg', 'button']):
                     element.decompose()
                     
@@ -95,14 +112,20 @@ def extraer_datos_inmueble(url):
         except:
             pass
 
-    # --- MÉTODO C: IMITACIÓN MÓVIL (A veces los sitios móviles son menos estrictos) ---
+    # ---------------------------------------------------------
+    # CAPA 3: IMITACIÓN MÓVIL (Último recurso)
+    # ---------------------------------------------------------
     if not texto_final or len(texto_final) < 500:
         try:
             headers_movil = {
                 "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/120.0.6099.119 Mobile/15E148 Safari/604.1"
             }
             
-            response = requests.get(url, headers=headers_movil, timeout=15)
+            response = requests.get(
+                url, 
+                headers=headers_movil, 
+                timeout=15
+            )
             
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
@@ -115,15 +138,15 @@ def extraer_datos_inmueble(url):
             pass
 
     # --- VEREDICTO FINAL ---
-    # Si logramos sacar más de 400 caracteres, consideramos éxito
     if len(texto_final) > 400:
         return texto_final[:6000], es_portal_conocido
     else:
-        # Mensaje amigable explicando la situación al usuario
-        return "⚠️ SECURITY ALERT: Automated access blocked by portal. Please COPY AND PASTE the property description manually below.", es_portal_conocido
+        return "⚠️ SECURITY ALERT: Automated access blocked. Please copy/paste description manually.", es_portal_conocido
 
 # ==============================================================================
-# 2. CONFIGURACIÓN DE IA Y CONEXIONES SEGURAS
+#
+#    2. CONFIGURACIÓN DE IA Y CONEXIONES SEGURAS
+#
 # ==============================================================================
 
 # Verificación de API Key de OpenAI
@@ -137,7 +160,12 @@ except Exception:
 # Conexión a Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# --- FUNCIONES DE BASE DE DATOS (CON LÓGICA VENCIMIENTO Y RESETEO) ---
+# ==============================================================================
+#
+#    3. FUNCIONES DE BASE DE DATOS
+#    Incluye: Lectura, Escritura, Reseteo Diario y Vencimiento.
+#
+# ==============================================================================
 
 def obtener_datos_db():
     """Obtiene la base de datos de usuarios principales con lectura en tiempo real."""
@@ -145,11 +173,11 @@ def obtener_datos_db():
         # ttl=0 OBLIGATORIO para ver cambios manuales en el Excel al instante
         df = conn.read(worksheet="Sheet1", ttl=0)
         
-        # Normalizamos: todo minúscula y sin espacios para evitar errores de tipeo en Excel
+        # Normalizamos: todo minúscula y sin espacios para evitar errores de tipeo
         df['email'] = df['email'].astype(str).str.strip().str.lower()
         
         if 'plan' in df.columns:
-            df['plan'] = df['plan'].astype(str).str.strip().str.title() # Convierte "pro" a "Pro"
+            df['plan'] = df['plan'].astype(str).str.strip().str.title()
             
         # Aseguramos columnas nuevas (Vencimiento y Ultima Fecha)
         if 'vencimiento' not in df.columns:
@@ -196,7 +224,7 @@ def actualizar_usos_db(email, nuevos_usos, plan_actual):
         df.loc[df['email'] == email, 'ultima_fecha'] = hoy_str
         
         # FIX IMPORTANTE: Si el plan actual es Pro/Agencia, asegurarse de que se guarde como tal
-        # Esto evita que un empleado Pro sea degradado a Gratis por error al actualizar usos
+        # Esto evita que un empleado Pro sea degradado a Gratis por error
         if plan_actual and plan_actual.lower() in ["pro", "agencia", "agency"]:
              df.loc[df['email'] == email, 'plan'] = "Pro"
     else:
@@ -301,12 +329,11 @@ def guardar_feedback(email, mensaje):
         conn.update(worksheet="Feedback", data=df_final)
         return True
     except Exception as e:
-        print(f"Error feedback: {e}")
         return False
 
 def generar_texto(prompt, modelo="gpt-4o"):
     """
-    Motor de generación de texto.
+    Motor de generación de texto IA.
     """
     try:
         response = client.chat.completions.create(
@@ -322,14 +349,14 @@ def generar_texto(prompt, modelo="gpt-4o"):
         return f"ERROR_IA: {str(e)}"
 
 # ==============================================================================
-# 3. CONFIGURACIÓN DE PÁGINA Y VARIABLES DE ESTADO
+# 4. CONFIGURACIÓN DE PÁGINA Y VARIABLES DE ESTADO
 # ==============================================================================
 
 st.set_page_config(
-    page_title="AI Realty Pro Platinum",
-    page_icon="🏢",
-    layout="wide",
-    initial_sidebar_state="expanded" 
+    page_title="AI Realty Pro Platinum", 
+    page_icon="🏢", 
+    layout="wide", 
+    initial_sidebar_state="expanded"
 )
 
 # Inicialización de variables de sesión
@@ -337,19 +364,18 @@ if "usos" not in st.session_state: st.session_state.usos = 0
 if "email_usuario" not in st.session_state: st.session_state.email_usuario = ""
 if "plan_usuario" not in st.session_state: st.session_state.plan_usuario = "Gratis"
 if "es_empleado" not in st.session_state: st.session_state.es_empleado = False
-# FIX: IDIOMA POR DEFECTO INGLÉS
 if "idioma" not in st.session_state: st.session_state.idioma = "English"
 if "last_result" not in st.session_state: st.session_state.last_result = None
 
 # ==============================================================================
-# 4. DICCIONARIO MAESTRO 360° (COMPLETO Y EXPANDIDO)
+# 5. DICCIONARIO MAESTRO (TOTALMENTE EXPANDIDO PARA LEGIBILIDAD)
 # ==============================================================================
 
 traducciones = {
     "English": {
         "title1": "Turn Boring Listings into", 
         "title2": "Sales Magnets", 
-        "sub": "The secret AI tool for top-producing agents in 2026.",
+        "sub": "The secret AI tool for top-producing agents.",
         "placeholder": "🏠 Describe property (beds, pool, view) or add instructions...", 
         "url_placeholder": "🔗 Paste property link...",
         "btn_gen": "✨ GENERATE TRIPLE STRATEGY", 
@@ -462,11 +488,11 @@ traducciones = {
         "plan1": "Inicial", 
         "plan2": "Agente Pro", 
         "plan3": "Agencia", 
-        "desc1": "3 descripciones / día",
+        "desc1": "3 descripciones / día", 
         "t1_1": "Límite diario prueba.", 
         "desc2": "Soporte Básico", 
         "t1_2": "Ayuda básica.", 
-        "desc3": "Marca de Agua",
+        "desc3": "Marca de Agua", 
         "t1_3": "Texto con firma.", 
         "desc4": "Generaciones Ilimitadas", 
         "t2_1": "Sin límites.",
@@ -531,7 +557,7 @@ traducciones = {
         "welcome_eve": "Buenas noches",
         "impact_text": "IMPACTO DE VENTA AUMENTADO", 
         "strategy_gen": "ESTRATEGIA GENERADA", 
-        "desc_luxury": "DESCRIPCIÓN LUJO",
+        "desc_luxury": "DESCRIPCIÓN LUJO", 
         "btn_refine": "Refinar / Ajustar", 
         "analyzing_msg": "ANALIZANDO PROPIEDAD Y REDACTANDO ESTRATEGIA...",
         "feedback_success": "✅ ¡Gracias! Tu comentario ha sido guardado.",
@@ -564,7 +590,7 @@ traducciones = {
         "popular": "POPULAR",
         "plan1": "Inicial", 
         "plan2": "Pro", 
-        "plan3": "Agência",
+        "plan3": "Agência", 
         "desc1": "3 descrições/dia", 
         "t1_1": "Limite diário.", 
         "desc2": "Suporte Básico", 
@@ -600,7 +626,7 @@ traducciones = {
         "stat1": "Otimizados", 
         "stat2": "Tempo", 
         "stat3": "Conversão", 
-        "foot_desc": "IA Imobiliária.",
+        "foot_desc": "IA Imobiliária.", 
         "mail_label": "📧 Email Profissional", 
         "limit_msg": "🚫 Limite atingido.", 
         "upgrade_msg": "Mude para PRO.",
@@ -778,7 +804,7 @@ traducciones = {
         "desc3": "Wasserzeichen", 
         "t1_3": "Mit Signatur.", 
         "desc4": "Unbegrenzt", 
-        "t2_1": "Keine Limits.",
+        "t2_1": "Keine Limits.", 
         "desc5": "Social Pack", 
         "t2_2": "Insta/TikTok.", 
         "desc6": "SEO", 
@@ -790,12 +816,12 @@ traducciones = {
         "desc9": "Team Panel", 
         "t3_2": "Verwaltung.", 
         "desc10": "API", 
-        "t3_3": "Bald.",
+        "t3_3": "Bald.", 
         "desc11": "Priorität", 
         "t3_4": "Doppelte Sichtbarkeit.", 
         "btn1": "GRATIS", 
         "btn2": "UPGRADE", 
-        "btn3": "KONTAKT",
+        "btn3": "KONTAKT", 
         "how_title": "Wie funktioniert es?", 
         "step1_t": "Link", 
         "step1_d": "Oder Text.",
@@ -806,10 +832,10 @@ traducciones = {
         "stat1": "Optimiert", 
         "stat2": "Zeit", 
         "stat3": "Konversion", 
-        "foot_desc": "Immo-KI.",
+        "foot_desc": "Immo-KI.", 
         "mail_label": "📧 E-Mail", 
         "limit_msg": "🚫 Limit erreicht.", 
-        "upgrade_msg": "Upgrade auf PRO.",
+        "upgrade_msg": "Upgrade auf PRO.", 
         "lbl_tone": "Ton:", 
         "lbl_lang_out": "Sprache:", 
         "annual_toggle": "📅 Sparen Sie 20%", 
@@ -869,7 +895,7 @@ traducciones = {
         "url_placeholder": "🔗 粘贴链接...", 
         "btn_gen": "✨ 生成策略", 
         "p_destacada": "精选", 
-        "comunidad": "社区",
+        "comunidad": "社区", 
         "popular": "最受欢迎", 
         "plan1": "基础", 
         "plan2": "专业", 
@@ -901,15 +927,15 @@ traducciones = {
         "btn3": "联系", 
         "how_title": "如何?", 
         "step1_t": "链接", 
-        "step1_d": "或文字。", 
+        "step1_d": "详情。", 
         "step2_t": "AI分析", 
         "step2_d": "引擎。", 
         "step3_t": "销售", 
-        "step3_d": "发布。",
+        "step3_d": "发布。", 
         "stat1": "优化", 
         "stat2": "时间", 
         "stat3": "转化", 
-        "foot_desc": "房产AI。",
+        "foot_desc": "房产AI。", 
         "mail_label": "📧 邮箱", 
         "limit_msg": "🚫 限制。", 
         "upgrade_msg": "升级PRO。", 
@@ -921,15 +947,15 @@ traducciones = {
         "download": "下载", 
         "copy_success": "已复制!", 
         "revoke": "撤销", 
-        "manage_team": "👥 团队",
+        "manage_team": "👥 团队", 
         "team_activity": "📈 活动", 
         "refine_pl": "🔄 调整...", 
         "social_title": "📱 社交", 
-        "char_count": "字数",
-        "link_warn": "⚠️ 链接错误。", 
+        "char_count": "字数", 
+        "link_warn": "⚠️ 错误。", 
         "badge_free": "免费", 
         "badge_pro": "专业", 
-        "badge_agency": "机构",
+        "badge_agency": "机构", 
         "legal_title": "条款", 
         "logout": "退出", 
         "welcome": "欢迎", 
@@ -937,16 +963,16 @@ traducciones = {
         "feedback_lbl": "💡 反馈", 
         "feedback_btn": "发送", 
         "support_mail": "支持", 
-        "credits_left": "额度:",
+        "credits_left": "额度:", 
         "welcome_morn": "早安", 
         "welcome_aft": "午安", 
         "welcome_eve": "晚安", 
         "impact_text": "影响力提升", 
         "strategy_gen": "策略", 
         "desc_luxury": "豪华描述", 
-        "btn_refine": "完善",
+        "btn_refine": "完善", 
         "analyzing_msg": "分析中...", 
-        "feedback_success": "✅ 谢谢!",
+        "feedback_success": "✅ 谢谢!", 
         "tone_lux": "豪华", 
         "tone_prof": "专业", 
         "tone_urg": "紧迫", 
@@ -972,10 +998,10 @@ traducciones = {
 
 st.markdown("""
 <style>
-    /* 1. FIX DEL SCROLL SUPERIOR (PADDING REMOVIDO) */
-    .block-container {
+    /* 1. FIX DEL SCROLL SUPERIOR */
+    .block-container { 
         padding-top: 1rem !important; 
-        padding-bottom: 5rem !important;
+        padding-bottom: 5rem !important; 
     }
 
     /* 2. RESET Y FONDO GLOBAL */
@@ -1091,14 +1117,14 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(0,210,255,0.3); 
     }
     
-    /* FIX: VIOLETA AGENCIA (#DDA0DD) */
+    /* FIX: AGENCIA VIOLETA (#DDA0DD) RESTAURADO */
     .badge-agency { 
         border-color: #DDA0DD; 
         color: #DDA0DD; 
         box-shadow: 0 0 15px rgba(221, 160, 221, 0.4); 
     }
 
-    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK CON BORDE VIOLETA/DORADO NEUTRO) */
+    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK CON BORDE VIOLETA) */
     .result-container {
         background: rgba(20, 20, 20, 0.95);
         color: #f0f0f0;
@@ -1136,14 +1162,14 @@ st.markdown("""
         border: 2px solid #00d2ff !important; 
     }
 
-    /* 10. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ */
+    /* 10. TARJETAS DE PLANES */
     .card-wrapper { 
         transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
         height: 480px; 
-        margin-bottom: 25px; 
-        position: relative; 
-        will-change: transform; 
+        margin-bottom: 25px;
+        position: relative;
+        will-change: transform;
     }
     
     .card-wrapper:hover { 
@@ -1267,7 +1293,7 @@ st.markdown("""
     }
     
     /* 12. BANNER ANIMADO DE FONDO */
-    .video-placeholder {
+    .video-placeholder { 
         border-radius: 12px; 
         height: 250px; 
         display: flex; 
@@ -1320,11 +1346,11 @@ st.markdown("""
         100% { transform: translateY(0px); } 
     }
 
-    /* 13. BARRA DE IMPACTO FINA Y ELEGANTE */
+    /* 13. BARRA DE IMPACTO SUTIL Y FINA */
     .meter-container { 
         background: rgba(255, 255, 255, 0.05); 
         border-radius: 4px; 
-        height: 4px; /* Fina */
+        height: 3px; /* Fina */
         width: 100%; 
         position: relative; 
         overflow: hidden; 
@@ -1337,7 +1363,7 @@ st.markdown("""
         background: linear-gradient(90deg, #D4AF37, #FFD700, #F2D06B); 
         width: 0%; 
         animation: fillMeter 2s ease-out forwards; 
-        box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Brillo sutil */
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.6); /* Brillo sutil */
     }
     
     .meter-text { 
@@ -1636,28 +1662,20 @@ with c2:
                     with st.spinner(f"🚀 {L['analyzing_msg']}"):
                         
                         datos_web, es_valido = extraer_datos_inmueble(url_input) if url_input else ("", True)
-                        if not es_valido:
-                            st.toast(L["link_warn"], icon="⚠️")
+                        if not es_valido: st.toast(L["link_warn"], icon="⚠️")
                         
                         # Ajustes de Tono
                         if tono == "Profesional":
-                            instrucciones_estilo = "STYLE: Corporate, direct, serious. Use data, lists."
+                            instrucciones_estilo = "STYLE: Corporate, direct, data-driven."
                         elif tono == "Storytelling":
                             instrucciones_estilo = "STYLE: Narrative, emotional, sensory. Describe smells, light."
                         elif tono == "Urgencia":
-                            instrucciones_estilo = "STYLE: Scarcity triggers, short sentences. 'Unique opportunity'."
+                            instrucciones_estilo = "STYLE: Scarcity triggers, short sentences."
                         else: # Lujo
                             instrucciones_estilo = "STYLE: Exclusive, sophisticated, high-ticket vocabulary."
 
-                        instrucciones_variedad = "RULE: Do NOT use clichés like 'Imagine waking up'. Be original."
+                        sec1, sec2, sec3, sec4 = L["sec_1"], L["sec_2"], L["sec_3"], L["sec_4"]
                         
-                        # FIX: Secciones traducidas dinámicamente desde el diccionario L
-                        sec_1_txt = L.get("sec_1", "SECTION 1")
-                        sec_2_txt = L.get("sec_2", "SECTION 2")
-                        sec_3_txt = L.get("sec_3", "SECTION 3")
-                        sec_4_txt = L.get("sec_4", "SECTION 4")
-                        sec_short = L.get("sec_short", "SHORT DESCRIPTION")
-
                         if es_pro:
                             instrucciones_plan = f"""
                             GENERATE FULL STRATEGY:
@@ -1707,18 +1725,46 @@ with c2:
             # --- VISUALIZACIÓN DE RESULTADOS ---
             if st.session_state.last_result:
                 
-                # FIX: BARRA DE IMPACTO FINA Y DORADA
+                # LOGICA DE COLOR DINÁMICO
+                p_u = st.session_state.plan_usuario.lower()
+                if "agencia" in p_u or "agency" in p_u:
+                    res_color = "#DDA0DD" # Violeta
+                elif "pro" in p_u:
+                    res_color = "#00d2ff" # Azul
+                else:
+                    res_color = "#cccccc" # Gris
+
+                # BARRA FINA Y SUTIL
                 st.markdown(f"""
                 <div class="meter-text">{L['impact_text']}</div>
-                <div class="meter-container">
-                    <div class="meter-fill"></div>
-                </div>
+                <div class="meter-container"><div class="meter-fill"></div></div>
                 """, unsafe_allow_html=True)
-
-                # FIX: RESULTADO LUXURY DARK
+                
+                # ESTILOS DEL REFLEJO (SHINE)
+                st.markdown(f"""
+                <style>
+                    @keyframes shine {{
+                        0% {{ background-position: -200% center; }}
+                        100% {{ background-position: 200% center; }}
+                    }}
+                    .shine-text {{
+                        background: linear-gradient(to right, {res_color} 0%, #ffffff 50%, {res_color} 100%);
+                        background-size: 200% auto;
+                        color: #000;
+                        background-clip: text;
+                        text-fill-color: transparent;
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        animation: shine 3s linear infinite;
+                        font-weight: 900;
+                    }}
+                </style>
+                """, unsafe_allow_html=True)
+                
+                # RESULTADO
                 st.markdown(f'''
-                    <div class="result-container">
-                        <div style="color: #DDA0DD; font-weight: 800; margin-bottom: 15px; letter-spacing: 1.5px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+                    <div class="result-container" style="border-top: 4px solid {res_color}; border-left: 1px solid {res_color}40; border-right: 1px solid {res_color}40; box-shadow: 0 0 20px {res_color}20;">
+                        <div class="shine-text" style="margin-bottom: 15px; letter-spacing: 1.5px; font-size: 1.1rem;">
                             {L['strategy_gen']} ({st.session_state.plan_usuario.upper()})
                         </div>
                         <div style="font-size: 1.05rem;">
@@ -1756,12 +1802,10 @@ with c2:
                             st.markdown(res_social)
                 
                 st.divider()
-                refine = st.text_input("", placeholder=L.get("refine_pl", "Quick adjust..."))
-                
-                # FIX: Botón Refinar traducido
+                refine = st.text_input("", placeholder=L.get("refine_pl", "..."))
                 if st.button(L["btn_refine"]):
                     with st.spinner("Refining..."):
-                        nuevo_res = generar_texto(f"Adjust this text: {st.session_state.last_result}. User request: {refine}")
+                        nuevo_res = generar_texto(f"Adjust this: {st.session_state.last_result}. User: {refine}")
                         st.session_state.last_result = nuevo_res
                         st.rerun()
 
@@ -1780,9 +1824,7 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
     st.divider()
     st.subheader(L["manage_team"])
     
-    # FIX: Pestañas traducidas
     tab_equipo, tab_monitor = st.tabs([L["tab_team"], L["tab_monitor"]])
-    
     df_emp = obtener_empleados_db()
     mi_equipo = df_emp[df_emp['BossEmail'] == st.session_state.email_usuario]['EmployeeEmail'].tolist()
     
@@ -1842,53 +1884,24 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
                 st.write(L["monitor_empty"])
 
 # ==============================================================================
-# 10. SECCIÓN INFORMATIVA Y PLANES DE SUSCRIPCIÓN
+# 10. PLANES
 # ==============================================================================
 
 st.markdown(f"<br><br><h2 style='text-align:center; color:white;'>{L['how_title']}</h2>", unsafe_allow_html=True)
-
-# Pasos de funcionamiento
 ch1, ch2, ch3 = st.columns(3)
-with ch1: 
-    st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>{L['step1_t']}</b><br>{L['step1_d']}</p></div>", unsafe_allow_html=True)
-with ch2: 
-    st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>{L['step2_t']}</b><br>{L['step2_d']}</p></div>", unsafe_allow_html=True)
-with ch3: 
-    st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>{L['step3_t']}</b><br>{L['step3_d']}</p></div>", unsafe_allow_html=True)
+with ch1: st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>{L['step1_t']}</b><br>{L['step1_d']}</p></div>", unsafe_allow_html=True)
+with ch2: st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>{L['step2_t']}</b><br>{L['step2_d']}</p></div>", unsafe_allow_html=True)
+with ch3: st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>{L['step3_t']}</b><br>{L['step3_d']}</p></div>", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
-
-# Estadísticas
-col_stat1, col_stat2, col_stat3 = st.columns(3)
-with col_stat1: 
-    st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+10k</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat1"]}</p></div>', unsafe_allow_html=True)
-with col_stat2: 
-    st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">-80%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat2"]}</p></div>', unsafe_allow_html=True)
-with col_stat3: 
-    st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+45%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p></div>', unsafe_allow_html=True)
-
-# --- SECCIÓN DE PLANES CON SWITCH ANUAL ---
-st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align:center;'>Plans</h3>", unsafe_allow_html=True)
-
-# SWITCH ANUAL (Lógica de Descuento)
 col_sw1, col_sw2, col_sw3 = st.columns([1,2,1])
-with col_sw2:
-    es_anual = st.toggle(L["annual_toggle"], value=False)
-
-# VARIABLES DE PRECIO DINÁMICAS
-precio_pro = "490" if es_anual else "49"
-precio_age = "1,990" if es_anual else "199"
-
-# IDs DE PAYPAL REALES (Configurados Anual vs Mensual)
+with col_sw2: es_anual = st.toggle(L["annual_toggle"], value=False)
+precio_pro = "490" if es_anual else "49"; precio_age = "1,990" if es_anual else "199"
 id_pro = "P-2PU023636P1209345NFQ7TMY" if es_anual else "P-3P2657040E401734NNFQQ5TY"
 id_age = "P-87X83840151393810NFQ7X6Q" if es_anual else "P-0S451470G5041550ENFQRB4I"
-
 ahorro_txt = L["annual_save"] if es_anual else ""
 
 col1, col2, col3 = st.columns(3)
-
-# PLAN GRATIS (BOTÓN OCULTO SI YA ESTÁ LOGUEADO)
 with col1:
     desc_f = f"<div class='feature-list'>{L['desc1']}<br>{L['desc2']}<br>{L['desc3']}</div>"
     st.markdown(f"<div class='card-wrapper free-card'><div class='glass-container'><h3>{L['plan1']}</h3><h1>$0</h1><hr style='opacity:0.2;'>{desc_f}</div></div>", unsafe_allow_html=True)
@@ -1896,67 +1909,16 @@ with col1:
         if st.button(L['btn1'], key="btn_f"):
             st.toast("Register above.")
 
-# PLAN PRO
 with col2:
     desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><br>{L['desc5']}<br>{L['desc6']}<br><b>{L['desc7']}</b></div>"
     st.markdown(f"<div class='card-wrapper pro-card'><div class='glass-container'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>${precio_pro}</h1><p style='color:#00d2ff; font-weight:bold;'>{ahorro_txt}</p><hr style='opacity:0.3;'>{desc_p}</div></div>", unsafe_allow_html=True)
-    
-    # Botón PayPal Pro (Dinámico ID)
-    pay_pro = f"""
-    <div id="paypal-button-container-pro"></div>
-    <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
-    <script>
-      paypal.Buttons({{
-        style: {{
-          shape: 'pill',
-          color: 'blue',
-          layout: 'vertical',
-          label: 'subscribe'
-        }},
-        createSubscription: function(data, actions) {{
-          return actions.subscription.create({{
-            'plan_id': '{id_pro}',
-            'custom_id': '{st.session_state.email_usuario}'
-          }});
-        }},
-        onApprove: function(data, actions) {{
-          alert('Subscription Successful: ' + data.subscriptionID);
-        }}
-      }}).render('#paypal-button-container-pro');
-    </script>
-    """
+    pay_pro = f"""<div id="p-pro"></div><script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script><script>paypal.Buttons({{style:{{shape:'pill',color:'blue',layout:'vertical',label:'subscribe'}},createSubscription:function(d,a){{return a.subscription.create({{'plan_id':'{id_pro}','custom_id':'{st.session_state.email_usuario}'}});}}}}).render('#p-pro');</script>"""
     components.html(pay_pro, height=150)
 
-# PLAN AGENCIA
 with col3:
     desc_a = f"<div class='feature-list'>{L['desc8']}<br>{L['desc9']}<br>{L['desc10']}<br><b>{L['desc11']}</b></div>"
-    # FIX: VIOLETA (#DDA0DD) RESTAURADO
     st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>${precio_age}</h1><p style='color:#DDA0DD; font-weight:bold;'>{ahorro_txt}</p><hr style='opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
-    
-    # Botón PayPal Agencia (Dinámico ID)
-    pay_age = f"""
-    <div id="paypal-button-container-age"></div>
-    <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
-    <script>
-      paypal.Buttons({{
-        style: {{
-          shape: 'pill',
-          color: 'blue',
-          layout: 'vertical',
-          label: 'subscribe'
-        }},
-        createSubscription: function(data, actions) {{
-          return actions.subscription.create({{
-            'plan_id': '{id_age}',
-            'custom_id': '{st.session_state.email_usuario}'
-          }});
-        }},
-        onApprove: function(data, actions) {{
-          alert('Subscription Successful: ' + data.subscriptionID);
-        }}
-      }}).render('#paypal-button-container-age');
-    </script>
-    """
+    pay_age = f"""<div id="p-age"></div><script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script><script>paypal.Buttons({{style:{{shape:'pill',color:'blue',layout:'vertical',label:'subscribe'}},createSubscription:function(d,a){{return a.subscription.create({{'plan_id':'{id_age}','custom_id':'{st.session_state.email_usuario}'}});}}}}).render('#p-age');</script>"""
     components.html(pay_age, height=150)
 
 # --- FOOTER LEGAL ---
