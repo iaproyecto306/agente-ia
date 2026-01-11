@@ -2012,7 +2012,19 @@ col1, col2, col3 = st.columns(3)
 
 # --- CARD GRATIS ---
 with col1:
-    desc_f = f"<div class='feature-list'>{L['desc1']}<br>{L['desc2']}<br>{L['desc3']}</div>"
+    # Tooltips persuasivos para el plan Gratis
+    tt_limite = "Tus 3 créditos se recargan automáticamente cada 24hs. Ideal para probar el sistema."
+    tt_soporte = "Acceso a soporte por email en horario comercial estándar."
+    
+    desc_f = f"""
+    <div class='feature-list'>
+        {L['desc1']} <span class='info-icon i-free' data-tooltip='{tt_limite}'>i</span><br>
+        {L['desc2']} <span class='info-icon i-free' data-tooltip='{tt_soporte}'>i</span><br>
+        {L['desc3']}
+    </div>
+    """
+    
+    # Se agrega la clase 'free-card' para el efecto de aura (hover)
     st.markdown(f'''
         <div class='card-wrapper free-card'>
             <div class='glass-container'>
@@ -2030,7 +2042,20 @@ with col1:
 
 # --- CARD PRO ---
 with col2:
-    desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><br>{L['desc5']}<br>{L['desc6']}<br><b>{L['desc7']}</b></div>"
+    # Tooltips persuasivos y Nuevas Ventajas (WhatsApp/Estrategia)
+    tt_unlimited = "Genera, reescribe y ajusta descripciones infinitas. Nunca te quedas sin saldo para vender."
+    tt_social = "Incluye scripts virales para TikTok/Reels y textos persuasivos de cierre para WhatsApp."
+    tt_seo = "Posicionamiento en portales con palabras clave de alto tráfico."
+    
+    desc_p = f"""
+    <div class='feature-list'>
+        <b>{L['desc4']}</b> <span class='info-icon i-pro' data-tooltip='{tt_unlimited}'>i</span><br>
+        {L['desc5']} + WhatsApp <span class='info-icon i-pro' data-tooltip='{tt_social}'>i</span><br>
+        {L['desc6']} <span class='info-icon i-pro' data-tooltip='{tt_seo}'>i</span><br>
+        <b>{L['desc7']}</b>
+    </div>
+    """
+    
     st.markdown(f'''
         <div class='card-wrapper pro-card'>
             <div class='glass-container'>
@@ -2044,7 +2069,6 @@ with col2:
         </div>
     ''', unsafe_allow_html=True)
     
-    # Botón PayPal Pro (Expandido para recuperar líneas)
     pay_pro = f"""
     <div id="paypal-button-container-pro"></div>
     <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
@@ -2072,7 +2096,19 @@ with col2:
 
 # --- CARD AGENCIA ---
 with col3:
-    desc_a = f"<div class='feature-list'>{L['desc8']}<br>{L['desc9']}<br>{L['desc10']}<br><b>{L['desc11']}</b></div>"
+    # Tooltips para Agencia
+    tt_team = "Gestiona hasta 5 agentes bajo una sola facturación centralizada y profesional."
+    tt_dash = "Audita el historial, rendimiento y uso de cada uno de tus agentes en tiempo real."
+    
+    desc_a = f"""
+    <div class='feature-list'>
+        {L['desc8']} <span class='info-icon i-agency' data-tooltip='{tt_team}'>i</span><br>
+        {L['desc9']} <span class='info-icon i-agency' data-tooltip='{tt_dash}'>i</span><br>
+        {L['desc10']}<br>
+        <b>{L['desc11']}</b>
+    </div>
+    """
+    
     st.markdown(f'''
         <div class='card-wrapper agency-card'>
             <div class='glass-container'>
@@ -2085,7 +2121,6 @@ with col3:
         </div>
     ''', unsafe_allow_html=True)
     
-    # Botón PayPal Agencia (Expandido)
     pay_age = f"""
     <div id="paypal-button-container-age"></div>
     <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
