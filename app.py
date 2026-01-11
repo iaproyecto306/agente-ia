@@ -13,9 +13,7 @@ import extra_streamlit_components as stx
 import random
 
 # ==============================================================================
-#
-#    0. GESTOR DE COOKIES (MEMORIA PERMANENTE)
-#
+# 0. GESTOR DE COOKIES (MEMORIA PERMANENTE)
 # ==============================================================================
 
 if "cookie_manager" not in st.session_state:
@@ -24,9 +22,7 @@ if "cookie_manager" not in st.session_state:
 cookie_manager = st.session_state.cookie_manager
 
 # ==============================================================================
-#
-#    1. MOTOR DE EXTRACCIÓN (NINJA V6.0)
-#
+# 1. MOTOR DE EXTRACCIÓN (NINJA V6.0)
 # ==============================================================================
 
 def extraer_datos_inmueble(url):
@@ -51,10 +47,9 @@ def extraer_datos_inmueble(url):
     es_portal_conocido = any(portal in url.lower() for portal in portales_validos)
     texto_final = ""
     
-    # --------------------------------------------------------------------------
-    # MÉTODO A: PUENTE JINA AI
-    # --------------------------------------------------------------------------
+    # --- MÉTODO A: PUENTE JINA AI ---
     try:
+        # Añadimos un timestamp para evitar caché
         url_jina = f"https://r.jina.ai/{url}"
         
         headers_jina = {
@@ -70,13 +65,10 @@ def extraer_datos_inmueble(url):
         
         if response.status_code == 200 and "Just a moment" not in response.text:
             texto_final = response.text
-            
     except:
         pass
 
-    # --------------------------------------------------------------------------
-    # MÉTODO B: IMITACIÓN NAVEGADOR PC
-    # --------------------------------------------------------------------------
+    # --- MÉTODO B: IMITACIÓN NAVEGADOR PC ---
     if not texto_final or len(texto_final) < 500:
         try:
             headers_pc = {
@@ -109,9 +101,7 @@ def extraer_datos_inmueble(url):
         except:
             pass
 
-    # --------------------------------------------------------------------------
-    # MÉTODO C: IMITACIÓN MÓVIL
-    # --------------------------------------------------------------------------
+    # --- MÉTODO C: IMITACIÓN MÓVIL ---
     if not texto_final or len(texto_final) < 500:
         try:
             headers_movil = {
@@ -141,9 +131,7 @@ def extraer_datos_inmueble(url):
         return "⚠️ SECURITY ALERT: Automated access blocked. Please copy/paste description manually.", es_portal_conocido
 
 # ==============================================================================
-#
-#    2. CONFIGURACIÓN DE IA Y CONEXIONES SEGURAS
-#
+# 2. CONFIGURACIÓN DE IA Y CONEXIONES SEGURAS
 # ==============================================================================
 
 # Verificación de API Key de OpenAI
@@ -157,12 +145,7 @@ except Exception:
 # Conexión a Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# ==============================================================================
-#
-#    3. FUNCIONES DE BASE DE DATOS
-#    (Lectura, Escritura, Reseteo Diario, Vencimiento, Historial, Feedback)
-#
-# ==============================================================================
+# --- FUNCIONES DE BASE DE DATOS (CON PASS, RESETEO Y VENCIMIENTO) ---
 
 def obtener_datos_db():
     """Obtiene la base de datos de usuarios principales."""
@@ -212,7 +195,6 @@ def actualizar_usos_db(email, nuevos_usos, plan_actual):
     """Actualiza el consumo de usos y la fecha de uso."""
     email = email.strip().lower() 
     df = obtener_datos_db()
-    
     hoy_str = datetime.now().strftime("%Y-%m-%d")
     
     if 'plan' not in df.columns:
@@ -226,6 +208,7 @@ def actualizar_usos_db(email, nuevos_usos, plan_actual):
         if plan_actual and plan_actual.lower() in ["pro", "agencia", "agency"]:
              df.loc[df['email'] == email, 'plan'] = "Pro"
     else:
+        # ESTO ES UN FAILSAFE, NORMALMENTE EL LOGIN YA CREÓ EL USUARIO
         nueva_fila = pd.DataFrame({
             "email": [email], 
             "usos": [nuevos_usos], 
@@ -286,26 +269,53 @@ def verificar_vencimiento(email, plan_actual):
                 
     return plan_actual
 
-def verificar_password(email, input_pass):
+def procesar_login_registro(email, input_pass):
     """
-    Verifica la contraseña si existe en la base de datos.
+    Maneja la lógica de Login Y Registro en un solo paso.
+    - Si existe: Verifica Password.
+    - Si NO existe: Crea usuario con ese Password.
+    Retorna: (Exito, Mensaje, EsNuevo)
     """
-    df = obtener_datos_db()
-    if email in df['email'].values:
-        row = df[df['email'] == email].iloc[0]
-        db_pass = str(row['password']).strip()
+    email = email.strip().lower()
+    input_pass = input_pass.strip()
+    
+    df_users = obtener_datos_db()
+    
+    # 1. USUARIO EXISTENTE
+    if email in df_users['email'].values:
+        row = df_users[df_users['email'] == email].iloc[0]
+        stored_pass = str(row['password']).strip()
         
-        # Si no hay contraseña guardada, pase libre
-        if not db_pass or db_pass.lower() == "nan":
-            return True
-        
-        # Si hay contraseña, debe coincidir
-        if db_pass == input_pass.strip():
-            return True
+        # Si tiene contraseña guardada, verificarla
+        if stored_pass and stored_pass.lower() != "nan" and stored_pass != "":
+            if input_pass != stored_pass:
+                return False, "❌ Contraseña incorrecta.", False
+            else:
+                return True, "✅ Login exitoso.", False
         else:
-            return False
+            # Si NO tiene contraseña (ej: creado manualmente sin pass), dejamos pasar
+            # Opcional: Podríamos guardar la pass ahora, pero mejor no complicar.
+            return True, "✅ Login exitoso (Sin pass).", False
             
-    return True # Usuario nuevo
+    # 2. USUARIO NUEVO (AUTO-REGISTRO)
+    else:
+        # Creamos el usuario con la contraseña que puso
+        hoy_str = datetime.now().strftime("%Y-%m-%d")
+        nueva_fila = pd.DataFrame({
+            "email": [email], 
+            "usos": [0], 
+            "plan": ["Gratis"],
+            "vencimiento": [""],
+            "ultima_fecha": [hoy_str],
+            "password": [input_pass] # Guardamos la contraseña para el futuro
+        })
+        
+        try:
+            df_updated = pd.concat([df_users, nueva_fila], ignore_index=True)
+            conn.update(worksheet="Sheet1", data=df_updated)
+            return True, "✨ Cuenta creada exitosamente.", True
+        except Exception as e:
+            return False, f"Error creando usuario: {e}", False
 
 def guardar_historial(email, input_user, output_ia):
     """Guarda cada generación en la hoja Historial."""
@@ -439,7 +449,7 @@ traducciones = {
         "stat3": "Conversion", 
         "foot_desc": "AI for Real Estate.",
         "mail_label": "📧 Professional Email", 
-        "pass_label": "🔑 Password (Optional)",
+        "pass_label": "🔑 Password",
         "limit_msg": "🚫 Free limit reached.", 
         "upgrade_msg": "Upgrade to PRO to keep selling.",
         "lbl_tone": "Tone:", 
@@ -457,7 +467,7 @@ traducciones = {
         "char_count": "Characters", 
         "link_warn": "⚠️ Link not recognized.", 
         "badge_free": "FREE USER", 
-        "badge_pro": "PRO MEMBER",
+        "badge_pro": "PRO MEMBER", 
         "badge_agency": "AGENCY PARTNER", 
         "legal_title": "Terms & Privacy", 
         "logout": "Log Out", 
@@ -551,7 +561,7 @@ traducciones = {
         "stat3": "Más Consultas", 
         "foot_desc": "IA Inmobiliaria.",
         "mail_label": "📧 Email Profesional", 
-        "pass_label": "🔑 Contraseña (Opcional)",
+        "pass_label": "🔑 Contraseña",
         "limit_msg": "🚫 Límite gratuito alcanzado.", 
         "upgrade_msg": "Pásate a PRO para seguir vendiendo.",
         "lbl_tone": "Tono:", 
@@ -663,7 +673,7 @@ traducciones = {
         "stat3": "Conversão", 
         "foot_desc": "IA Imobiliária.", 
         "mail_label": "📧 Email Profissional", 
-        "pass_label": "🔑 Senha (Opcional)",
+        "pass_label": "🔑 Senha",
         "limit_msg": "🚫 Limite atingido.", 
         "upgrade_msg": "Mude para PRO.",
         "lbl_tone": "Tom:", 
@@ -772,7 +782,7 @@ traducciones = {
         "stat3": "Conversion", 
         "foot_desc": "IA Immobilier.",
         "mail_label": "📧 Email Pro", 
-        "pass_label": "🔑 Mot de passe (Optionnel)",
+        "pass_label": "🔑 Mot de passe",
         "limit_msg": "🚫 Limite atteinte.", 
         "upgrade_msg": "Passez PRO.",
         "lbl_tone": "Ton:", 
@@ -832,8 +842,8 @@ traducciones = {
         "test3_txt": "Vital.", "test3_au": "Luis P."
     },
     "Deutsch": {
-        "title1": "Verwandeln Sie Anzeigen", 
-        "title2": "in Magnete", 
+        "title1": "Anzeigen verwandeln", 
+        "title2": "Verkaufsmagnete", 
         "sub": "Das geheime KI-Tool.",
         "placeholder": "🏠 Beschreibung...", 
         "url_placeholder": "🔗 Link einfügen...", 
@@ -881,9 +891,9 @@ traducciones = {
         "stat3": "Konversion", 
         "foot_desc": "Immo-KI.", 
         "mail_label": "📧 E-Mail", 
-        "pass_label": "🔑 Passwort (Optional)",
+        "pass_label": "🔑 Passwort",
         "limit_msg": "🚫 Limit erreicht.", 
-        "upgrade_msg": "Upgrade auf PRO.",
+        "upgrade_msg": "Upgrade auf PRO.", 
         "lbl_tone": "Ton:", 
         "lbl_lang_out": "Sprache:", 
         "annual_toggle": "📅 Sparen Sie 20%", 
@@ -947,7 +957,7 @@ traducciones = {
         "btn_gen": "✨ 生成策略", 
         "p_destacada": "精选", 
         "comunidad": "社区", 
-        "popular": "热门", 
+        "popular": "最受欢迎", 
         "plan1": "基础", 
         "plan2": "专业", 
         "plan3": "机构", 
@@ -988,7 +998,7 @@ traducciones = {
         "stat3": "转化", 
         "foot_desc": "房产AI。", 
         "mail_label": "📧 邮箱", 
-        "pass_label": "🔑 密码 (可选)",
+        "pass_label": "🔑 密码",
         "limit_msg": "🚫 限制。", 
         "upgrade_msg": "升级PRO。", 
         "lbl_tone": "语气:", 
@@ -1031,7 +1041,7 @@ traducciones = {
         "tone_story": "故事", 
         "emp_email_lbl": "邮箱", 
         "emp_add_btn": "添加", 
-        "pass_error": "密码错误",
+        "pass_error": "密码错误", 
         "sec_1": "第1部分", 
         "sec_2": "第2部分", 
         "sec_3": "第3部分", 
@@ -1041,7 +1051,7 @@ traducciones = {
         "tab_monitor": "📊 监控", 
         "monitor_desc": "历史。", 
         "monitor_empty": "无数据。", 
-        "expired_msg": "⚠️ 过期。",
+        "expired_msg": "⚠️ 过期。", 
         "test_title": "专家评价", "test1_txt": "销售额+50%。",
         "test1_au": "Carlos R.", "test2_txt": "节省时间。", "test2_au": "Ana M.", "test3_txt": "机构必备。", "test3_au": "Luis P."
     }
@@ -1186,6 +1196,7 @@ st.markdown("""
         padding: 30px; 
         border-radius: 15px; 
         border: 1px solid rgba(255, 255, 255, 0.1); 
+        /* Border top dinámico */
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         font-size: 1.1rem; 
         line-height: 1.6; 
@@ -1216,7 +1227,7 @@ st.markdown("""
         border: 2px solid #00d2ff !important; 
     }
 
-    /* 10. TARJETAS DE PLANES - ALTO RENDIMIENTO */
+    /* 10. TARJETAS DE PLANES */
     .card-wrapper { 
         transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
@@ -1630,64 +1641,67 @@ with c2:
         
         if st.button("START / ENTRAR", type="primary"):
             if email_input and "@" in email_input:
-                st.session_state.email_usuario = email_input.strip().lower()
                 
-                # VALIDAR PASSWORD ANTES DE SEGUIR
-                if not verificar_password(st.session_state.email_usuario, password_input):
-                    st.error(L.get("pass_error", "Incorrect Password"))
-                    st.stop()
+                # ----------------------------------------------------
+                # LÓGICA DE LOGIN Y REGISTRO AUTOMÁTICO
+                # ----------------------------------------------------
                 
-                try:
-                    cookie_manager.set("user_email", st.session_state.email_usuario, expires_at=datetime.now().replace(year=datetime.now().year + 1))
-                except:
-                    pass
+                exito, mensaje, es_nuevo = procesar_login_registro(email_input, password_input)
                 
-                df_actual = obtener_datos_db()
-                df_emp = obtener_empleados_db()
-                
-                # LOGIN: CHECK 1 - ¿Es empleado? (Prioridad sobre cuenta gratis personal)
-                if st.session_state.email_usuario in df_emp['EmployeeEmail'].values:
-                    jefe_email = df_emp[df_emp['EmployeeEmail'] == st.session_state.email_usuario].iloc[0]['BossEmail']
-                    
-                    if jefe_email in df_actual['email'].values:
-                        datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
-                        st.session_state.usos = 0
-                        
-                        # FIX CRÍTICO LOGIN: Detectar Agencia
-                        plan_jefe_raw = str(datos_jefe['plan']).strip()
-                        if any(p.lower() in plan_jefe_raw.lower() for p in ["agencia", "agency", "partner"]):
-                            st.session_state.plan_usuario = "Pro"
-                        else:
-                            st.session_state.plan_usuario = plan_jefe_raw.title()
-                            
-                        st.session_state.es_empleado = True
-                        st.session_state.boss_ref = jefe_email
-                    else:
-                        # Si el jefe no existe, fallback a gratis
-                        st.session_state.plan_usuario = "Gratis"
-
-                # LOGIN: CHECK 2 - ¿Es usuario directo?
-                elif st.session_state.email_usuario in df_actual['email'].values:
-                    usuario = df_actual[df_actual['email'] == st.session_state.email_usuario].iloc[0]
-                    
-                    # FIX: Verificar Vencimiento al Login
-                    plan_verificado = verificar_vencimiento(st.session_state.email_usuario, usuario['plan'])
-                    st.session_state.plan_usuario = plan_verificado
-                    if plan_verificado == "Gratis" and usuario['plan'] != "Gratis":
-                        st.toast(L["expired_msg"], icon="⚠️")
-                        
-                    # FIX: Reseteo diario
-                    usos_reales = verificar_reseteo_diario(st.session_state.email_usuario)
-                    st.session_state.usos = usos_reales
-                    
-                    st.session_state.es_empleado = False
-                
+                if not exito:
+                    st.error(mensaje)
                 else:
-                    st.session_state.usos = 0
-                    st.session_state.plan_usuario = "Gratis"
-                
-                time.sleep(0.5)
-                st.rerun()
+                    if es_nuevo:
+                        st.toast("🎉 Account Created Successfully!")
+                    
+                    st.session_state.email_usuario = email_input.strip().lower()
+                    
+                    try:
+                        cookie_manager.set("user_email", st.session_state.email_usuario, expires_at=datetime.now().replace(year=datetime.now().year + 1))
+                    except:
+                        pass
+                    
+                    # RE-CARGA DE DATOS PARA ASIGNAR PLAN CORRECTO
+                    df_actual = obtener_datos_db()
+                    df_emp = obtener_empleados_db()
+                    
+                    # SI ES EMPLEADO
+                    if st.session_state.email_usuario in df_emp['EmployeeEmail'].values:
+                        jefe_email = df_emp[df_emp['EmployeeEmail'] == st.session_state.email_usuario].iloc[0]['BossEmail']
+                        if jefe_email in df_actual['email'].values:
+                            datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
+                            st.session_state.usos = 0
+                            plan_jefe_raw = str(datos_jefe['plan']).strip()
+                            
+                            if any(p.lower() in plan_jefe_raw.lower() for p in ["agencia", "agency", "partner"]):
+                                st.session_state.plan_usuario = "Pro"
+                            else:
+                                st.session_state.plan_usuario = plan_jefe_raw.title()
+                                
+                            st.session_state.es_empleado = True
+                            st.session_state.boss_ref = jefe_email
+                        else:
+                            st.session_state.plan_usuario = "Gratis"
+                    
+                    # SI ES USUARIO DIRECTO
+                    elif st.session_state.email_usuario in df_actual['email'].values:
+                        usuario = df_actual[df_actual['email'] == st.session_state.email_usuario].iloc[0]
+                        
+                        # Vencimiento
+                        plan_verificado = verificar_vencimiento(st.session_state.email_usuario, usuario['plan'])
+                        st.session_state.plan_usuario = plan_verificado
+                        
+                        if plan_verificado == "Gratis" and usuario['plan'] != "Gratis":
+                            st.toast(L["expired_msg"], icon="⚠️")
+                        
+                        # Reseteo Diario
+                        usos_reales = verificar_reseteo_diario(st.session_state.email_usuario)
+                        st.session_state.usos = usos_reales
+                        
+                        st.session_state.es_empleado = False
+                    
+                    time.sleep(0.5)
+                    st.rerun()
             else:
                 st.error("Invalid Email.")
         st.markdown('</div>', unsafe_allow_html=True)
@@ -1912,13 +1926,15 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
                         new_row_main = pd.DataFrame({"email": [nuevo_e.strip().lower()], "usos": [0], "plan": ["Pro"], "vencimiento": [""], "ultima_fecha": [""]})
                         conn.update(worksheet="Sheet1", data=pd.concat([df_main, new_row_main], ignore_index=True))
                     st.rerun()
-                elif len(mi_equipo) >= 4: st.warning("Full Team.")
+                elif len(mi_equipo) >= 4:
+                    st.warning("Full Team (Max 4).")
         
         if mi_equipo:
             st.write("---")
             for miembro in mi_equipo:
                 cm1, cm2 = st.columns([3, 1])
                 cm1.write(f"👤 {miembro}")
+                
                 if cm2.button(L["revoke"], key=f"del_{miembro}"):
                     df_limpio = df_emp[~((df_emp['BossEmail'] == st.session_state.email_usuario) & (df_emp['EmployeeEmail'] == miembro))]
                     conn.update(worksheet="Employees", data=df_limpio)
@@ -1961,7 +1977,7 @@ with ch3:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Estadísticas
+# Estadísticas (RECUPERADAS)
 col_stat1, col_stat2, col_stat3 = st.columns(3)
 with col_stat1: 
     st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+10k</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat1"]}</p></div>', unsafe_allow_html=True)
@@ -1970,7 +1986,7 @@ with col_stat2:
 with col_stat3: 
     st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+45%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p></div>', unsafe_allow_html=True)
 
-# --- SECCIÓN DE TESTIMONIOS (REINCORPORADA) ---
+# --- SECCIÓN DE TESTIMONIOS (RECUPERADA) ---
 st.markdown(f"<br><br><h3 style='text-align:center; color:white;'>{L.get('test_title', 'Expert Reviews')}</h3>", unsafe_allow_html=True)
 t1, t2, t3 = st.columns(3)
 with t1:
