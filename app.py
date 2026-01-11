@@ -157,7 +157,6 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 # ----------------------------------------------------------------------
 #  AQUÍ PEGA TU URL DE MAKE (INTEGROMAT)
 # ----------------------------------------------------------------------
-# Esta URL única manejará tanto Pro como Agencia.
 WEBHOOK_MAKE_GENERAL = "PEGAR_TU_WEBHOOK_AQUI" 
 
 # ==============================================================================
@@ -1372,6 +1371,8 @@ with st.sidebar:
     
     idioma_selec = st.selectbox("🌐 Idioma / Language", list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
     st.session_state.idioma = idioma_selec
+    
+    # --- HERE IS THE FIX: Define 'L' globally for sidebar usage, but also make it available outside ---
     L = traducciones[st.session_state.idioma]
 
     if st.session_state.email_usuario:
@@ -1425,6 +1426,9 @@ with st.sidebar:
 # ==============================================================================
 # 7. INTERFAZ
 # ==============================================================================
+
+# --- CRITICAL FIX: Re-define 'L' here to ensure it exists in the main scope ---
+L = traducciones[st.session_state.idioma]
 
 col_logo, _, col_lang = st.columns([2.5, 4, 1.5])
 with col_logo:
@@ -1595,11 +1599,13 @@ with c2:
                             instr_estilo = "STYLE: Exclusive, sophisticated, high-ticket vocabulary."
 
                         # --- FIX ERROR NAME 'sec_1' IS NOT DEFINED ---
-                        # Definimos las variables antes de usarlas en el f-string
-                        sec_1 = L["sec_1"]
-                        sec_2 = L["sec_2"]
-                        sec_3 = L["sec_3"]
-                        sec_4 = L["sec_4"]
+                        # Usamos .get() para evitar crashes
+                        sec_1 = L.get("sec_1", "Section 1")
+                        sec_2 = L.get("sec_2", "Section 2")
+                        sec_3 = L.get("sec_3", "Section 3")
+                        sec_4 = L.get("sec_4", "Section 4")
+                        sec_short = L.get("sec_short", "Short Description")
+                        desc3 = L.get("desc3", "Watermark")
                         
                         if es_pro:
                             instrucciones_plan = f"""
@@ -1610,7 +1616,7 @@ with c2:
                             {sec_4} (Title <60 chars, Meta <160 chars)
                             """
                         else:
-                            instrucciones_plan = f'GENERATE ONLY: {L["sec_short"]}. Append at the end: "{L["desc3"]}"'
+                            instrucciones_plan = f'GENERATE ONLY: {sec_short}. Append at the end: "{desc3}"'
 
                         prompt_base = f"""
                         ACT AS: Expert Real Estate Copywriter. 
