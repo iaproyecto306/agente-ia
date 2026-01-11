@@ -359,6 +359,13 @@ traducciones = {
         "stat1": "Optimized Ads",
         "stat2": "Time Saved",
         "stat3": "Conversion",
+        "test_title": "What Experts Say",
+        "test1_txt": "Sales went up 50%.",
+        "test1_au": "Carlos R. (RE/MAX)",
+        "test2_txt": "Saves hours of writing.",
+        "test2_au": "Ana M. (Century 21)",
+        "test3_txt": "Agency plan is vital.",
+        "test3_au": "Luis P. (Independent)",
         "foot_desc": "AI for Real Estate.",
         "mail_label": "📧 Professional Email",
         "limit_msg": "🚫 Free limit reached.",
@@ -462,6 +469,13 @@ traducciones = {
         "stat1": "Anuncios Optimizados",
         "stat2": "Tiempo Ahorrado",
         "stat3": "Más Consultas",
+        "test_title": "Lo que dicen los Expertos",
+        "test1_txt": "Mis ventas subieron 50%.",
+        "test1_au": "Carlos R. (RE/MAX)",
+        "test2_txt": "Ahorro horas de redacción.",
+        "test2_au": "Ana M. (Century 21)",
+        "test3_txt": "El plan Agencia es vital.",
+        "test3_au": "Luis P. (Independiente)",
         "foot_desc": "IA Inmobiliaria.",
         "mail_label": "📧 Email Profesional",
         "limit_msg": "🚫 Límite gratuito alcanzado.",
@@ -476,18 +490,19 @@ traducciones = {
         "revoke": "Revocar Acceso",
         "manage_team": "👥 Gestionar Equipo",
         "team_activity": "📈 Actividad",
-        "refine_pl": "🔄 Ajuste rápido...",
-        "social_title": "📱 Pack Redes Sociales",
+        "refine_pl": "🔄 Ajuste rápido (ej: hazlo más corto)...",
+        "social_title": "📱 Social Media Pack",
         "char_count": "Caracteres",
         "link_warn": "⚠️ Este link no parece ser de un portal conocido.",
         "badge_free": "USUARIO GRATIS",
         "badge_pro": "MIEMBRO PRO",
         "badge_agency": "SOCIO AGENCIA",
-        "legal_title": "Términos Legales",
+        "api_soon": "Acceso API (Próximamente)",
+        "legal_title": "Términos Legales & Privacidad",
         "logout": "Cerrar Sesión",
         "welcome": "Bienvenido",
         "usage_bar": "Progreso Diario",
-        "feedback_lbl": "💡 Sugerencias",
+        "feedback_lbl": "💡 Sugerencias / Soporte",
         "feedback_btn": "Enviar Comentario",
         "support_mail": "Soporte",
         "credits_left": "Créditos hoy:",
@@ -498,7 +513,7 @@ traducciones = {
         "strategy_gen": "ESTRATEGIA GENERADA",
         "desc_luxury": "DESCRIPCIÓN LUJO",
         "btn_refine": "Refinar / Ajustar",
-        "analyzing_msg": "ANALIZANDO PROPIEDAD...",
+        "analyzing_msg": "ANALIZANDO PROPIEDAD Y REDACTANDO ESTRATEGIA...",
         "feedback_success": "✅ ¡Gracias! Tu comentario ha sido guardado.",
         "tone_lux": "Lujo",
         "tone_prof": "Profesional",
@@ -506,6 +521,7 @@ traducciones = {
         "tone_story": "Storytelling",
         "emp_email_lbl": "Email Agente",
         "emp_add_btn": "AÑADIR",
+        # KEYS AGREGADAS ESPAÑOL
         "sec_1": "SECCIÓN 1: DESCRIPCIÓN PRINCIPAL",
         "sec_2": "SECCIÓN 2: FICHA TÉCNICA",
         "sec_3": "SECCIÓN 3: COPY WHATSAPP",
@@ -513,7 +529,7 @@ traducciones = {
         "sec_short": "DESCRIPCIÓN CORTA",
         "tab_team": "👥 Mi Equipo",
         "tab_monitor": "📊 Monitor de Actividad",
-        "monitor_desc": "Aquí puedes ver el consumo de tus agentes.",
+        "monitor_desc": "Aquí puedes ver el consumo de tus agentes en tiempo real.",
         "monitor_empty": "Tus empleados aún no han generado contenido.",
         "expired_msg": "⚠️ Tu suscripción ha vencido. Cambiado a Plan Gratis."
     },
@@ -565,6 +581,13 @@ traducciones = {
         "stat1": "Otimizados",
         "stat2": "Tempo",
         "stat3": "Conversão",
+        "test_title": "Especialistas",
+        "test1_txt": "Vendas subiram 50%.",
+        "test1_au": "Carlos R.",
+        "test2_txt": "Economizo horas.",
+        "test2_au": "Ana M.",
+        "test3_txt": "Vital para agência.",
+        "test3_au": "Luis P.",
         "foot_desc": "IA Imobiliária.",
         "mail_label": "📧 Email Profissional",
         "limit_msg": "🚫 Limite atingido.",
@@ -584,16 +607,17 @@ traducciones = {
         "char_count": "Caracteres",
         "link_warn": "⚠️ Link não reconhecido.",
         "badge_free": "GRÁTIS",
-        "badge_pro": "PRO",
-        "badge_agency": "AGÊNCIA",
-        "legal_title": "Termos",
+        "badge_pro": "MEMBRO PRO",
+        "badge_agency": "PARCEIRO AGÊNCIA",
+        "api_soon": "API (Em breve)",
+        "legal_title": "Termos e Privacidade",
         "logout": "Sair",
         "welcome": "Bem-vindo",
-        "usage_bar": "Progresso",
-        "feedback_lbl": "💡 Suporte",
+        "usage_bar": "Progresso Diário",
+        "feedback_lbl": "💡 Sugestões / Suporte",
         "feedback_btn": "Enviar",
         "support_mail": "Suporte",
-        "credits_left": "Créditos:",
+        "credits_left": "Créditos hoje:",
         "welcome_morn": "Bom dia",
         "welcome_aft": "Boa tarde",
         "welcome_eve": "Boa noite",
@@ -602,7 +626,7 @@ traducciones = {
         "desc_luxury": "DESCRIÇÃO DE LUXO",
         "btn_refine": "Refinar",
         "analyzing_msg": "ANALISANDO PROPRIEDADE...",
-        "feedback_success": "✅ Obrigado!",
+        "feedback_success": "✅ Obrigado pelo feedback!",
         "tone_lux": "Luxo",
         "tone_prof": "Profissional",
         "tone_urg": "Urgência",
@@ -668,6 +692,13 @@ traducciones = {
         "stat1": "Optimisés",
         "stat2": "Temps",
         "stat3": "Conversion",
+        "test_title": "Avis Experts",
+        "test1_txt": "Ventes +50%.",
+        "test1_au": "Carlos R.",
+        "test2_txt": "Gain de temps.",
+        "test2_au": "Ana M.",
+        "test3_txt": "Vital pour agence.",
+        "test3_au": "Luis P.",
         "foot_desc": "IA Immobilier.",
         "mail_label": "📧 Email Pro",
         "limit_msg": "🚫 Limite atteinte.",
@@ -689,23 +720,24 @@ traducciones = {
         "badge_free": "GRATUIT",
         "badge_pro": "MEMBRE PRO",
         "badge_agency": "PARTENAIRE AGENCE",
+        "api_soon": "API (Bientôt)",
         "legal_title": "Mentions Légales",
         "logout": "Déconnexion",
         "welcome": "Bienvenue",
-        "usage_bar": "Progrès",
-        "feedback_lbl": "💡 Support",
+        "usage_bar": "Progrès Quotidien",
+        "feedback_lbl": "💡 Suggestions / Support",
         "feedback_btn": "Envoyer",
         "support_mail": "Support",
-        "credits_left": "Crédits:",
+        "credits_left": "Crédits aujourd'hui:",
         "welcome_morn": "Bonjour",
         "welcome_aft": "Bonne après-midi",
         "welcome_eve": "Bonsoir",
-        "impact_text": "IMPACT AUGMENTÉ",
+        "impact_text": "IMPACT DE VENTE AUGMENTÉ",
         "strategy_gen": "STRATÉGIE GÉNÉRÉE",
         "desc_luxury": "DESCRIPTION DE LUXE",
         "btn_refine": "Raffiner",
-        "analyzing_msg": "ANALYSE...",
-        "feedback_success": "✅ Merci!",
+        "analyzing_msg": "ANALYSE DE LA PROPRIÉTÉ...",
+        "feedback_success": "✅ Merci pour vos commentaires!",
         "tone_lux": "Luxe",
         "tone_prof": "Professionnel",
         "tone_urg": "Urgence",
@@ -771,6 +803,13 @@ traducciones = {
         "stat1": "Optimiert",
         "stat2": "Zeit",
         "stat3": "Konversion",
+        "test_title": "Experten",
+        "test1_txt": "Umsatz +50%.",
+        "test1_au": "Carlos R.",
+        "test2_txt": "Zeit gespart.",
+        "test2_au": "Ana M.",
+        "test3_txt": "Wichtig für Agentur.",
+        "test3_au": "Luis P.",
         "foot_desc": "Immo-KI.",
         "mail_label": "📧 E-Mail",
         "limit_msg": "🚫 Limit erreicht.",
@@ -791,24 +830,25 @@ traducciones = {
         "link_warn": "⚠️ Link Fehler.",
         "badge_free": "GRATIS",
         "badge_pro": "PRO MITGLIED",
-        "badge_agency": "AGENTUR",
+        "badge_agency": "AGENTUR PARTNER",
+        "api_soon": "API (Bald)",
         "legal_title": "Rechtliches",
         "logout": "Abmelden",
         "welcome": "Willkommen",
-        "usage_bar": "Fortschritt",
-        "feedback_lbl": "💡 Support",
+        "usage_bar": "Täglicher Fortschritt",
+        "feedback_lbl": "💡 Vorschläge / Support",
         "feedback_btn": "Senden",
         "support_mail": "Support",
-        "credits_left": "Credits:",
+        "credits_left": "Credits heute:",
         "welcome_morn": "Guten Morgen",
         "welcome_aft": "Guten Tag",
         "welcome_eve": "Guten Abend",
-        "impact_text": "IMPAKT GESTEIGERT",
+        "impact_text": "VERKAUFSIMPAKT GESTEIGERT",
         "strategy_gen": "STRATEGIE GENERIERT",
         "desc_luxury": "LUXUS BESCHREIBUNG",
         "btn_refine": "Verfeinern",
-        "analyzing_msg": "ANALYSIEREN...",
-        "feedback_success": "✅ Danke!",
+        "analyzing_msg": "IMMOBILIE WIRD ANALYSIERT...",
+        "feedback_success": "✅ Danke für Ihr Feedback!",
         "tone_lux": "Luxus",
         "tone_prof": "Professionell",
         "tone_urg": "Dringlichkeit",
@@ -874,6 +914,13 @@ traducciones = {
         "stat1": "已优化",
         "stat2": "时间",
         "stat3": "转化",
+        "test_title": "专家评价",
+        "test1_txt": "销售额+50%。",
+        "test1_au": "Carlos R.",
+        "test2_txt": "节省时间。",
+        "test2_au": "Ana M.",
+        "test3_txt": "机构必备。",
+        "test3_au": "Luis P.",
         "foot_desc": "房地产AI。",
         "mail_label": "📧 邮箱",
         "limit_msg": "🚫 限制已达。",
@@ -895,12 +942,13 @@ traducciones = {
         "badge_free": "免费用户",
         "badge_pro": "专业会员",
         "badge_agency": "机构伙伴",
-        "legal_title": "条款",
+        "api_soon": "API (即将推出)",
+        "legal_title": "条款和隐私",
         "logout": "退出",
         "welcome": "欢迎",
-        "usage_bar": "进度",
-        "feedback_lbl": "💡 反馈",
-        "feedback_btn": "发送",
+        "usage_bar": "每日进度",
+        "feedback_lbl": "💡 反馈 / 支持",
+        "feedback_btn": "发送反馈",
         "support_mail": "支持",
         "credits_left": "额度:",
         "welcome_morn": "早上好",
@@ -910,8 +958,8 @@ traducciones = {
         "strategy_gen": "生成策略",
         "desc_luxury": "豪华描述",
         "btn_refine": "完善",
-        "analyzing_msg": "分析中...",
-        "feedback_success": "✅ 谢谢！",
+        "analyzing_msg": "正在分析属性...",
+        "feedback_success": "✅ 谢谢！您的反馈已保存。",
         "tone_lux": "豪华",
         "tone_prof": "专业",
         "tone_urg": "紧迫感",
@@ -937,10 +985,10 @@ traducciones = {
 
 st.markdown("""
 <style>
-    /* 1. FIX DEL SCROLL SUPERIOR */
-    .block-container { 
+    /* 1. FIX DEL SCROLL SUPERIOR (PADDING REMOVIDO) */
+    .block-container {
         padding-top: 1rem !important; 
-        padding-bottom: 5rem !important; 
+        padding-bottom: 5rem !important;
     }
 
     /* 2. RESET Y FONDO GLOBAL */
@@ -1022,7 +1070,7 @@ st.markdown("""
         margin-bottom: 40px; 
     }
 
-    /* 7. HUD SUPERIOR */
+    /* 7. HUD SUPERIOR (IDENTIDAD) */
     .hud-bar { 
         display: flex; 
         justify-content: space-between; 
@@ -1056,14 +1104,14 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(0,210,255,0.3); 
     }
     
-    /* FIX: VIOLETA AGENCIA (#DDA0DD) */
+    /* FIX: AGENCIA VIOLETA (#DDA0DD) RESTAURADO */
     .badge-agency { 
         border-color: #DDA0DD; 
         color: #DDA0DD; 
         box-shadow: 0 0 15px rgba(221, 160, 221, 0.4); 
     }
 
-    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK CON BORDE VIOLETA/DORADO NEUTRO) */
+    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK) CON BORDE VIOLETA */
     .result-container {
         background: rgba(20, 20, 20, 0.95);
         color: #f0f0f0;
@@ -1079,7 +1127,7 @@ st.markdown("""
         backdrop-filter: blur(10px);
     }
 
-    /* 9. BOTÓN GENERAR */
+    /* 9. BOTÓN GENERAR PLATINUM */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; 
         border: none !important; 
@@ -1101,7 +1149,7 @@ st.markdown("""
         border: 2px solid #00d2ff !important; 
     }
 
-    /* 10. TARJETAS DE PLANES */
+    /* 10. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ */
     .card-wrapper { 
         transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
@@ -1171,7 +1219,7 @@ st.markdown("""
         background-color: #fff;
     }
 
-    /* 11. TOOLTIPS */
+    /* 11. TOOLTIPS DE AYUDA */
     .info-icon { 
         display: inline-block; 
         width: 16px; 
@@ -1231,8 +1279,8 @@ st.markdown("""
         line-height: 2.0; 
     }
     
-    /* 12. BANNER ANIMADO */
-    .video-placeholder { 
+    /* 12. BANNER ANIMADO DE FONDO */
+    .video-placeholder {
         border-radius: 12px; 
         height: 250px; 
         display: flex; 
@@ -1285,7 +1333,7 @@ st.markdown("""
         100% { transform: translateY(0px); } 
     }
 
-    /* 13. BARRA DE IMPACTO */
+    /* 13. BARRA DE IMPACTO (DORADA COMPLETA, VIOLETA EN SOMBRA) */
     .meter-container { 
         background: #111; 
         border-radius: 10px; 
@@ -1314,8 +1362,8 @@ st.markdown("""
         color: #000; 
         text-shadow: 0px 0px 2px rgba(255,255,255,0.7); 
         font-size: 1rem; 
-        letter-spacing: 1px; 
-        text-transform: uppercase; 
+        letter-spacing: 1px;
+        text-transform: uppercase;
     }
     
     @keyframes fillMeter { 
@@ -1786,10 +1834,19 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
     with tab_monitor:
         st.info(L["monitor_desc"])
         if mi_equipo:
-            df_total = obtener_datos_db()
-            empleados_stats = df_total[df_total['email'].isin(mi_equipo)][['email', 'usos']]
-            if not empleados_stats.empty:
-                st.dataframe(empleados_stats, use_container_width=True)
+            df_hist = obtener_historial_db()
+            if not df_hist.empty:
+                # Filtrar solo el historial de los empleados de este jefe
+                team_history = df_hist[df_hist['email'].isin(mi_equipo)]
+                
+                if not team_history.empty:
+                    # Mostrar tabla ordenada por fecha (más reciente primero)
+                    st.dataframe(
+                        team_history.sort_values(by="fecha", ascending=False), 
+                        use_container_width=True
+                    )
+                else:
+                    st.write(L["monitor_empty"])
             else:
                 st.write(L["monitor_empty"])
 
