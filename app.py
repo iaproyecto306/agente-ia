@@ -1594,7 +1594,12 @@ with c2:
                         else: 
                             instr_estilo = "STYLE: Exclusive, sophisticated, high-ticket vocabulary."
 
-                        sec1, sec2, sec3, sec4 = L["sec_1"], L["sec_2"], L["sec_3"], L["sec_4"]
+                        # --- FIX ERROR NAME 'sec_1' IS NOT DEFINED ---
+                        # Definimos las variables antes de usarlas en el f-string
+                        sec_1 = L["sec_1"]
+                        sec_2 = L["sec_2"]
+                        sec_3 = L["sec_3"]
+                        sec_4 = L["sec_4"]
                         
                         if es_pro:
                             instrucciones_plan = f"""
