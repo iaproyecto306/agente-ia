@@ -1968,13 +1968,28 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 col_stat1, col_stat2, col_stat3 = st.columns(3)
 
 with col_stat1: 
-    st.markdown(f'''<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+10k</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat1"]}</p></div>''', unsafe_allow_html=True)
+    st.markdown(f'''
+        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
+            <h2 style="color:#00d2ff; margin:0;">+10k</h2>
+            <p style="color:#aaa; font-size:0.9rem;">{L["stat1"]}</p>
+        </div>
+    ''', unsafe_allow_html=True)
 
 with col_stat2: 
-    st.markdown(f'''<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">-80%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat2"]}</p></div>''', unsafe_allow_html=True)
+    st.markdown(f'''
+        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
+            <h2 style="color:#00d2ff; margin:0;">-80%</h2>
+            <p style="color:#aaa; font-size:0.9rem;">{L["stat2"]}</p>
+        </div>
+    ''', unsafe_allow_html=True)
 
 with col_stat3: 
-    st.markdown(f'''<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+45%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p></div>''', unsafe_allow_html=True)
+    st.markdown(f'''
+        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
+            <h2 style="color:#00d2ff; margin:0;">+45%</h2>
+            <p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p>
+        </div>
+    ''', unsafe_allow_html=True)
 
 # 2. PLANES (SEGUNDO)
 st.markdown("<br><br>", unsafe_allow_html=True)
@@ -1996,12 +2011,17 @@ col1, col2, col3 = st.columns(3)
 
 # --- CARD GRATIS ---
 with col1:
-    tt_limite = "Tus 3 créditos se recargan automáticamente cada 24hs."
-    tt_soporte = "Soporte básico por email."
-    
-    desc_f = f"""<div class='feature-list'>{L['desc1']} <span class='info-icon i-free' data-tooltip='{tt_limite}'>i</span><br>{L['desc2']} <span class='info-icon i-free' data-tooltip='{tt_soporte}'>i</span><br>{L['desc3']}</div>"""
-    
-    st.markdown(f'''<div class='card-wrapper free-card'><div class='glass-container'><h3 style="margin-top:10px;">{L['plan1']}</h3><h1>$0</h1><hr style='opacity:0.2;'>{desc_f}</div></div>''', unsafe_allow_html=True)
+    desc_f = f"<div class='feature-list'>{L['desc1']}<br>{L['desc2']}<br>{L['desc3']}</div>"
+    st.markdown(f'''
+        <div class='card-wrapper free-card'>
+            <div class='glass-container'>
+                <h3>{L['plan1']}</h3>
+                <h1>$0</h1>
+                <hr style='opacity:0.2;'>
+                {desc_f}
+            </div>
+        </div>
+    ''', unsafe_allow_html=True)
     
     if not st.session_state.email_usuario:
         if st.button(L['btn1'], key="btn_f"):
@@ -2009,27 +2029,85 @@ with col1:
 
 # --- CARD PRO ---
 with col2:
-    tt_unlimited = "Generaciones infinitas."
-    tt_social = "Scripts virales para Redes + Estrategia de cierre WhatsApp."
-    tt_seo = "Keywords de alto tráfico."
+    desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><br>{L['desc5']}<br>{L['desc6']}<br><b>{L['desc7']}</b></div>"
+    st.markdown(f'''
+        <div class='card-wrapper pro-card'>
+            <div class='glass-container'>
+                <div class='popular-badge'>{L['popular']}</div>
+                <h3 style='color:#00d2ff;'>{L['plan2']}</h3>
+                <h1>${precio_pro}</h1>
+                <p style='color:#00d2ff; font-weight:bold;'>{ahorro_txt}</p>
+                <hr style='opacity:0.3;'>
+                {desc_p}
+            </div>
+        </div>
+    ''', unsafe_allow_html=True)
     
-    desc_p = f"""<div class='feature-list'><b>{L['desc4']}</b> <span class='info-icon i-pro' data-tooltip='{tt_unlimited}'>i</span><br>{L['desc5']} + WhatsApp <span class='info-icon i-pro' data-tooltip='{tt_social}'>i</span><br>{L['desc6']} <span class='info-icon i-pro' data-tooltip='{tt_seo}'>i</span><br><b>{L['desc7']}</b></div>"""
-    
-    st.markdown(f'''<div class='card-wrapper pro-card'><div class='glass-container'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff; margin-top:15px;'>{L['plan2']}</h3><h1>${precio_pro}</h1><p style='color:#00d2ff; font-weight:bold;'>{ahorro_txt}</p><hr style='opacity:0.3;'>{desc_p}</div></div>''', unsafe_allow_html=True)
-    
-    pay_pro = f"""<div id="paypal-button-container-pro"></div><script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script><script>paypal.Buttons({{style:{{shape:'pill',color:'blue',layout:'vertical',label:'subscribe'}},createSubscription:function(d,a){{return a.subscription.create({{'plan_id':'{id_pro}','custom_id':'{st.session_state.email_usuario}'}});}},onApprove:function(data, actions){{alert('Subscription Successful: ' + data.subscriptionID);}}}}).render('#paypal-button-container-pro');</script>"""
+    # Botón PayPal Pro (Expandido para recuperar líneas)
+    pay_pro = f"""
+    <div id="paypal-button-container-pro"></div>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
+    <script>
+      paypal.Buttons({{
+        style: {{
+          shape: 'pill',
+          color: 'blue',
+          layout: 'vertical',
+          label: 'subscribe'
+        }},
+        createSubscription: function(data, actions) {{
+          return actions.subscription.create({{
+            'plan_id': '{id_pro}',
+            'custom_id': '{st.session_state.email_usuario}'
+          }});
+        }},
+        onApprove: function(data, actions) {{
+          alert('Subscription Successful: ' + data.subscriptionID);
+        }}
+      }}).render('#paypal-button-container-pro');
+    </script>
+    """
     components.html(pay_pro, height=150)
 
 # --- CARD AGENCIA ---
 with col3:
-    tt_team = "Gestiona hasta 5 agentes."
-    tt_dash = "Audita a tu equipo en tiempo real."
+    desc_a = f"<div class='feature-list'>{L['desc8']}<br>{L['desc9']}<br>{L['desc10']}<br><b>{L['desc11']}</b></div>"
+    st.markdown(f'''
+        <div class='card-wrapper agency-card'>
+            <div class='glass-container'>
+                <h3 style='color:#DDA0DD;'>{L['plan3']}</h3>
+                <h1>${precio_age}</h1>
+                <p style='color:#DDA0DD; font-weight:bold;'>{ahorro_txt}</p>
+                <hr style='opacity:0.3;'>
+                {desc_a}
+            </div>
+        </div>
+    ''', unsafe_allow_html=True)
     
-    desc_a = f"""<div class='feature-list'>{L['desc8']} <span class='info-icon i-agency' data-tooltip='{tt_team}'>i</span><br>{L['desc9']} <span class='info-icon i-agency' data-tooltip='{tt_dash}'>i</span><br>{L['desc10']}<br><b>{L['desc11']}</b></div>"""
-    
-    st.markdown(f'''<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD; margin-top:10px;'>{L['plan3']}</h3><h1>${precio_age}</h1><p style='color:#DDA0DD; font-weight:bold;'>{ahorro_txt}</p><hr style='opacity:0.3;'>{desc_a}</div></div>''', unsafe_allow_html=True)
-    
-    pay_age = f"""<div id="paypal-button-container-age"></div><script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script><script>paypal.Buttons({{style:{{shape:'pill',color:'blue',layout:'vertical',label:'subscribe'}},createSubscription:function(d,a){{return a.subscription.create({{'plan_id':'{id_age}','custom_id':'{st.session_state.email_usuario}'}});}},onApprove:function(data, actions){{alert('Subscription Successful: ' + data.subscriptionID);}}}}).render('#paypal-button-container-age');</script>"""
+    # Botón PayPal Agencia (Expandido)
+    pay_age = f"""
+    <div id="paypal-button-container-age"></div>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYaVEtIjq5MpcAfeqGxyicDqPTUooERvDGAObJyJcB-UAQU4FWqyvmFNPigHn6Xwv30kN0el5dWPBxnj&vault=true&intent=subscription"></script>
+    <script>
+      paypal.Buttons({{
+        style: {{
+          shape: 'pill',
+          color: 'blue',
+          layout: 'vertical',
+          label: 'subscribe'
+        }},
+        createSubscription: function(data, actions) {{
+          return actions.subscription.create({{
+            'plan_id': '{id_age}',
+            'custom_id': '{st.session_state.email_usuario}'
+          }});
+        }},
+        onApprove: function(data, actions) {{
+          alert('Subscription Successful: ' + data.subscriptionID);
+        }}
+      }}).render('#paypal-button-container-age');
+    </script>
+    """
     components.html(pay_age, height=150)
 
 # 3. CÓMO FUNCIONA (TERCERO)
@@ -2037,29 +2115,64 @@ st.markdown(f"<br><br><h2 style='text-align:center; color:white;'>{L['how_title'
 ch1, ch2, ch3 = st.columns(3)
 
 with ch1: 
-    st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>1</h1><p><b>{L['step1_t']}</b><br>{L['step1_d']}</p></div>", unsafe_allow_html=True)
+    st.markdown(f'''
+        <div style='text-align:center;'>
+            <h1 style='color:#00d2ff;'>1</h1>
+            <p><b>{L['step1_t']}</b><br>{L['step1_d']}</p>
+        </div>
+    ''', unsafe_allow_html=True)
 
 with ch2: 
-    st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>2</h1><p><b>{L['step2_t']}</b><br>{L['step2_d']}</p></div>", unsafe_allow_html=True)
+    st.markdown(f'''
+        <div style='text-align:center;'>
+            <h1 style='color:#00d2ff;'>2</h1>
+            <p><b>{L['step2_t']}</b><br>{L['step2_d']}</p>
+        </div>
+    ''', unsafe_allow_html=True)
 
 with ch3: 
-    st.markdown(f"<div style='text-align:center;'><h1 style='color:#00d2ff;'>3</h1><p><b>{L['step3_t']}</b><br>{L['step3_d']}</p></div>", unsafe_allow_html=True)
+    st.markdown(f'''
+        <div style='text-align:center;'>
+            <h1 style='color:#00d2ff;'>3</h1>
+            <p><b>{L['step3_t']}</b><br>{L['step3_d']}</p>
+        </div>
+    ''', unsafe_allow_html=True)
 
 # 4. RESEÑAS / TESTIMONIOS (CUARTO)
 st.markdown(f"<br><br><h3 style='text-align:center; color:white;'>{L.get('test_title', 'Expert Reviews')}</h3>", unsafe_allow_html=True)
 t1, t2, t3 = st.columns(3)
 
 with t1:
-    st.markdown(f"<div style='padding:15px; border:1px solid #333; border-radius:10px; text-align:center;'><i>\"{L['test1_txt']}\"</i><br><br><b>{L['test1_au']}</b></div>", unsafe_allow_html=True)
+    st.markdown(f'''
+        <div style='padding:15px; border:1px solid #333; border-radius:10px; text-align:center;'>
+            <i>"{L['test1_txt']}"</i><br><br>
+            <b>{L['test1_au']}</b>
+        </div>
+    ''', unsafe_allow_html=True)
 
 with t2:
-    st.markdown(f"<div style='padding:15px; border:1px solid #333; border-radius:10px; text-align:center;'><i>\"{L['test2_txt']}\"</i><br><br><b>{L['test2_au']}</b></div>", unsafe_allow_html=True)
+    st.markdown(f'''
+        <div style='padding:15px; border:1px solid #333; border-radius:10px; text-align:center;'>
+            <i>"{L['test2_txt']}"</i><br><br>
+            <b>{L['test2_au']}</b>
+        </div>
+    ''', unsafe_allow_html=True)
 
 with t3:
-    st.markdown(f"<div style='padding:15px; border:1px solid #333; border-radius:10px; text-align:center;'><i>\"{L['test3_txt']}\"</i><br><br><b>{L['test3_au']}</b></div>", unsafe_allow_html=True)
+    st.markdown(f'''
+        <div style='padding:15px; border:1px solid #333; border-radius:10px; text-align:center;'>
+            <i>"{L['test3_txt']}"</i><br><br>
+            <b>{L['test3_au']}</b>
+        </div>
+    ''', unsafe_allow_html=True)
 
 # --- FOOTER LEGAL ---
-st.markdown(f'<div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;"><div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 AI REALTY PRO</div><p style="color:#666; font-size:0.8rem;">© 2026 AI Realty Pro - {L["foot_desc"]}</p></div>', unsafe_allow_html=True)
+st.markdown(f'''
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;">
+        <div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 AI REALTY PRO</div>
+        <p style="color:#666; font-size:0.8rem;">© 2026 AI Realty Pro - {L["foot_desc"]}</p>
+    </div>
+''', unsafe_allow_html=True)
 
 with st.expander(f"⚖️ {L.get('legal_title', 'Términos Legales')}"):
     st.write("1. No credit card data stored (PayPal).")
