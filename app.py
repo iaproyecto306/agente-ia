@@ -1785,27 +1785,27 @@ col_stat1, col_stat2, col_stat3 = st.columns(3)
 
 with col_stat1: 
     st.markdown(f'''
-        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
-            <h2 style="color:#00d2ff; margin:0;">+10k</h2>
-            <p style="color:#aaa; font-size:0.9rem;">{L["stat1"]}</p>
-        </div>
-    ''', unsafe_allow_html=True)
+<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
+<h2 style="color:#00d2ff; margin:0;">+10k</h2>
+<p style="color:#aaa; font-size:0.9rem;">{L["stat1"]}</p>
+</div>
+''', unsafe_allow_html=True)
 
 with col_stat2: 
     st.markdown(f'''
-        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
-            <h2 style="color:#00d2ff; margin:0;">-80%</h2>
-            <p style="color:#aaa; font-size:0.9rem;">{L["stat2"]}</p>
-        </div>
-    ''', unsafe_allow_html=True)
+<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
+<h2 style="color:#00d2ff; margin:0;">-80%</h2>
+<p style="color:#aaa; font-size:0.9rem;">{L["stat2"]}</p>
+</div>
+''', unsafe_allow_html=True)
 
 with col_stat3: 
     st.markdown(f'''
-        <div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
-            <h2 style="color:#00d2ff; margin:0;">+45%</h2>
-            <p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p>
-        </div>
-    ''', unsafe_allow_html=True)
+<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);">
+<h2 style="color:#00d2ff; margin:0;">+45%</h2>
+<p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p>
+</div>
+''', unsafe_allow_html=True)
 
 # 2. PLANES (SEGUNDO)
 st.markdown("<br><br>", unsafe_allow_html=True)
@@ -1834,24 +1834,23 @@ with col1:
     tt_limite = "Tus 3 créditos se recargan automáticamente cada 24hs. Ideal para probar."
     tt_soporte = "Soporte básico por email en horario comercial."
     
-    desc_f = f"""
-    <div class='feature-list'>
-        {L['desc1']} <span class='info-icon i-free' data-tooltip='{tt_limite}'>i</span><br>
-        {L['desc2']} <span class='info-icon i-free' data-tooltip='{tt_soporte}'>i</span><br>
-        {L['desc3']}
-    </div>
-    """
+    # HTML STRING FLATTENED TO AVOID </div> ERROR
+    desc_f = f"""<div class='feature-list'>
+{L['desc1']} <span class='info-icon i-free' data-tooltip='{tt_limite}'>i</span><br>
+{L['desc2']} <span class='info-icon i-free' data-tooltip='{tt_soporte}'>i</span><br>
+{L['desc3']}
+</div>"""
     
     st.markdown(f'''
-        <div class='card-wrapper free-card'>
-            <div class='glass-container'>
-                <h3 style="margin-top:10px;">{L['plan1']}</h3>
-                <h1>$0</h1>
-                <hr style='opacity:0.2;'>
-                {desc_f}
-            </div>
-        </div>
-    ''', unsafe_allow_html=True)
+<div class='card-wrapper free-card'>
+<div class='glass-container'>
+<h3 style="margin-top:10px;">{L['plan1']}</h3>
+<h1>$0</h1>
+<hr style='opacity:0.2;'>
+{desc_f}
+</div>
+</div>
+''', unsafe_allow_html=True)
     
     if not st.session_state.email_usuario:
         if st.button(L['btn1'], key="btn_f"):
@@ -1864,27 +1863,26 @@ with col2:
     tt_social = "Incluye scripts virales para TikTok/Reels y textos de cierre para WhatsApp."
     tt_seo = "Posicionamiento en portales con palabras clave de alto tráfico."
     
-    desc_p = f"""
-    <div class='feature-list'>
-        <b>{L['desc4']}</b> <span class='info-icon i-pro' data-tooltip='{tt_unlimited}'>i</span><br>
-        {L['desc5']} + WhatsApp <span class='info-icon i-pro' data-tooltip='{tt_social}'>i</span><br>
-        {L['desc6']} <span class='info-icon i-pro' data-tooltip='{tt_seo}'>i</span><br>
-        <b>{L['desc7']}</b>
-    </div>
-    """
+    # HTML STRING FLATTENED TO AVOID </div> ERROR
+    desc_p = f"""<div class='feature-list'>
+<b>{L['desc4']}</b> <span class='info-icon i-pro' data-tooltip='{tt_unlimited}'>i</span><br>
+{L['desc5']} + WhatsApp <span class='info-icon i-pro' data-tooltip='{tt_social}'>i</span><br>
+{L['desc6']} <span class='info-icon i-pro' data-tooltip='{tt_seo}'>i</span><br>
+<b>{L['desc7']}</b>
+</div>"""
     
     st.markdown(f'''
-        <div class='card-wrapper pro-card'>
-            <div class='glass-container'>
-                <div class='popular-badge'>{L['popular']}</div>
-                <h3 style='color:#00d2ff; margin-top:15px;'>{L['plan2']}</h3>
-                <h1>${precio_pro}</h1>
-                <p style='color:#00d2ff; font-weight:bold;'>{ahorro_txt}</p>
-                <hr style='opacity:0.3;'>
-                {desc_p}
-            </div>
-        </div>
-    ''', unsafe_allow_html=True)
+<div class='card-wrapper pro-card'>
+<div class='glass-container'>
+<div class='popular-badge'>{L['popular']}</div>
+<h3 style='color:#00d2ff; margin-top:15px;'>{L['plan2']}</h3>
+<h1>${precio_pro}</h1>
+<p style='color:#00d2ff; font-weight:bold;'>{ahorro_txt}</p>
+<hr style='opacity:0.3;'>
+{desc_p}
+</div>
+</div>
+''', unsafe_allow_html=True)
     
     pay_pro = f"""
     <div id="paypal-button-container-pro"></div>
@@ -1926,26 +1924,25 @@ with col3:
     tt_team = "Gestiona hasta 5 agentes bajo una sola facturación centralizada."
     tt_dash = "Audita el historial y uso de cada agente en tiempo real."
     
-    desc_a = f"""
-    <div class='feature-list'>
-        {L['desc8']} <span class='info-icon i-agency' data-tooltip='{tt_team}'>i</span><br>
-        {L['desc9']} <span class='info-icon i-agency' data-tooltip='{tt_dash}'>i</span><br>
-        {L['desc10']}<br>
-        <b>{L['desc11']}</b>
-    </div>
-    """
+    # HTML STRING FLATTENED TO AVOID </div> ERROR
+    desc_a = f"""<div class='feature-list'>
+{L['desc8']} <span class='info-icon i-agency' data-tooltip='{tt_team}'>i</span><br>
+{L['desc9']} <span class='info-icon i-agency' data-tooltip='{tt_dash}'>i</span><br>
+{L['desc10']}<br>
+<b>{L['desc11']}</b>
+</div>"""
     
     st.markdown(f'''
-        <div class='card-wrapper agency-card'>
-            <div class='glass-container'>
-                <h3 style='color:#DDA0DD; margin-top:10px;'>{L['plan3']}</h3>
-                <h1>${precio_age}</h1>
-                <p style='color:#DDA0DD; font-weight:bold;'>{ahorro_txt}</p>
-                <hr style='opacity:0.3;'>
-                {desc_a}
-            </div>
-        </div>
-    ''', unsafe_allow_html=True)
+<div class='card-wrapper agency-card'>
+<div class='glass-container'>
+<h3 style='color:#DDA0DD; margin-top:10px;'>{L['plan3']}</h3>
+<h1>${precio_age}</h1>
+<p style='color:#DDA0DD; font-weight:bold;'>{ahorro_txt}</p>
+<hr style='opacity:0.3;'>
+{desc_a}
+</div>
+</div>
+''', unsafe_allow_html=True)
     
     pay_age = f"""
     <div id="paypal-button-container-age"></div>
