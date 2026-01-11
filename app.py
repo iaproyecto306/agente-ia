@@ -15,6 +15,8 @@ import random
 # ==============================================================================
 # 0. GESTOR DE COOKIES (MEMORIA PERMANENTE - ARQUITECTURA SEGURA)
 # ==============================================================================
+# Esta sección maneja la persistencia para que el usuario no tenga que loguearse
+# cada vez que recarga la página. Se usa session_state como puente.
 
 if "cookie_manager" not in st.session_state:
     st.session_state.cookie_manager = stx.CookieManager()
@@ -106,7 +108,7 @@ def extraer_datos_inmueble(url):
         return texto_final[:6000], es_portal_conocido
     else:
         # Mensaje amigable explicando la situación al usuario
-        return "⚠️ AVISO DE SEGURIDAD: Zillow/MercadoLibre ha bloqueado el acceso automático desde la nube. Esto es normal en versiones gratuitas. Por favor, COPIA Y PEGA la descripción del inmueble manualmente en la caja de abajo.", es_portal_conocido
+        return "⚠️ SECURITY ALERT: Automated access blocked by portal. Please COPY AND PASTE the property description manually below.", es_portal_conocido
 
 # ==============================================================================
 # 2. CONFIGURACIÓN DE IA Y CONEXIONES SEGURAS
@@ -117,7 +119,7 @@ try:
     api_key = st.secrets["OPENAI_API_KEY"]
     client = OpenAI(api_key=api_key)
 except Exception:
-    st.error("⚠️ ERROR CRÍTICO: No se detectó la OPENAI_API_KEY en los Secrets de Streamlit.")
+    st.error("⚠️ CRITICAL ERROR: OPENAI_API_KEY not found in Streamlit Secrets.")
     st.stop()
 
 # Conexión a Google Sheets
@@ -188,7 +190,7 @@ def guardar_historial(email, input_user, output_ia):
         df_final = pd.concat([df_hist, nueva_fila], ignore_index=True)
         conn.update(worksheet="Historial", data=df_final)
     except Exception as e:
-        print(f"Error guardando historial: {e}")
+        print(f"Error saving history: {e}")
 
 def guardar_feedback(email, mensaje):
     """Guarda los mensajes de soporte en una hoja nueva."""
@@ -219,7 +221,7 @@ def generar_texto(prompt, modelo="gpt-4o"):
         response = client.chat.completions.create(
             model=modelo,
             messages=[
-                {"role": "system", "content": "Eres un Broker Inmobiliario Senior de Lujo y Copywriter experto en Neuromarketing. Tu objetivo es VENDER."},
+                {"role": "system", "content": "You are a Senior Luxury Real Estate Broker and Expert Copywriter. Your goal is to SELL."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.75 
@@ -244,7 +246,8 @@ if "usos" not in st.session_state: st.session_state.usos = 0
 if "email_usuario" not in st.session_state: st.session_state.email_usuario = ""
 if "plan_usuario" not in st.session_state: st.session_state.plan_usuario = "Gratis"
 if "es_empleado" not in st.session_state: st.session_state.es_empleado = False
-if "idioma" not in st.session_state: st.session_state.idioma = "Español"
+# FIX: IDIOMA POR DEFECTO INGLÉS
+if "idioma" not in st.session_state: st.session_state.idioma = "English"
 if "last_result" not in st.session_state: st.session_state.last_result = None
 
 # ==============================================================================
@@ -252,108 +255,6 @@ if "last_result" not in st.session_state: st.session_state.last_result = None
 # ==============================================================================
 
 traducciones = {
-    "Español": {
-        "title1": "Convierte Anuncios Aburridos en",
-        "title2": "Imanes de Ventas",
-        "sub": "La herramienta IA secreta de los agentes top productores en 2026.",
-        "placeholder": "🏠 Describe la propiedad (ej: 3 dorm, piscina, vista al mar) o añade instrucciones...",
-        "url_placeholder": "🔗 Pega el link de la propiedad...",
-        "btn_gen": "✨ GENERAR ESTRATEGIA TRIPLE",
-        "p_destacada": "PROPIEDAD DESTACADA",
-        "comunidad": "Comunidad Real Estate",
-        "popular": "MÁS POPULAR",
-        "plan1": "Inicial",
-        "plan2": "Agente Pro",
-        "plan3": "Agencia",
-        "desc1": "3 descripciones / día",
-        "t1_1": "Límite diario para prueba gratuita.",
-        "desc2": "Soporte Básico",
-        "t1_2": "Ayuda técnica básica vía email.",
-        "desc3": "Marca de Agua",
-        "t1_3": "El texto incluye firma de la plataforma.",
-        "desc4": "Generaciones Ilimitadas",
-        "t2_1": "Sin límites mensuales de uso.",
-        "desc5": "Pack Redes Sociales",
-        "t2_2": "Scripts para Instagram, TikTok y Reels.",
-        "desc6": "Optimización SEO",
-        "t2_3": "Palabras clave y meta-tags incluidos.",
-        "desc7": "Banner Principal",
-        "t2_4": "Rotación de propiedades en home.",
-        "desc8": "5 Usuarios / Cuentas",
-        "t3_1": "Acceso para todo tu equipo.",
-        "desc9": "Panel de Equipo",
-        "t3_2": "Audita y gestiona a tus agentes.",
-        "desc10": "Acceso vía API",
-        "t3_3": "Integración CRM (Próximamente).",
-        "desc11": "Prioridad en Banner",
-        "t3_4": "Doble exposición en portada.",
-        "btn1": "REGISTRO GRATIS",
-        "btn2": "MEJORAR AHORA",
-        "btn3": "CONTACTAR VENTAS",
-        "how_title": "¿Cómo funciona?",
-        "step1_t": "Pega el Link",
-        "step1_d": "O escribe los detalles.",
-        "step2_t": "IA Analiza",
-        "step2_d": "Motor Triple Generación.",
-        "step3_t": "Vende",
-        "step3_d": "Copia y cierra tratos.",
-        "stat1": "Anuncios Optimizados",
-        "stat2": "Tiempo Ahorrado",
-        "stat3": "Más Consultas",
-        "test_title": "Lo que dicen los Expertos",
-        "test1_txt": "Mis ventas subieron 50%.",
-        "test1_au": "Carlos R. (RE/MAX)",
-        "test2_txt": "Ahorro horas de redacción.",
-        "test2_au": "Ana M. (Century 21)",
-        "test3_txt": "El plan Agencia es vital.",
-        "test3_au": "Luis P. (Independiente)",
-        "foot_desc": "Inteligencia Artificial Inmobiliaria.",
-        "mail_label": "📧 Email Profesional",
-        "limit_msg": "🚫 Límite gratuito alcanzado.",
-        "upgrade_msg": "Pásate a PRO para seguir vendiendo.",
-        "lbl_tone": "Tono:",
-        "lbl_lang_out": "Idioma Salida:",
-        "annual_toggle": "📅 Ahorrar 20% con Pago Anual",
-        "annual_save": "✅ 2 Meses GRATIS incluidos",
-        "whatsapp": "Enviar a WhatsApp",
-        "download": "Descargar Reporte .txt",
-        "copy_success": "¡Copiado con éxito!",
-        "revoke": "Revocar Acceso",
-        "manage_team": "👥 Gestionar Equipo",
-        "team_activity": "📈 Actividad",
-        "refine_pl": "🔄 Ajuste rápido (ej: hazlo más corto)...",
-        "social_title": "📱 Social Media Pack",
-        "char_count": "Caracteres",
-        "link_warn": "⚠️ Este link no parece ser de un portal conocido.",
-        "badge_free": "USUARIO GRATIS",
-        "badge_pro": "MIEMBRO PRO",
-        "badge_agency": "SOCIO AGENCIA",
-        "api_soon": "Acceso API (Próximamente)",
-        "legal_title": "Términos Legales & Privacidad",
-        "logout": "Cerrar Sesión",
-        "welcome": "Bienvenido",
-        "usage_bar": "Progreso Diario",
-        "feedback_lbl": "💡 Sugerencias / Soporte",
-        "feedback_btn": "Enviar Comentario",
-        "support_mail": "Soporte",
-        "credits_left": "Créditos hoy:",
-        # --- TRADUCCIONES AGREGADAS PARA CORRECCIONES ---
-        "welcome_morn": "Buenos días",
-        "welcome_aft": "Buenas tardes",
-        "welcome_eve": "Buenas noches",
-        "impact_text": "IMPACTO DE VENTA AUMENTADO",
-        "strategy_gen": "ESTRATEGIA GENERADA",
-        "desc_luxury": "DESCRIPCIÓN LUJO",
-        "btn_refine": "Refinar / Ajustar",
-        "analyzing_msg": "ANALIZANDO PROPIEDAD Y REDACTANDO ESTRATEGIA...",
-        "feedback_success": "✅ ¡Gracias! Tu comentario ha sido guardado.",
-        "tone_lux": "Lujo",
-        "tone_prof": "Profesional",
-        "tone_urg": "Urgencia",
-        "tone_story": "Storytelling",
-        "emp_email_lbl": "Email Agente",
-        "emp_add_btn": "AÑADIR"
-    },
     "English": {
         "title1": "Turn Boring Listings into",
         "title2": "Sales Magnets",
@@ -439,7 +340,6 @@ traducciones = {
         "feedback_btn": "Send Feedback",
         "support_mail": "Support",
         "credits_left": "Credits left:",
-        # --- TRADUCCIONES AGREGADAS PARA CORRECCIONES ---
         "welcome_morn": "Good morning",
         "welcome_aft": "Good afternoon",
         "welcome_eve": "Good evening",
@@ -454,7 +354,128 @@ traducciones = {
         "tone_urg": "Urgency",
         "tone_story": "Storytelling",
         "emp_email_lbl": "Agent Email",
-        "emp_add_btn": "ADD"
+        "emp_add_btn": "ADD",
+        # KEYS DE SECCIÓN AGREGADAS
+        "sec_1": "SECTION 1: MAIN DESCRIPTION",
+        "sec_2": "SECTION 2: TECHNICAL SPECS",
+        "sec_3": "SECTION 3: WHATSAPP COPY",
+        "sec_4": "SECTION 4: SEO PACK",
+        "sec_short": "SHORT DESCRIPTION",
+        "tab_team": "👥 My Team",
+        "tab_monitor": "📊 Activity Monitor",
+        "monitor_desc": "Here you can see your agents' usage in real time.",
+        "monitor_empty": "Your employees haven't generated content yet."
+    },
+    "Español": {
+        "title1": "Convierte Anuncios Aburridos en",
+        "title2": "Imanes de Ventas",
+        "sub": "La herramienta IA secreta de los agentes top productores en 2026.",
+        "placeholder": "🏠 Describe la propiedad (ej: 3 dorm, piscina, vista al mar) o añade instrucciones...",
+        "url_placeholder": "🔗 Pega el link de la propiedad...",
+        "btn_gen": "✨ GENERAR ESTRATEGIA TRIPLE",
+        "p_destacada": "PROPIEDAD DESTACADA",
+        "comunidad": "Comunidad Real Estate",
+        "popular": "MÁS POPULAR",
+        "plan1": "Inicial",
+        "plan2": "Agente Pro",
+        "plan3": "Agencia",
+        "desc1": "3 descripciones / día",
+        "t1_1": "Límite diario para prueba gratuita.",
+        "desc2": "Soporte Básico",
+        "t1_2": "Ayuda técnica básica vía email.",
+        "desc3": "Marca de Agua",
+        "t1_3": "El texto incluye firma de la plataforma.",
+        "desc4": "Generaciones Ilimitadas",
+        "t2_1": "Sin límites mensuales de uso.",
+        "desc5": "Pack Redes Sociales",
+        "t2_2": "Scripts para Instagram, TikTok y Reels.",
+        "desc6": "Optimización SEO",
+        "t2_3": "Palabras clave y meta-tags incluidos.",
+        "desc7": "Banner Principal",
+        "t2_4": "Rotación de propiedades en home.",
+        "desc8": "5 Usuarios / Cuentas",
+        "t3_1": "Acceso para todo tu equipo.",
+        "desc9": "Panel de Equipo",
+        "t3_2": "Audita y gestiona a tus agentes.",
+        "desc10": "Acceso vía API",
+        "t3_3": "Integración CRM (Próximamente).",
+        "desc11": "Prioridad en Banner",
+        "t3_4": "Doble exposición en portada.",
+        "btn1": "REGISTRO GRATIS",
+        "btn2": "MEJORAR AHORA",
+        "btn3": "CONTACTAR VENTAS",
+        "how_title": "¿Cómo funciona?",
+        "step1_t": "Pega el Link",
+        "step1_d": "O escribe los detalles.",
+        "step2_t": "IA Analiza",
+        "step2_d": "Motor Triple Generación.",
+        "step3_t": "Vende",
+        "step3_d": "Copia y cierra tratos.",
+        "stat1": "Anuncios Optimizados",
+        "stat2": "Tiempo Ahorrado",
+        "stat3": "Más Consultas",
+        "test_title": "Lo que dicen los Expertos",
+        "test1_txt": "Mis ventas subieron 50%.",
+        "test1_au": "Carlos R. (RE/MAX)",
+        "test2_txt": "Ahorro horas de redacción.",
+        "test2_au": "Ana M. (Century 21)",
+        "test3_txt": "El plan Agencia es vital.",
+        "test3_au": "Luis P. (Independiente)",
+        "foot_desc": "Inteligencia Artificial Inmobiliaria.",
+        "mail_label": "📧 Email Profesional",
+        "limit_msg": "🚫 Límite gratuito alcanzado.",
+        "upgrade_msg": "Pásate a PRO para seguir vendiendo.",
+        "lbl_tone": "Tono:",
+        "lbl_lang_out": "Idioma Salida:",
+        "annual_toggle": "📅 Ahorrar 20% con Pago Anual",
+        "annual_save": "✅ 2 Meses GRATIS incluidos",
+        "whatsapp": "Enviar a WhatsApp",
+        "download": "Descargar Reporte .txt",
+        "copy_success": "¡Copiado con éxito!",
+        "revoke": "Revocar Acceso",
+        "manage_team": "👥 Gestionar Equipo",
+        "team_activity": "📈 Actividad",
+        "refine_pl": "🔄 Ajuste rápido (ej: hazlo más corto)...",
+        "social_title": "📱 Social Media Pack",
+        "char_count": "Caracteres",
+        "link_warn": "⚠️ Este link no parece ser de un portal conocido.",
+        "badge_free": "USUARIO GRATIS",
+        "badge_pro": "MIEMBRO PRO",
+        "badge_agency": "SOCIO AGENCIA",
+        "api_soon": "Acceso API (Próximamente)",
+        "legal_title": "Términos Legales & Privacidad",
+        "logout": "Cerrar Sesión",
+        "welcome": "Bienvenido",
+        "usage_bar": "Progreso Diario",
+        "feedback_lbl": "💡 Sugerencias / Soporte",
+        "feedback_btn": "Enviar Comentario",
+        "support_mail": "Soporte",
+        "credits_left": "Créditos hoy:",
+        "welcome_morn": "Buenos días",
+        "welcome_aft": "Buenas tardes",
+        "welcome_eve": "Buenas noches",
+        "impact_text": "IMPACTO DE VENTA AUMENTADO",
+        "strategy_gen": "ESTRATEGIA GENERADA",
+        "desc_luxury": "DESCRIPCIÓN LUJO",
+        "btn_refine": "Refinar / Ajustar",
+        "analyzing_msg": "ANALIZANDO PROPIEDAD Y REDACTANDO ESTRATEGIA...",
+        "feedback_success": "✅ ¡Gracias! Tu comentario ha sido guardado.",
+        "tone_lux": "Lujo",
+        "tone_prof": "Profesional",
+        "tone_urg": "Urgencia",
+        "tone_story": "Storytelling",
+        "emp_email_lbl": "Email Agente",
+        "emp_add_btn": "AÑADIR",
+        # KEYS AGREGADAS ESPAÑOL
+        "sec_1": "SECCIÓN 1: DESCRIPCIÓN PRINCIPAL",
+        "sec_2": "SECCIÓN 2: FICHA TÉCNICA",
+        "sec_3": "SECCIÓN 3: COPY WHATSAPP",
+        "sec_4": "SECCIÓN 4: PACK SEO",
+        "sec_short": "DESCRIPCIÓN CORTA",
+        "tab_team": "👥 Mi Equipo",
+        "tab_monitor": "📊 Monitor de Actividad",
+        "monitor_desc": "Aquí puedes ver el consumo de tus agentes en tiempo real.",
+        "monitor_empty": "Tus empleados aún no han generado contenido."
     },
     "Português": {
         "title1": "Transforme Anúncios em",
@@ -555,7 +576,16 @@ traducciones = {
         "tone_urg": "Urgência",
         "tone_story": "Storytelling",
         "emp_email_lbl": "Email do Agente",
-        "emp_add_btn": "ADICIONAR"
+        "emp_add_btn": "ADICIONAR",
+        "sec_1": "SEÇÃO 1: DESCRIÇÃO PRINCIPAL",
+        "sec_2": "SEÇÃO 2: FICHA TÉCNICA",
+        "sec_3": "SEÇÃO 3: COPY WHATSAPP",
+        "sec_4": "SEÇÃO 4: PACK SEO",
+        "sec_short": "DESCRIÇÃO CURTA",
+        "tab_team": "👥 Minha Equipe",
+        "tab_monitor": "📊 Monitor",
+        "monitor_desc": "Veja o consumo em tempo real.",
+        "monitor_empty": "Sem dados ainda."
     },
     "Français": {
         "title1": "Transformez vos Annonces",
@@ -656,7 +686,16 @@ traducciones = {
         "tone_urg": "Urgence",
         "tone_story": "Storytelling",
         "emp_email_lbl": "Email Agent",
-        "emp_add_btn": "AJOUTER"
+        "emp_add_btn": "AJOUTER",
+        "sec_1": "SECTION 1: DESCRIPTION PRINCIPALE",
+        "sec_2": "SECTION 2: FICHES TECHNIQUES",
+        "sec_3": "SECTION 3: COPY WHATSAPP",
+        "sec_4": "SECTION 4: PACK SEO",
+        "sec_short": "DESCRIPTION COURTE",
+        "tab_team": "👥 Mon Équipe",
+        "tab_monitor": "📊 Moniteur",
+        "monitor_desc": "Suivez la consommation en temps réel.",
+        "monitor_empty": "Pas encore de données."
     },
     "Deutsch": {
         "title1": "Verwandeln Sie Anzeigen",
@@ -757,7 +796,16 @@ traducciones = {
         "tone_urg": "Dringlichkeit",
         "tone_story": "Storytelling",
         "emp_email_lbl": "Agent E-Mail",
-        "emp_add_btn": "HINZUFÜGEN"
+        "emp_add_btn": "HINZUFÜGEN",
+        "sec_1": "TEIL 1: HAUPTBESCHREIBUNG",
+        "sec_2": "TEIL 2: TECHNISCHE DATEN",
+        "sec_3": "TEIL 3: WHATSAPP COPY",
+        "sec_4": "TEIL 4: SEO PACK",
+        "sec_short": "KURZE BESCHREIBUNG",
+        "tab_team": "👥 Mein Team",
+        "tab_monitor": "📊 Monitor",
+        "monitor_desc": "Echtzeit-Verbrauch.",
+        "monitor_empty": "Keine Daten."
     },
     "中文": {
         "title1": "将枯燥的广告",
@@ -858,9 +906,19 @@ traducciones = {
         "tone_urg": "紧迫感",
         "tone_story": "讲故事",
         "emp_email_lbl": "代理邮箱",
-        "emp_add_btn": "添加"
+        "emp_add_btn": "添加",
+        "sec_1": "第1部分：主要描述",
+        "sec_2": "第2部分：技术规格",
+        "sec_3": "第3部分：WhatsApp文案",
+        "sec_4": "第4部分：SEO包",
+        "sec_short": "简短描述",
+        "tab_team": "👥 我的团队",
+        "tab_monitor": "📊 监控",
+        "monitor_desc": "实时查看消耗。",
+        "monitor_empty": "暂无数据。"
     }
 }
+
 # ==============================================================================
 # 5. ESTILOS CSS PLATINUM (BLINDAJE VISUAL - CÓDIGO EXTENDIDO)
 # ==============================================================================
@@ -986,22 +1044,21 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(0,210,255,0.3); 
     }
     
-    /* AGENCIA DORADA FIX: COLOR #FFD700 */
+    /* FIX: AGENCIA VIOLETA (#DDA0DD) RESTAURADO */
     .badge-agency { 
-        border-color: #FFD700; 
-        color: #FFD700; 
-        box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); 
+        border-color: #DDA0DD; 
+        color: #DDA0DD; 
+        box-shadow: 0 0 15px rgba(221, 160, 221, 0.4); 
     }
 
-    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY GLASS OSCURO) */
-    /* FIX: FONDO OSCURO, BORDES DORADOS */
+    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK) CON BORDE VIOLETA */
     .result-container {
         background: rgba(20, 20, 20, 0.95);
         color: #f0f0f0;
         padding: 30px;
         border-radius: 15px;
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        border-top: 4px solid #D4AF37;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 4px solid #DDA0DD;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1.1rem;
         line-height: 1.6;
@@ -1073,14 +1130,14 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(0, 210, 255, 0.3); 
     }
     
-    /* FIX: AGENCIA CARD DORADA */
+    /* FIX: AGENCIA CARD VIOLETA */
     .agency-card { 
-        border: 1px solid rgba(255, 215, 0, 0.3) !important; 
+        border: 1px solid rgba(221, 160, 221, 0.3) !important; 
     }
     
     .agency-card:hover { 
-        border: 1px solid rgba(255, 215, 0, 0.6) !important; 
-        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3); 
+        border: 1px solid rgba(221, 160, 221, 0.6) !important; 
+        box-shadow: 0 10px 30px rgba(221, 160, 221, 0.3); 
     }
 
     .popular-badge { 
@@ -1128,9 +1185,9 @@ st.markdown("""
         border: 1px solid rgba(0, 210, 255, 0.5); 
     }
     .i-agency { 
-        background-color: rgba(255, 215, 0, 0.15); 
-        color: #FFD700; 
-        border: 1px solid rgba(255, 215, 0, 0.5); 
+        background-color: rgba(221, 160, 221, 0.15); 
+        color: #DDA0DD; 
+        border: 1px solid rgba(221, 160, 221, 0.5); 
     }
     
     .info-icon:hover::after {
@@ -1195,12 +1252,12 @@ st.markdown("""
 
     @keyframes auraChange { 
         0%, 70% { box-shadow: 0 0 45px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.4); } 
-        75%, 100% { box-shadow: 0 0 45px rgba(255, 215, 0, 0.5); border-color: rgba(255, 215, 0, 0.4); } 
+        75%, 100% { box-shadow: 0 0 45px rgba(221, 160, 221, 0.5); border-color: rgba(221, 160, 221, 0.4); } 
     }
     
     @keyframes tagColorChange { 
         0%, 70% { background: rgba(0, 210, 255, 1); } 
-        75%, 100% { background: rgba(255, 215, 0, 1); } 
+        75%, 100% { background: rgba(221, 160, 221, 1); } 
     }
     
     @keyframes adCarousel { 
@@ -1216,8 +1273,7 @@ st.markdown("""
         100% { transform: translateY(0px); } 
     }
 
-    /* 13. BARRA DE IMPACTO DORADA (SIN NÚMERO) */
-    /* FIX: BARRA LLENA Y TEXTO CENTRADO */
+    /* 13. BARRA DE IMPACTO (DORADA COMPLETA, VIOLETA EN SOMBRA) */
     .meter-container { 
         background: #111; 
         border-radius: 10px; 
@@ -1295,7 +1351,7 @@ with st.sidebar:
             progreso = min(usos / limite, 1.0)
             st.progress(progreso)
         else:
-            st.progress(1.0) # Barra llena dorada/azul para Pros
+            st.progress(1.0) 
             
         st.markdown("---")
         
@@ -1330,7 +1386,7 @@ with st.sidebar:
             st.warning("El mensaje está vacío.")
             
     st.markdown("---")
-    st.markdown(f"<div style='text-align:center; color:#666; font-size:0.8rem;'>v2.6 Diamond Fixed</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center; color:#666; font-size:0.8rem;'>v2.7 Final Build</div>", unsafe_allow_html=True)
 
 # ==============================================================================
 # 7. INTERFAZ: CABECERA Y HUD DE IDENTIDAD
@@ -1365,7 +1421,7 @@ if st.session_state.email_usuario:
 
     p_name = str(st.session_state.plan_usuario).lower()
     
-    if "agencia" in p_name: 
+    if "agencia" in p_name or "agency" in p_name: 
         badge_cls = "badge-agency"
         badge_txt = L.get("badge_agency", "AGENCIA")
     elif "pro" in p_name: 
@@ -1418,7 +1474,7 @@ with c2:
         st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
         
         email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
-        if st.button("COMENZAR / START", type="primary"):
+        if st.button("START / ENTRAR", type="primary"):
             if email_input and "@" in email_input:
                 st.session_state.email_usuario = email_input.strip().lower()
                 try:
@@ -1429,23 +1485,30 @@ with c2:
                 df_actual = obtener_datos_db()
                 df_emp = obtener_empleados_db()
                 
+                # CHECK 1: ¿Es un usuario directo?
                 if st.session_state.email_usuario in df_actual['email'].values:
                     usuario = df_actual[df_actual['email'] == st.session_state.email_usuario].iloc[0]
                     st.session_state.usos = int(usuario['usos'])
                     st.session_state.plan_usuario = usuario['plan'] if 'plan' in usuario else 'Gratis'
                     st.session_state.es_empleado = False
+                
+                # CHECK 2: ¿Es un empleado?
                 elif st.session_state.email_usuario in df_emp['EmployeeEmail'].values:
                     jefe_email = df_emp[df_emp['EmployeeEmail'] == st.session_state.email_usuario].iloc[0]['BossEmail']
                     datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
                     st.session_state.usos = 0
                     
-                    # FIX: LOGICA EMPLEADO "GRATIS" -> "PRO" (Normalizar casing)
-                    plan_jefe_norm = str(datos_jefe['plan']).strip().title()
-                    # Si el jefe es Agencia, el empleado es Pro (o Agencia, da igual para permisos)
-                    if plan_jefe_norm == "Agencia":
+                    # FIX CRÍTICO: Lógica de Plan Empleado (Multilenguaje)
+                    plan_jefe_raw = str(datos_jefe['plan']).strip()
+                    
+                    # Lista de valores aceptados para que el empleado sea PRO
+                    planes_agencia_validos = ["Agencia", "Agency", "Agency Partner", "Socio Agencia", "Pro Agency"]
+                    
+                    if any(p.lower() == plan_jefe_raw.lower() for p in planes_agencia_validos):
                         st.session_state.plan_usuario = "Pro"
                     else:
-                        st.session_state.plan_usuario = plan_jefe_norm
+                        # Si no es agencia, hereda el plan tal cual (ej: Pro -> Pro)
+                        st.session_state.plan_usuario = plan_jefe_raw.title()
                         
                     st.session_state.es_empleado = True
                     st.session_state.boss_ref = jefe_email
@@ -1456,7 +1519,7 @@ with c2:
                 time.sleep(0.5)
                 st.rerun()
             else:
-                st.error("Por favor, ingresa un email válido.")
+                st.error("Please enter a valid email.")
         st.markdown('</div>', unsafe_allow_html=True)
 
     # --- MOTOR DE GENERACIÓN IA PLATINUM ---
@@ -1500,47 +1563,54 @@ with c2:
                         
                         # Ajustes de Tono
                         if tono == "Profesional":
-                            instrucciones_estilo = "ESTILO: Corporativo, directo, serio. Usa datos, porcentajes y listas. CERO lenguaje poético."
+                            instrucciones_estilo = "STYLE: Corporate, direct, serious. Use data, lists."
                         elif tono == "Storytelling":
-                            instrucciones_estilo = "ESTILO: Narrativo, emocional, sensorial. Describe olores, luces, sensaciones."
+                            instrucciones_estilo = "STYLE: Narrative, emotional, sensory. Describe smells, light."
                         elif tono == "Urgencia":
-                            instrucciones_estilo = "ESTILO: Gatillos mentales de escasez. Frases cortas. 'Oportunidad única'."
+                            instrucciones_estilo = "STYLE: Scarcity triggers. Short sentences. 'Unique opportunity'."
                         else: # Lujo
-                            instrucciones_estilo = "ESTILO: Exclusivo, sofisticado, palabras de alto valor (High-Ticket)."
+                            instrucciones_estilo = "STYLE: Exclusive, sophisticated, high-ticket vocabulary."
 
-                        instrucciones_variedad = "REGLA DE ORO: NO uses frases cliché como 'Imagina despertar' o 'Bienvenido a'. Sé original."
+                        instrucciones_variedad = "RULE: Do NOT use clichés like 'Imagine waking up'. Be original."
                         
+                        # FIX: Secciones traducidas dinámicamente desde el diccionario L
+                        sec_1_txt = L.get("sec_1", "SECTION 1")
+                        sec_2_txt = L.get("sec_2", "SECTION 2")
+                        sec_3_txt = L.get("sec_3", "SECTION 3")
+                        sec_4_txt = L.get("sec_4", "SECTION 4")
+                        sec_short = L.get("sec_short", "SHORT DESCRIPTION")
+
                         if es_pro:
                             instrucciones_plan = f"""
-                            GENERA LA ESTRATEGIA COMPLETA:
-                            SECCIÓN 1: 📖 DESCRIPCIÓN PRINCIPAL ({tono.upper()})
-                            SECCIÓN 2: 🛠️ FICHA TÉCNICA (Datos duros y bullets)
-                            SECCIÓN 3: 📲 COPY WHATSAPP (Persuasivo con emojis)
-                            SECCIÓN 4: 🔍 SEO PACK (Título <60 y Meta <160 caracteres)
+                            GENERATE FULL STRATEGY:
+                            {sec_1_txt} ({tono.upper()})
+                            {sec_2_txt} (Technical Bullets)
+                            {sec_3_txt} (Persuasive w/ emojis)
+                            {sec_4_txt} (Title <60 chars, Meta <160 chars)
                             """
                         else:
                             instrucciones_plan = f"""
-                            GENERA ÚNICAMENTE:
-                            SECCIÓN 1: 📖 DESCRIPCIÓN CORTA (Estilo estándar, máximo 2 párrafos)
-                            Al final del texto añade obligatoriamente: "{L['desc3']}"
+                            GENERATE ONLY:
+                            {sec_short} (Standard style, max 2 paragraphs)
+                            At the end append strictly: "{L['desc3']}"
                             """
 
                         prompt_base = f"""
-                        ACTÚA COMO: El mejor Copywriter Inmobiliario del mundo.
-                        IDIOMA SALIDA: {idioma_salida}. 
+                        ACT AS: World Class Real Estate Copywriter.
+                        OUTPUT LANGUAGE: {idioma_salida}. 
                         
                         {instrucciones_estilo}
                         {instrucciones_variedad}
                         
-                        DATOS DEL INMUEBLE (WEB): {datos_web}
-                        DATOS MANUALES: {user_input}
+                        PROPERTY DATA (WEB): {datos_web}
+                        MANUAL DATA: {user_input}
                         
-                        REGLA SEGURIDAD: Si DATOS WEB dice 'ERROR_LECTURA' y no hay datos manuales, responde SOLO con un aviso de error. No inventes.
+                        SAFETY RULE: If WEB DATA says 'ERROR' and no manual data, return an error message only.
                         
-                        INSTRUCCIONES DE SALIDA:
+                        OUTPUT INSTRUCTIONS:
                         {instrucciones_plan}
                         
-                        FORMATO: Markdown con negritas.
+                        FORMAT: Markdown with bolding.
                         """
                         
                         resultado = generar_texto(prompt_base)
@@ -1553,10 +1623,10 @@ with c2:
                             st.cache_data.clear()
                             st.rerun()
                 else:
-                    st.warning("Ingresa un link o texto para comenzar.")
+                    st.warning("Please enter a link or description.")
             st.markdown('</div>', unsafe_allow_html=True)
             
-            # --- VISUALIZACIÓN DE RESULTADOS (AQUÍ ESTABA EL ERROR) ---
+            # --- VISUALIZACIÓN DE RESULTADOS ---
             if st.session_state.last_result:
                 
                 # FIX: BARRA DE IMPACTO DORADA Y TRADUCIDA
@@ -1570,7 +1640,7 @@ with c2:
                 # FIX: RESULTADO LUXURY DARK
                 st.markdown(f'''
                     <div class="result-container">
-                        <div style="color: #D4AF37; font-weight: 800; margin-bottom: 15px; letter-spacing: 1.5px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+                        <div style="color: #DDA0DD; font-weight: 800; margin-bottom: 15px; letter-spacing: 1.5px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
                             {L['strategy_gen']} ({st.session_state.plan_usuario.upper()})
                         </div>
                         <div style="font-size: 1.05rem;">
@@ -1590,7 +1660,7 @@ with c2:
                             st.copy_to_clipboard(st.session_state.last_result)
                             st.toast(L["copy_success"])
                         else:
-                            st.info("Copia el texto de arriba")
+                            st.info("Copy text above")
                             st.code(st.session_state.last_result)
                 
                 with b2:
@@ -1598,22 +1668,22 @@ with c2:
                     st.link_button(f"📲 {L['whatsapp']}", f"https://wa.me/?text={wa_msg}", use_container_width=True)
                 
                 with b3:
-                    st.download_button(f"💾 {L['download']}", st.session_state.last_result, file_name=f"Estrategia_{datetime.now().strftime('%Y%m%d')}.txt", use_container_width=True)
+                    st.download_button(f"💾 {L['download']}", st.session_state.last_result, file_name=f"Strategy_{datetime.now().strftime('%Y%m%d')}.txt", use_container_width=True)
 
                 if es_pro:
                     st.markdown("---")
                     with st.expander(f"📱 {L.get('social_title', 'Social Pack')}"):
-                        with st.spinner("Creando contenido viral..."):
-                            res_social = generar_texto(f"Crea Post IG con hashtags y Guion TikTok (15s) para: {st.session_state.last_result}")
+                        with st.spinner("Generating viral content..."):
+                            res_social = generar_texto(f"Create IG Post with hashtags and TikTok Script (15s) for: {st.session_state.last_result}")
                             st.markdown(res_social)
                 
                 st.divider()
-                refine = st.text_input("", placeholder=L.get("refine_pl", "Ajuste rápido..."))
+                refine = st.text_input("", placeholder=L.get("refine_pl", "Quick adjust..."))
                 
                 # FIX: Botón Refinar traducido
                 if st.button(L["btn_refine"]):
-                    with st.spinner("Ajustando texto..."):
-                        nuevo_res = generar_texto(f"Ajusta este texto: {st.session_state.last_result}. Pedido del usuario: {refine}")
+                    with st.spinner("Refining..."):
+                        nuevo_res = generar_texto(f"Adjust this text: {st.session_state.last_result}. User request: {refine}")
                         st.session_state.last_result = nuevo_res
                         st.rerun()
 
@@ -1632,7 +1702,8 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
     st.divider()
     st.subheader(L["manage_team"])
     
-    tab_equipo, tab_monitor = st.tabs(["👥 Mi Equipo", "📊 Monitor de Actividad"])
+    # FIX: Pestañas traducidas
+    tab_equipo, tab_monitor = st.tabs([L["tab_team"], L["tab_monitor"]])
     
     df_emp = obtener_empleados_db()
     mi_equipo = df_emp[df_emp['BossEmail'] == st.session_state.email_usuario]['EmployeeEmail'].tolist()
@@ -1641,7 +1712,7 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
         c_add1, c_add2 = st.columns([3, 1])
         with c_add1: 
             # FIX: Placeholder traducido
-            nuevo_e = st.text_input(L["emp_email_lbl"], key="new_ag_in", placeholder="agente@tuagencia.com")
+            nuevo_e = st.text_input(L["emp_email_lbl"], key="new_ag_in", placeholder="agent@agency.com")
         with c_add2:
             st.write(" ")
             # FIX: Botón traducido
@@ -1651,11 +1722,11 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
                     conn.update(worksheet="Employees", data=pd.concat([df_emp, new_row], ignore_index=True))
                     st.rerun()
                 elif len(mi_equipo) >= 4:
-                    st.warning("Equipo lleno (Máx 4).")
+                    st.warning("Full Team (Max 4).")
         
         if mi_equipo:
             st.write("---")
-            st.write("**Miembros Activos:**")
+            st.write(f"**{L['tab_team']}:**")
             for miembro in mi_equipo:
                 cm1, cm2 = st.columns([3, 1])
                 cm1.write(f"👤 {miembro}")
@@ -1663,18 +1734,18 @@ if st.session_state.plan_usuario == "Agencia" and not st.session_state.es_emplea
                 if cm2.button(L["revoke"], key=f"del_{miembro}"):
                     df_limpio = df_emp[~((df_emp['BossEmail'] == st.session_state.email_usuario) & (df_emp['EmployeeEmail'] == miembro))]
                     conn.update(worksheet="Employees", data=df_limpio)
-                    st.toast(f"Acceso revocado a {miembro}")
+                    st.toast(f"Revoked: {miembro}")
                     st.rerun()
     
     with tab_monitor:
-        st.info("Aquí puedes ver el consumo de tus agentes en tiempo real.")
+        st.info(L["monitor_desc"])
         if mi_equipo:
             df_total = obtener_datos_db()
             empleados_stats = df_total[df_total['email'].isin(mi_equipo)][['email', 'usos']]
             if not empleados_stats.empty:
                 st.dataframe(empleados_stats, use_container_width=True)
             else:
-                st.write("Tus empleados aún no han generado contenido.")
+                st.write(L["monitor_empty"])
 
 # ==============================================================================
 # 10. SECCIÓN INFORMATIVA Y PLANES DE SUSCRIPCIÓN
@@ -1704,7 +1775,7 @@ with col_stat3:
 
 # --- SECCIÓN DE PLANES CON SWITCH ANUAL ---
 st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align:center;'>Selecciona tu Plan</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align:center;'>Plans</h3>", unsafe_allow_html=True)
 
 # SWITCH ANUAL (Lógica de Descuento)
 col_sw1, col_sw2, col_sw3 = st.columns([1,2,1])
@@ -1716,7 +1787,6 @@ precio_pro = "490" if es_anual else "49"
 precio_age = "1,990" if es_anual else "199"
 
 # IDs DE PAYPAL REALES (Configurados Anual vs Mensual)
-# Si es anual usa tus nuevos IDs (TMY y X6Q), si es mensual usa los originales.
 id_pro = "P-2PU023636P1209345NFQ7TMY" if es_anual else "P-3P2657040E401734NNFQQ5TY"
 id_age = "P-87X83840151393810NFQ7X6Q" if es_anual else "P-0S451470G5041550ENFQRB4I"
 
@@ -1732,7 +1802,7 @@ with col1:
     # Condición para ocultar el botón si ya está logueado
     if not st.session_state.email_usuario:
         if st.button(L['btn1'], key="btn_f"):
-            st.toast("Sube al inicio para registrarte.")
+            st.toast("Register above.")
 
 # PLAN PRO
 with col2:
@@ -1758,7 +1828,7 @@ with col2:
           }});
         }},
         onApprove: function(data, actions) {{
-          alert('Suscripción PRO Exitosa: ' + data.subscriptionID);
+          alert('Subscription Successful: ' + data.subscriptionID);
         }}
       }}).render('#paypal-button-container-pro');
     </script>
@@ -1768,8 +1838,8 @@ with col2:
 # PLAN AGENCIA
 with col3:
     desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
-    # FIX: CSS COLOR AGENCIA #FFD700
-    st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#FFD700;'>{L['plan3']}</h3><h1>${precio_age}</h1><p style='color:#FFD700; font-weight:bold; font-size:0.9rem;'>{ahorro_txt}</p><hr style='border-color:#FFD700;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
+    # FIX: VIOLETA (#DDA0DD) RESTAURADO
+    st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>${precio_age}</h1><p style='color:#DDA0DD; font-weight:bold; font-size:0.9rem;'>{ahorro_txt}</p><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
     
     # Botón PayPal Agencia (Dinámico ID)
     pay_age = f"""
@@ -1790,7 +1860,7 @@ with col3:
           }});
         }},
         onApprove: function(data, actions) {{
-          alert('Suscripción AGENCIA Exitosa: ' + data.subscriptionID);
+          alert('Subscription Successful: ' + data.subscriptionID);
         }}
       }}).render('#paypal-button-container-age');
     </script>
@@ -1798,9 +1868,9 @@ with col3:
     components.html(pay_age, height=150)
 
 # --- FOOTER LEGAL ---
-st.markdown(f'<div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;"><div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 AI REALTY PRO</div><p style="color:#666; font-size:0.8rem;">© 2026 IA Realty Pro - {L["foot_desc"]}</p></div>', unsafe_allow_html=True)
+st.markdown(f'<div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0px; text-align: center;"><div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom:10px;">🏢 AI REALTY PRO</div><p style="color:#666; font-size:0.8rem;">© 2026 AI Realty Pro - {L["foot_desc"]}</p></div>', unsafe_allow_html=True)
 
 with st.expander(f"⚖️ {L.get('legal_title', 'Términos Legales')}"):
-    st.write("1. No guardamos datos de tarjeta de crédito (procesado por PayPal).")
-    st.write("2. Las descripciones son generadas por IA y deben ser verificadas.")
-    st.write("3. No hay reembolsos en planes mensuales. Planes anuales tienen 7 días de garantía.")
+    st.write("1. No credit card data stored (PayPal).")
+    st.write("2. AI generated descriptions require review.")
+    st.write("3. No refunds on monthly plans.")
