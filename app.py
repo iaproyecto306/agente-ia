@@ -45,6 +45,7 @@ def extraer_datos_inmueble(url):
         "fotocasa", 
         "inmuebles24"
     ]
+    
     es_portal_conocido = any(portal in url.lower() for portal in portales_validos)
     texto_final = ""
     
@@ -52,11 +53,14 @@ def extraer_datos_inmueble(url):
     try:
         # Añadimos un timestamp para evitar caché
         url_jina = f"https://r.jina.ai/{url}"
+        
         headers_jina = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "X-Return-Format": "text"
         }
+        
         response = requests.get(url_jina, headers=headers_jina, timeout=25)
+        
         if response.status_code == 200 and "Just a moment" not in response.text:
             texto_final = response.text
     except:
@@ -77,7 +81,9 @@ def extraer_datos_inmueble(url):
                 "Sec-Fetch-Site": "none",
                 "Sec-Fetch-User": "?1"
             }
+            
             response = requests.get(url, headers=headers_pc, timeout=15)
+            
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
                 # Eliminamos basura
@@ -93,7 +99,9 @@ def extraer_datos_inmueble(url):
             headers_movil = {
                 "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/120.0.6099.119 Mobile/15E148 Safari/604.1"
             }
+            
             response = requests.get(url, headers=headers_movil, timeout=15)
+            
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
                 for element in soup(['script', 'style', 'nav', 'footer']):
@@ -369,9 +377,9 @@ traducciones = {
     "Español": {
         "title1": "Convierte Anuncios Aburridos en",
         "title2": "Imanes de Ventas",
-        "sub": "La herramienta IA secreta de los agentes top productores en 2026.",
-        "placeholder": "🏠 Describe la propiedad (ej: 3 dorm, piscina, vista al mar) o añade instrucciones...",
-        "url_placeholder": "🔗 Pega el link de la propiedad...",
+        "sub": "La herramienta IA secreta de los agentes top productores.",
+        "placeholder": "🏠 Describe la propiedad...",
+        "url_placeholder": "🔗 Pega el link...",
         "btn_gen": "✨ GENERAR ESTRATEGIA TRIPLE",
         "p_destacada": "PROPIEDAD DESTACADA",
         "comunidad": "Comunidad Real Estate",
@@ -380,37 +388,37 @@ traducciones = {
         "plan2": "Agente Pro",
         "plan3": "Agencia",
         "desc1": "3 descripciones / día",
-        "t1_1": "Límite diario para prueba gratuita.",
+        "t1_1": "Límite diario prueba.",
         "desc2": "Soporte Básico",
-        "t1_2": "Ayuda técnica básica vía email.",
+        "t1_2": "Ayuda básica.",
         "desc3": "Marca de Agua",
-        "t1_3": "El texto incluye firma de la plataforma.",
+        "t1_3": "Texto con firma.",
         "desc4": "Generaciones Ilimitadas",
-        "t2_1": "Sin límites mensuales de uso.",
+        "t2_1": "Sin límites.",
         "desc5": "Pack Redes Sociales",
-        "t2_2": "Scripts para Instagram, TikTok y Reels.",
+        "t2_2": "Scripts Insta/TikTok.",
         "desc6": "Optimización SEO",
-        "t2_3": "Palabras clave y meta-tags incluidos.",
+        "t2_3": "Palabras clave.",
         "desc7": "Banner Principal",
-        "t2_4": "Rotación de propiedades en home.",
+        "t2_4": "Rotación en home.",
         "desc8": "5 Usuarios / Cuentas",
-        "t3_1": "Acceso para todo tu equipo.",
+        "t3_1": "Acceso equipo.",
         "desc9": "Panel de Equipo",
-        "t3_2": "Audita y gestiona a tus agentes.",
-        "desc10": "Acceso vía API",
-        "t3_3": "Integración CRM (Próximamente).",
+        "t3_2": "Gestiona agentes.",
+        "desc10": "Acceso API",
+        "t3_3": "Próximamente.",
         "desc11": "Prioridad en Banner",
-        "t3_4": "Doble exposición en portada.",
+        "t3_4": "Doble exposición.",
         "btn1": "REGISTRO GRATIS",
         "btn2": "MEJORAR AHORA",
         "btn3": "CONTACTAR VENTAS",
         "how_title": "¿Cómo funciona?",
         "step1_t": "Pega el Link",
-        "step1_d": "O escribe los detalles.",
+        "step1_d": "O escribe detalles.",
         "step2_t": "IA Analiza",
-        "step2_d": "Motor Triple Generación.",
+        "step2_d": "Motor Triple.",
         "step3_t": "Vende",
-        "step3_d": "Copia y cierra tratos.",
+        "step3_d": "Cierra tratos.",
         "stat1": "Anuncios Optimizados",
         "stat2": "Tiempo Ahorrado",
         "stat3": "Más Consultas",
@@ -421,13 +429,13 @@ traducciones = {
         "test2_au": "Ana M. (Century 21)",
         "test3_txt": "El plan Agencia es vital.",
         "test3_au": "Luis P. (Independiente)",
-        "foot_desc": "Inteligencia Artificial Inmobiliaria.",
+        "foot_desc": "IA Inmobiliaria.",
         "mail_label": "📧 Email Profesional",
         "limit_msg": "🚫 Límite gratuito alcanzado.",
         "upgrade_msg": "Pásate a PRO para seguir vendiendo.",
         "lbl_tone": "Tono:",
         "lbl_lang_out": "Idioma Salida:",
-        "annual_toggle": "📅 Ahorrar 20% con Pago Anual",
+        "annual_toggle": "📅 Ahorrar 20% Anual",
         "annual_save": "✅ 2 Meses GRATIS incluidos",
         "whatsapp": "Enviar a WhatsApp",
         "download": "Descargar Reporte .txt",
@@ -435,20 +443,19 @@ traducciones = {
         "revoke": "Revocar Acceso",
         "manage_team": "👥 Gestionar Equipo",
         "team_activity": "📈 Actividad",
-        "refine_pl": "🔄 Ajuste rápido (ej: hazlo más corto)...",
-        "social_title": "📱 Social Media Pack",
+        "refine_pl": "🔄 Ajuste rápido...",
+        "social_title": "📱 Pack Redes Sociales",
         "char_count": "Caracteres",
-        "link_warn": "⚠️ Este link no parece ser de un portal conocido.",
-        "badge_free": "USUARIO GRATIS",
-        "badge_pro": "MIEMBRO PRO",
-        "badge_agency": "SOCIO AGENCIA",
-        "api_soon": "Acceso API (Próximamente)",
-        "legal_title": "Términos Legales & Privacidad",
+        "link_warn": "⚠️ Link no reconocido.",
+        "badge_free": "GRATIS",
+        "badge_pro": "PRO",
+        "badge_agency": "AGENCIA",
+        "legal_title": "Legales",
         "logout": "Cerrar Sesión",
         "welcome": "Bienvenido",
-        "usage_bar": "Progreso Diario",
-        "feedback_lbl": "💡 Sugerencias / Soporte",
-        "feedback_btn": "Enviar Comentario",
+        "usage_bar": "Progreso",
+        "feedback_lbl": "💡 Ayuda",
+        "feedback_btn": "Enviar",
         "support_mail": "Soporte",
         "credits_left": "Créditos hoy:",
         "welcome_morn": "Buenos días",
@@ -458,8 +465,8 @@ traducciones = {
         "strategy_gen": "ESTRATEGIA GENERADA",
         "desc_luxury": "DESCRIPCIÓN LUJO",
         "btn_refine": "Refinar / Ajustar",
-        "analyzing_msg": "ANALIZANDO PROPIEDAD Y REDACTANDO ESTRATEGIA...",
-        "feedback_success": "✅ ¡Gracias! Tu comentario ha sido guardado.",
+        "analyzing_msg": "ANALIZANDO PROPIEDAD...",
+        "feedback_success": "✅ Feedback enviado.",
         "tone_lux": "Lujo",
         "tone_prof": "Profesional",
         "tone_urg": "Urgencia",
@@ -551,9 +558,8 @@ traducciones = {
         "char_count": "Caracteres",
         "link_warn": "⚠️ Link não reconhecido.",
         "badge_free": "GRÁTIS",
-        "badge_pro": "MEMBRO PRO",
-        "badge_agency": "PARCEIRO AGÊNCIA",
-        "api_soon": "API (Em breve)",
+        "badge_pro": "PRO",
+        "badge_agency": "AGÊNCIA",
         "legal_title": "Termos e Privacidade",
         "logout": "Sair",
         "welcome": "Bem-vindo",
@@ -663,7 +669,6 @@ traducciones = {
         "badge_free": "GRATUIT",
         "badge_pro": "MEMBRE PRO",
         "badge_agency": "PARTENAIRE AGENCE",
-        "api_soon": "API (Bientôt)",
         "legal_title": "Mentions Légales",
         "logout": "Déconnexion",
         "welcome": "Bienvenue",
@@ -772,25 +777,24 @@ traducciones = {
         "link_warn": "⚠️ Link Fehler.",
         "badge_free": "GRATIS",
         "badge_pro": "PRO MITGLIED",
-        "badge_agency": "AGENTUR PARTNER",
-        "api_soon": "API (Bald)",
+        "badge_agency": "AGENTUR",
         "legal_title": "Rechtliches",
         "logout": "Abmelden",
         "welcome": "Willkommen",
-        "usage_bar": "Täglicher Fortschritt",
-        "feedback_lbl": "💡 Vorschläge / Support",
+        "usage_bar": "Fortschritt",
+        "feedback_lbl": "💡 Support",
         "feedback_btn": "Senden",
         "support_mail": "Support",
-        "credits_left": "Credits heute:",
+        "credits_left": "Credits:",
         "welcome_morn": "Guten Morgen",
         "welcome_aft": "Guten Tag",
         "welcome_eve": "Guten Abend",
-        "impact_text": "VERKAUFSIMPAKT GESTEIGERT",
+        "impact_text": "IMPAKT GESTEIGERT",
         "strategy_gen": "STRATEGIE GENERIERT",
         "desc_luxury": "LUXUS BESCHREIBUNG",
         "btn_refine": "Verfeinern",
-        "analyzing_msg": "IMMOBILIE WIRD ANALYSIERT...",
-        "feedback_success": "✅ Danke für Ihr Feedback!",
+        "analyzing_msg": "ANALYSIEREN...",
+        "feedback_success": "✅ Danke!",
         "tone_lux": "Luxus",
         "tone_prof": "Professionell",
         "tone_urg": "Dringlichkeit",
@@ -855,13 +859,6 @@ traducciones = {
         "stat1": "已优化",
         "stat2": "时间",
         "stat3": "转化",
-        "test_title": "专家评价",
-        "test1_txt": "销售额+50%。",
-        "test1_au": "Carlos R.",
-        "test2_txt": "节省时间。",
-        "test2_au": "Ana M.",
-        "test3_txt": "机构必备。",
-        "test3_au": "Luis P.",
         "foot_desc": "房地产AI。",
         "mail_label": "📧 邮箱",
         "limit_msg": "🚫 限制已达。",
@@ -883,15 +880,14 @@ traducciones = {
         "badge_free": "免费用户",
         "badge_pro": "专业会员",
         "badge_agency": "机构伙伴",
-        "api_soon": "API (即将推出)",
-        "legal_title": "条款和隐私",
+        "legal_title": "条款",
         "logout": "退出",
         "welcome": "欢迎",
-        "usage_bar": "每日进度",
-        "feedback_lbl": "💡 反馈 / 支持",
-        "feedback_btn": "发送反馈",
+        "usage_bar": "进度",
+        "feedback_lbl": "💡 反馈",
+        "feedback_btn": "发送",
         "support_mail": "支持",
-        "credits_left": "今日额度:",
+        "credits_left": "额度:",
         "welcome_morn": "早上好",
         "welcome_aft": "下午好",
         "welcome_eve": "晚上好",
@@ -899,8 +895,8 @@ traducciones = {
         "strategy_gen": "生成策略",
         "desc_luxury": "豪华描述",
         "btn_refine": "完善",
-        "analyzing_msg": "正在分析属性...",
-        "feedback_success": "✅ 谢谢！您的反馈已保存。",
+        "analyzing_msg": "分析中...",
+        "feedback_success": "✅ 谢谢！",
         "tone_lux": "豪华",
         "tone_prof": "专业",
         "tone_urg": "紧迫感",
@@ -925,7 +921,7 @@ traducciones = {
 
 st.markdown("""
 <style>
-    /* 1. FIX DEL SCROLL SUPERIOR (PADDING REMOVIDO) */
+    /* 1. FIX DEL SCROLL SUPERIOR */
     .block-container {
         padding-top: 1rem !important; 
         padding-bottom: 5rem !important;
@@ -1010,7 +1006,7 @@ st.markdown("""
         margin-bottom: 40px; 
     }
 
-    /* 7. HUD SUPERIOR (IDENTIDAD) */
+    /* 7. HUD SUPERIOR */
     .hud-bar { 
         display: flex; 
         justify-content: space-between; 
@@ -1051,14 +1047,14 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(221, 160, 221, 0.4); 
     }
 
-    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK) CON BORDE VIOLETA */
+    /* 8. CAJA DE RESULTADO ELEGANTE (LUXURY DARK CON BORDE VIOLETA) */
     .result-container {
         background: rgba(20, 20, 20, 0.95);
         color: #f0f0f0;
         padding: 30px;
         border-radius: 15px;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-top: 4px solid #DDA0DD;
+        border-top: 4px solid #DDA0DD; /* VIOLETA AGENCIA */
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: 1.1rem;
         line-height: 1.6;
@@ -1067,7 +1063,7 @@ st.markdown("""
         backdrop-filter: blur(10px);
     }
 
-    /* 9. BOTÓN GENERAR PLATINUM */
+    /* 9. BOTÓN GENERAR */
     div.stButton > button[kind="primary"] { 
         background: linear-gradient(90deg, #00d2ff 0%, #0099ff 100%) !important; 
         border: none !important; 
@@ -1089,7 +1085,7 @@ st.markdown("""
         border: 2px solid #00d2ff !important; 
     }
 
-    /* 10. TARJETAS DE PLANES - ALTO RENDIMIENTO Y FLUIDEZ */
+    /* 10. TARJETAS DE PLANES */
     .card-wrapper { 
         transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
         border-radius: 12px; 
@@ -1159,7 +1155,7 @@ st.markdown("""
         background-color: #fff;
     }
 
-    /* 11. TOOLTIPS DE AYUDA */
+    /* 11. TOOLTIPS */
     .info-icon { 
         display: inline-block; 
         width: 16px; 
@@ -1219,8 +1215,8 @@ st.markdown("""
         line-height: 2.0; 
     }
     
-    /* 12. BANNER ANIMADO DE FONDO */
-    .video-placeholder {
+    /* 12. BANNER ANIMADO */
+    .video-placeholder { 
         border-radius: 12px; 
         height: 250px; 
         display: flex; 
@@ -1348,8 +1344,7 @@ with st.sidebar:
         """, unsafe_allow_html=True)
         
         if limite < 100:
-            progreso = min(usos / limite, 1.0)
-            st.progress(progreso)
+            st.progress(min(usos / limite, 1.0))
         else:
             st.progress(1.0) 
             
@@ -1461,10 +1456,29 @@ if not st.session_state.email_usuario:
     if cookie_val:
         st.session_state.email_usuario = cookie_val
         df_actual = obtener_datos_db()
-        if cookie_val in df_actual['email'].values:
+        df_emp = obtener_empleados_db()
+        
+        # LOGICA COOKIE: CHECK 1 - ¿Es empleado? (Prioridad)
+        if cookie_val in df_emp['EmployeeEmail'].values:
+            jefe_email = df_emp[df_emp['EmployeeEmail'] == cookie_val].iloc[0]['BossEmail']
+            if jefe_email in df_actual['email'].values:
+                datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
+                plan_jefe_raw = str(datos_jefe['plan']).strip()
+                # FIX COOKIE: Detectar Agencia en cualquier idioma
+                if any(p.lower() in plan_jefe_raw.lower() for p in ["agencia", "agency", "partner"]):
+                    st.session_state.plan_usuario = "Pro"
+                else:
+                    st.session_state.plan_usuario = plan_jefe_raw.title()
+                st.session_state.es_empleado = True
+                st.session_state.boss_ref = jefe_email
+                st.session_state.usos = 0 # Empleados suelen tener usos ilimitados o propios, aquí reset visual
+        
+        # LOGICA COOKIE: CHECK 2 - ¿Usuario normal?
+        elif cookie_val in df_actual['email'].values:
             usuario = df_actual[df_actual['email'] == cookie_val].iloc[0]
             st.session_state.usos = int(usuario['usos'])
             st.session_state.plan_usuario = usuario['plan']
+        
         st.rerun()
 
 c1, c2, c3 = st.columns([1, 2, 1])
@@ -1473,7 +1487,7 @@ with c2:
     if not st.session_state.email_usuario:
         st.markdown('<div class="glass-container" style="height:auto; box-shadow: 0 0 30px rgba(0,0,0,0.5);">', unsafe_allow_html=True)
         
-        email_input = st.text_input(L["mail_label"], placeholder="email@ejemplo.com", key="user_email")
+        email_input = st.text_input(L["mail_label"], placeholder="email@example.com", key="user_email")
         if st.button("START / ENTRAR", type="primary"):
             if email_input and "@" in email_input:
                 st.session_state.email_usuario = email_input.strip().lower()
@@ -1485,33 +1499,34 @@ with c2:
                 df_actual = obtener_datos_db()
                 df_emp = obtener_empleados_db()
                 
-                # CHECK 1: ¿Es un usuario directo?
-                if st.session_state.email_usuario in df_actual['email'].values:
+                # LOGIN: CHECK 1 - ¿Es empleado? (Prioridad sobre cuenta gratis personal)
+                if st.session_state.email_usuario in df_emp['EmployeeEmail'].values:
+                    jefe_email = df_emp[df_emp['EmployeeEmail'] == st.session_state.email_usuario].iloc[0]['BossEmail']
+                    
+                    if jefe_email in df_actual['email'].values:
+                        datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
+                        st.session_state.usos = 0
+                        
+                        # FIX CRÍTICO LOGIN: Detectar Agencia
+                        plan_jefe_raw = str(datos_jefe['plan']).strip()
+                        if any(p.lower() in plan_jefe_raw.lower() for p in ["agencia", "agency", "partner"]):
+                            st.session_state.plan_usuario = "Pro"
+                        else:
+                            st.session_state.plan_usuario = plan_jefe_raw.title()
+                            
+                        st.session_state.es_empleado = True
+                        st.session_state.boss_ref = jefe_email
+                    else:
+                        # Si el jefe no existe, fallback a gratis
+                        st.session_state.plan_usuario = "Gratis"
+
+                # LOGIN: CHECK 2 - ¿Es usuario directo?
+                elif st.session_state.email_usuario in df_actual['email'].values:
                     usuario = df_actual[df_actual['email'] == st.session_state.email_usuario].iloc[0]
                     st.session_state.usos = int(usuario['usos'])
                     st.session_state.plan_usuario = usuario['plan'] if 'plan' in usuario else 'Gratis'
                     st.session_state.es_empleado = False
                 
-                # CHECK 2: ¿Es un empleado?
-                elif st.session_state.email_usuario in df_emp['EmployeeEmail'].values:
-                    jefe_email = df_emp[df_emp['EmployeeEmail'] == st.session_state.email_usuario].iloc[0]['BossEmail']
-                    datos_jefe = df_actual[df_actual['email'] == jefe_email].iloc[0]
-                    st.session_state.usos = 0
-                    
-                    # FIX CRÍTICO: Lógica de Plan Empleado (Multilenguaje)
-                    plan_jefe_raw = str(datos_jefe['plan']).strip()
-                    
-                    # Lista de valores aceptados para que el empleado sea PRO
-                    planes_agencia_validos = ["Agencia", "Agency", "Agency Partner", "Socio Agencia", "Pro Agency"]
-                    
-                    if any(p.lower() == plan_jefe_raw.lower() for p in planes_agencia_validos):
-                        st.session_state.plan_usuario = "Pro"
-                    else:
-                        # Si no es agencia, hereda el plan tal cual (ej: Pro -> Pro)
-                        st.session_state.plan_usuario = plan_jefe_raw.title()
-                        
-                    st.session_state.es_empleado = True
-                    st.session_state.boss_ref = jefe_email
                 else:
                     st.session_state.usos = 0
                     st.session_state.plan_usuario = "Gratis"
@@ -1519,7 +1534,7 @@ with c2:
                 time.sleep(0.5)
                 st.rerun()
             else:
-                st.error("Please enter a valid email.")
+                st.error("Invalid Email.")
         st.markdown('</div>', unsafe_allow_html=True)
 
     # --- MOTOR DE GENERACIÓN IA PLATINUM ---
@@ -1533,7 +1548,7 @@ with c2:
             
             # FIX: Opciones traducidas
             with col_t1: 
-                tono_display = st.selectbox(L.get("lbl_tone", "Tono:"), [L["tone_story"], L["tone_prof"], L["tone_urg"], L["tone_lux"]])
+                tono_display = st.selectbox(L.get("lbl_tone", "Tone:"), [L["tone_story"], L["tone_prof"], L["tone_urg"], L["tone_lux"]])
                 
                 # Mapeo inverso para lógica interna
                 mapa_tonos = {
@@ -1545,12 +1560,11 @@ with c2:
                 tono = mapa_tonos.get(tono_display, "Lujo")
                 
             with col_t2: 
-                idioma_salida = st.selectbox(L.get("lbl_lang_out", "Idioma:"), list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
+                idioma_salida = st.selectbox(L.get("lbl_lang_out", "Lang:"), list(traducciones.keys()), index=list(traducciones.keys()).index(st.session_state.idioma))
 
-            url_input = st.text_input("", placeholder=L["placeholder"].split(" ")[0] + " Link...", label_visibility="collapsed")
+            url_input = st.text_input("", placeholder=L["url_placeholder"], label_visibility="collapsed")
             user_input = st.text_area("", placeholder=L['placeholder'], key="input_ia", label_visibility="collapsed", height=150)
-            
-            st.caption(f"{L.get('char_count', 'Caracteres')}: {len(user_input)}")
+            st.caption(f"{L.get('char_count', 'Chars')}: {len(user_input)}")
 
             if st.button(L['btn_gen'], key="main_gen", type="primary"):
                 if user_input or url_input: 
@@ -1567,7 +1581,7 @@ with c2:
                         elif tono == "Storytelling":
                             instrucciones_estilo = "STYLE: Narrative, emotional, sensory. Describe smells, light."
                         elif tono == "Urgencia":
-                            instrucciones_estilo = "STYLE: Scarcity triggers. Short sentences. 'Unique opportunity'."
+                            instrucciones_estilo = "STYLE: Scarcity triggers, short sentences. 'Unique opportunity'."
                         else: # Lujo
                             instrucciones_estilo = "STYLE: Exclusive, sophisticated, high-ticket vocabulary."
 
@@ -1796,18 +1810,16 @@ col1, col2, col3 = st.columns(3)
 
 # PLAN GRATIS (BOTÓN OCULTO SI YA ESTÁ LOGUEADO)
 with col1:
-    desc_f = f"<div class='feature-list'>{L['desc1']}<span class='info-icon i-free' data-tooltip='{L['t1_1']}'>i</span><br>{L['desc2']}<span class='info-icon i-free' data-tooltip='{L['t1_2']}'>i</span><br>{L['desc3']}<span class='info-icon i-free' data-tooltip='{L['t1_3']}'>i</span></div>"
+    desc_f = f"<div class='feature-list'>{L['desc1']}<br>{L['desc2']}<br>{L['desc3']}</div>"
     st.markdown(f"<div class='card-wrapper free-card'><div class='glass-container'><h3>{L['plan1']}</h3><h1>$0</h1><hr style='opacity:0.2;'>{desc_f}</div></div>", unsafe_allow_html=True)
-    
-    # Condición para ocultar el botón si ya está logueado
     if not st.session_state.email_usuario:
         if st.button(L['btn1'], key="btn_f"):
             st.toast("Register above.")
 
 # PLAN PRO
 with col2:
-    desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_1']}'>i</span><br>{L['desc5']}<span class='info-icon i-pro' data-tooltip='{L['t2_2']}'>i</span><br>{L['desc6']}<span class='info-icon i-pro' data-tooltip='{L['t2_3']}'>i</span><br><b>{L['desc7']}</b><span class='info-icon i-pro' data-tooltip='{L['t2_4']}'>i</span></div>"
-    st.markdown(f"<div class='card-wrapper pro-card'><div class='glass-container'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>${precio_pro}</h1><p style='color:#00d2ff; font-weight:bold; font-size:0.9rem;'>{ahorro_txt}</p><hr style='border-color:#00d2ff;opacity:0.3;'>{desc_p}</div></div>", unsafe_allow_html=True)
+    desc_p = f"<div class='feature-list'><b>{L['desc4']}</b><br>{L['desc5']}<br>{L['desc6']}<br><b>{L['desc7']}</b></div>"
+    st.markdown(f"<div class='card-wrapper pro-card'><div class='glass-container'><div class='popular-badge'>{L['popular']}</div><h3 style='color:#00d2ff;'>{L['plan2']}</h3><h1>${precio_pro}</h1><p style='color:#00d2ff; font-weight:bold;'>{ahorro_txt}</p><hr style='opacity:0.3;'>{desc_p}</div></div>", unsafe_allow_html=True)
     
     # Botón PayPal Pro (Dinámico ID)
     pay_pro = f"""
@@ -1837,9 +1849,9 @@ with col2:
 
 # PLAN AGENCIA
 with col3:
-    desc_a = f"<div class='feature-list'>{L['desc8']}<span class='info-icon i-agency' data-tooltip='{L['t3_1']}'>i</span><br>{L['desc9']}<span class='info-icon i-agency' data-tooltip='{L['t3_2']}'>i</span><br>{L['desc10']}<span class='info-icon i-agency' data-tooltip='{L['t3_3']}'>i</span><br><b>{L['desc11']}</b><span class='info-icon i-agency' data-tooltip='{L['t3_4']}'>i</span></div>"
+    desc_a = f"<div class='feature-list'>{L['desc8']}<br>{L['desc9']}<br>{L['desc10']}<br><b>{L['desc11']}</b></div>"
     # FIX: VIOLETA (#DDA0DD) RESTAURADO
-    st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>${precio_age}</h1><p style='color:#DDA0DD; font-weight:bold; font-size:0.9rem;'>{ahorro_txt}</p><hr style='border-color:#DDA0DD;opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='card-wrapper agency-card'><div class='glass-container'><h3 style='color:#DDA0DD;'>{L['plan3']}</h3><h1>${precio_age}</h1><p style='color:#DDA0DD; font-weight:bold;'>{ahorro_txt}</p><hr style='opacity:0.3;'>{desc_a}</div></div>", unsafe_allow_html=True)
     
     # Botón PayPal Agencia (Dinámico ID)
     pay_age = f"""
