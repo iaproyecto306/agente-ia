@@ -1977,7 +1977,7 @@ with ch3:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Estadísticas (RECUPERADAS)
+# Estadísticas
 col_stat1, col_stat2, col_stat3 = st.columns(3)
 with col_stat1: 
     st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+10k</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat1"]}</p></div>', unsafe_allow_html=True)
@@ -1986,7 +1986,7 @@ with col_stat2:
 with col_stat3: 
     st.markdown(f'<div style="text-align:center; padding:20px; border-radius:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(0,210,255,0.2);"><h2 style="color:#00d2ff; margin:0;">+45%</h2><p style="color:#aaa; font-size:0.9rem;">{L["stat3"]}</p></div>', unsafe_allow_html=True)
 
-# --- SECCIÓN DE TESTIMONIOS (RECUPERADA) ---
+# --- SECCIÓN DE TESTIMONIOS (REINCORPORADA) ---
 st.markdown(f"<br><br><h3 style='text-align:center; color:white;'>{L.get('test_title', 'Expert Reviews')}</h3>", unsafe_allow_html=True)
 t1, t2, t3 = st.columns(3)
 with t1:
