@@ -24,73 +24,80 @@ if "cookie_manager" not in st.session_state:
 cookie_manager = st.session_state.cookie_manager
 
 # ==============================================================================
-# 1. MOTOR DE EXTRACCIÓN Y VALIDACIÓN (SOLUCIÓN HÍBRIDA JINA AI)
+# 1. MOTOR DE EXTRACCIÓN (NINJA V6.0 - ANTI-BLOQUEO)
 # ==============================================================================
 
 def extraer_datos_inmueble(url):
     """
-    Función de scraping v4.0.
-    Usa un puente (Jina) para saltar los bloqueos de Zillow y Mercado Libre en la nube.
+    Función Ninja v6.0.
+    Estrategia de 3 capas para intentar saltar el bloqueo de IP de servidor.
     """
-    # Lista de dominios para validación de seguridad (Feature Platinum)
-    portales_validos = [
-        "infocasas", 
-        "mercadolibre", 
-        "zillow", 
-        "properati", 
-        "remax", 
-        "fincaraiz", 
-        "realtor", 
-        "idealista", 
-        "fotocasa", 
-        "inmuebles24"
-    ]
+    # 1. Validación básica de dominio
+    portales_validos = ["infocasas", "mercadolibre", "zillow", "properati", "remax", "fincaraiz", "realtor", "idealista", "fotocasa", "inmuebles24"]
     es_portal_conocido = any(portal in url.lower() for portal in portales_validos)
-    
     texto_final = ""
     
-    # INTENTO 1: Puente Jina AI (Indispensable para Streamlit Cloud)
+    # --- MÉTODO A: PUENTE JINA AI (Mejor opción para texto limpio) ---
     try:
-        # TRUCO MAESTRO: Usamos r.jina.ai como puente
-        url_puente = f"https://r.jina.ai/{url}"
-        
+        # Añadimos un timestamp para evitar caché
+        url_jina = f"https://r.jina.ai/{url}"
         headers_jina = {
-            "User-Agent": "Mozilla/5.0",
-            "X-With-Generated-Alt": "true" 
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "X-Return-Format": "text"
         }
-        
-        response = requests.get(url_puente, headers=headers_jina, timeout=20)
-        
-        if response.status_code == 200 and len(response.text) > 300:
+        response = requests.get(url_jina, headers=headers_jina, timeout=25)
+        if response.status_code == 200 and "Just a moment" not in response.text:
             texto_final = response.text
-            return texto_final[:6000], es_portal_conocido
     except:
-        pass # Si falla Jina, intentamos el método directo
+        pass
 
-    # INTENTO 2: Scraping Directo (Respaldo para sitios normales)
-    if not texto_final:
+    # --- MÉTODO B: IMITACIÓN NAVEGADOR PC (Si Jina falla) ---
+    if not texto_final or len(texto_final) < 500:
         try:
-            headers_directo = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept-Language": "es-ES,es;q=0.9"
+            headers_pc = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive",
+                "Upgrade-Insecure-Requests": "1",
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "none",
+                "Sec-Fetch-User": "?1"
             }
-            response = requests.get(url, headers=headers_directo, timeout=12)
-            
+            response = requests.get(url, headers=headers_pc, timeout=15)
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
-                
-                # Limpieza profunda de elementos basura
-                for element in soup(['script', 'style', 'header', 'footer', 'nav', 'aside', 'iframe', 'button', 'input', 'noscript']):
+                # Eliminamos basura
+                for element in soup(['script', 'style', 'nav', 'footer', 'iframe', 'svg', 'button']):
                     element.decompose()
-                
                 texto_final = soup.get_text(separator=' ', strip=True)
-                return texto_final[:5000], es_portal_conocido
         except:
             pass
 
-    # Si todo falla:
-    return "ERROR_LECTURA: El sistema de seguridad del portal bloqueó el acceso. Por favor, copie y pegue la descripción manualmente.", es_portal_conocido
+    # --- MÉTODO C: IMITACIÓN MÓVIL (A veces los sitios móviles son menos estrictos) ---
+    if not texto_final or len(texto_final) < 500:
+        try:
+            headers_movil = {
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/120.0.6099.119 Mobile/15E148 Safari/604.1"
+            }
+            response = requests.get(url, headers=headers_movil, timeout=15)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, 'html.parser')
+                for element in soup(['script', 'style', 'nav', 'footer']):
+                    element.decompose()
+                texto_final = soup.get_text(separator=' ', strip=True)
+        except:
+            pass
 
+    # --- VEREDICTO FINAL ---
+    # Si logramos sacar más de 400 caracteres, consideramos éxito
+    if len(texto_final) > 400:
+        return texto_final[:6000], es_portal_conocido
+    else:
+        # Mensaje amigable explicando la situación al usuario
+        return "⚠️ AVISO DE SEGURIDAD: Zillow/MercadoLibre ha bloqueado el acceso automático desde la nube. Esto es normal en versiones gratuitas. Por favor, COPIA Y PEGA la descripción del inmueble manualmente en la caja de abajo.", es_portal_conocido
 # ==============================================================================
 # 2. CONFIGURACIÓN DE IA Y CONEXIONES SEGURAS
 # ==============================================================================
