@@ -1473,6 +1473,24 @@ with c2:
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 b1, b2, b3 = st.columns(3)
+                # === AGREGAR ESTE BLOQUE NUEVO AQUÍ ===
+
+with st.expander("🧠 Análisis: ¿Qué mejoró la IA?"):
+    with st.spinner("Analizando mejoras..."):
+        # Le pedimos a la IA que compare brevemente
+        prompt_analisis = f"""
+        Actúa como un profesor de Marketing Inmobiliario.
+        Compara brevemente estos dos textos y dime 3 puntos clave (balas) de por qué la VERSIÓN B es mejor para vender que la A.
+        
+        TEXTO A (Original): {txt_in if txt_in else datos_web}
+        TEXTO B (Generado): {st.session_state.last_result}
+        
+        Salida: Solo los 3 puntos con emojis. Sé breve.
+        """
+        explicacion = generar_texto(prompt_analisis)
+        st.write(explicacion)
+
+# ======================================
                 
                 # BOTONES DE ACCIÓN
                 with b1:
