@@ -3,6 +3,5 @@ openai
 pandas
 requests
 beautifulsoup4
-streamlit-gsheets
-extra-streamlit-components
 st-gsheets-connection
+extra-streamlit-components
