@@ -1830,7 +1830,7 @@ with col_sw2:
 # Variables de Precio
 precio_pro = "490" if es_anual else "49"
 precio_age = "1,990" if es_anual else "199"
-id_pro = "P-2PU023636P1209345NFQ7TMY" if es_anual else "P-3P2657040E401734NNFQQ5TY"
+id_pro = "P-2PU023636P1209345NFQ7TMY" if es_anual else "P-911961951P420343JNFSFFHI"
 id_age = "P-87X83840151393810NFQ7X6Q" if es_anual else "P-0S451470G5041550ENFQRB4I"
 ahorro_txt = L["annual_save"] if es_anual else ""
 
