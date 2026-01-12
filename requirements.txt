@@ -1,7 +1,8 @@
-beautifulsoup4
-requests
-pandas
 streamlit
 openai
-st-gsheets-connection
+pandas
+requests
+beautifulsoup4
+streamlit-gsheets
 extra-streamlit-components
+st-gsheets-connection
