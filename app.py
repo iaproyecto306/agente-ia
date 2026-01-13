@@ -1618,23 +1618,23 @@ with c2:
                         else:
                             instrucciones_plan = f'GENERATE ONLY: {sec_short}. Append at the end: "{desc3}"'
 
-                       prompt_base = f"""
-                       ACT AS: Expert Real Estate Copywriter. 
-                       OUTPUT LANGUAGE: {idioma_salida}. 
-                       {instr_estilo}. 
+                        prompt_base = f"""
+                        ACT AS: Expert Real Estate Copywriter. 
+                        OUTPUT LANGUAGE: {idioma_salida}. 
+                        {instr_estilo}. 
 
-                       INPUT DATA:
-                       - WEB DATA (Scraped): {datos_web}
-                       - MANUAL DATA (User Input): {user_input}
+                        INPUT DATA:
+                        - WEB DATA (Scraped): {datos_web}
+                        - MANUAL DATA (User Input): {user_input}
 
-                       CRITICAL INSTRUCTION:
-                       1. Analyze the INPUT DATA. 
-                       2. If the data contains specific property details (bedrooms, price, features, location), WRITE the marketing campaign.
-                       3. IF THE DATA IS GENERIC, EMPTY, OR LOOKS LIKE A CAPTCHA/LOGIN PAGE: DO NOT HALLUCINATE. Return exactly this string: "⚠️ ERROR: Unable to read property details from link. Zillow/Portal security active. Please copy and paste the property description text manually."
+                        CRITICAL INSTRUCTION:
+                        1. Analyze the INPUT DATA. 
+                        2. If the data contains specific property details (bedrooms, price, features, location), WRITE the marketing campaign.
+                        3. IF THE DATA IS GENERIC, EMPTY, OR LOOKS LIKE A CAPTCHA/LOGIN PAGE: DO NOT HALLUCINATE. Return exactly this string: "⚠️ ERROR: Unable to read property details from link. Zillow/Portal security active. Please copy and paste the property description text manually."
 
-                       {instrucciones_plan}. 
-                       FORMAT: Markdown.
-                       """
+                        {instrucciones_plan}. 
+                        FORMAT: Markdown.
+                        """
                         resultado = generar_texto(prompt_base)
                         
                         if "ERROR_TECNICO" not in resultado:
